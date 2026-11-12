@@ -21,7 +21,7 @@ services:
         name: Referrer-Policy
         value: no-referrer
 
-  # 사용법 안내 챗봇 (chatbot/README.md). ANTHROPIC_API_KEY 는 Render 대시보드에서 직접 넣는다
+  # 사용법 안내 챗봇 (chatbot/README.md). OPENAI_API_KEY 는 Render 대시보드에서 직접 넣는다
   - type: web
     name: spacelog-chatbot
     runtime: node
@@ -32,9 +32,9 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "24"
-      - key: ANTHROPIC_API_KEY
+      - key: OPENAI_API_KEY
         sync: false
       - key: CHATBOT_MODEL
-        value: claude-opus-5-5
+        value: gpt-5-mini
       - key: CHATBOT_DAILY_MAX
         value: "1000"

@@ -6,10 +6,10 @@
   "description": "SpaceLog 사용법 안내 챗봇 서버 (제품과 별개로 배포)",
   "engines": { "node": ">=24" },
   "scripts": {
-    "start": "node server.ts",
+    "start": "node --env-file-if-exists=.env server.ts",
     "test": "node --test \"*.test.ts\""
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.100.0"
+    "openai": "^7.55.0"
   }
 }

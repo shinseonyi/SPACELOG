@@ -1,0 +1,5 @@
+# 키가 들어가는 파일은 커밋하지 않는다 (.env.example 만 허용)
+.env
+.env.*
+!.env.example
+node_modules/

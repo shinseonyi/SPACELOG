@@ -49,7 +49,7 @@ async function start(streamer: Streamer, extra: { perIpPerMinute?: number; daily
 const post = (url: string, body: unknown, headers: Record<string, string> = {}) =>
   fetch(`${url}/api/chat`, { method: "POST", headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body) });
 
-test("서버: 화면·상태 확인, 답변을 SSE 로 조금씩 보낸다 (가짜 Claude)", async () => {
+test("서버: 화면·상태 확인, 답변을 SSE 로 조금씩 보낸다 (가짜 AI)", async () => {
   let seen: { system: string; n: number } | null = null;
   const { server, url } = await start(async function* (system, messages) {
     seen = { system, n: messages.length };
@@ -86,7 +86,7 @@ test("서버: 잘못된 요청과 다른 출처, 사용량 초과를 거절한�
   }
 });
 
-test("서버: Claude 호출이 실패해도 내용 없이 오류 문구만 보내고, 서버는 계속 산다", async () => {
+test("서버: AI 호출이 실패해도 내용 없이 오류 문구만 보내고, 서버는 계속 산다", async () => {
   const { server, url } = await start(async function* () { throw new Error("비밀 내용"); yield ""; });
   try {
     const text = await (await post(url, { messages: [{ role: "user", content: "x" }] })).text();

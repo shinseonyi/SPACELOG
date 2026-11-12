@@ -1,4 +1,4 @@
-// 챗봇 서버: 안내 문서를 지식으로 Claude 가 사용법 질문에 답한다. 제품(수집 앱·로컬 웹)과 별개로 배포한다 (README 6-1 챗봇 버튼이 이 주소를 연다).
+// 챗봇 서버: 안내 문서를 지식으로 AI가 사용법 질문에 답한다. 제품(수집 앱·로컬 웹)과 별개로 배포한다 (README 6-1 챗봇 버튼이 이 주소를 연다).
 // - API 키는 서버 환경 변수에만 둔다. 브라우저에는 주지 않는다.
 // - 질문·답변 내용은 저장하거나 기록하지 않는다 (요청 수와 오류 종류만 센다).
 // - 같은 출처(이 서버가 내려주는 화면)에서 온 요청만 받고, IP별 · 하루 전체 사용량을 제한한다.
@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { DailyCap, LIMITS, parseChat, RateLimiter, systemPrompt, type ChatMessage } from "./lib.ts";
 
-/** 답변 글자를 한 조각씩 돌려주는 함수. 실제로는 Claude API (anthropic.ts), 테스트에서는 가짜 */
+/** 답변 글자를 한 조각씩 돌려주는 함수. 실제로는 OpenAI API (openai.ts), 테스트에서는 가짜 */
 export type Streamer = (system: string, messages: ChatMessage[], signal: AbortSignal) => AsyncIterable<string>;
 
 export interface ChatServerOptions {
@@ -81,7 +81,7 @@ export function createChatServer(opt: ChatServerOptions): Server {
     // 서버 보내기 이벤트(SSE)로 답변을 조금씩 보낸다
     res.writeHead(200, { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store", connection: "keep-alive" });
     const abort = new AbortController();
-    res.on("close", () => abort.abort()); // 사용자가 창을 닫으면 Claude 호출도 멈춘다 (비용 절약)
+    res.on("close", () => abort.abort()); // 사용자가 창을 닫으면 AI 호출도 멈춘다 (비용 절약)
     try {
       for await (const text of opt.streamer(system, parsed.messages, abort.signal)) res.write(`data: ${JSON.stringify({ text })}\n\n`);
       res.write("data: [DONE]\n\n");
@@ -97,12 +97,12 @@ export function createChatServer(opt: ChatServerOptions): Server {
 
 // `node chatbot/server.ts` 로 직접 실행할 때만 켠다 (테스트가 가져다 쓸 때는 켜지 않는다)
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const { anthropicStreamer } = await import("./anthropic.ts");
+  const { openaiStreamer } = await import("./openai.ts");
   const here = (f: string) => fileURLToPath(new URL(f, import.meta.url));
   const port = Number(process.env.PORT ?? 8788);
-  const model = process.env.CHATBOT_MODEL || "claude-opus-5-5";
+  const model = process.env.CHATBOT_MODEL || process.env.OPENAI_MODEL || "gpt-5-mini"; // .env 의 OPENAI_MODEL 도 받는다
   createChatServer({
-    streamer: anthropicStreamer(model),
+    streamer: openaiStreamer(model),
     knowledge: readFileSync(here("./knowledge.md"), "utf8"),
     html: readFileSync(here("./public/index.html"), "utf8"),
     perIpPerMinute: Number(process.env.CHATBOT_PER_MINUTE ?? 12),

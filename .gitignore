@@ -15,3 +15,13 @@ Thumbs.db
 .env*
 !.env.example
 .vault/
+
+# [추가] 키·인증서, 로그, 에디터/OS 잡파일
+*.pem
+*.p12
+*.pfx
+*.log
+npm-debug.log*
+.vscode/
+.idea/
+.claude/settings.local.json
