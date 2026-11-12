@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { demo } from "../demo/demoStore.ts";
 import { freeSpot } from "../demo/planets.ts";
 import { VANISH_MS } from "../home/Blackhole.tsx";
+import { overHole, setHoleOver } from "../home/holeHover.ts";
 import { dimSide } from "../home/sideDim.ts";
 import { store } from "../state/store.ts";
 import heroUrl from "../assets/planet-hero.png";
@@ -536,6 +537,10 @@ export class DepthScene {
     if (!this.ray.ray.intersectPlane(d.plane, p)) return;
     d.n.at.set(p.x - d.grab.x, p.y - d.grab.y, d.origin.z);
     this.rebuildLinks(); // 별자리 선이 따라오게
+    // 블랙홀 위에 올리면 놓기 전부터 반응 (블랙홀은 Blackhole.tsx, 행성은 빨려 들듯 조금 작아진다)
+    const over = overHole(e.clientX, e.clientY);
+    setHoleOver(over);
+    d.n.g.scale.setScalar(over ? 0.82 : 1);
   }
 
   /** 놓았다: 블랙홀 위면 보내기를 묻고(묻는 동안 제자리로), 아니면 다른 행성과 겹치지 않는 가까운 자리에 둔다. e 없음 = 취소 */
@@ -543,8 +548,10 @@ export class DepthScene {
     const d = this.pdrag;
     if (!d) return;
     this.pdrag = null;
+    setHoleOver(false);
     if (!d.moved) return;
     const back = () => {
+      d.n.g.scale.setScalar(1);
       d.n.at.copy(d.origin);
       this.rebuildLinks();
     };
@@ -585,7 +592,10 @@ export class DepthScene {
     if (!h) return;
     this.held = null;
     if (vanishing === h.n.p.id) this.vanish = { n: h.n, t: 0, from: h.n.at.clone(), to: h.center };
-    else this.glide = { t: 0, ms: 500, moves: [{ n: h.n, from: h.n.at.clone(), to: h.origin }] };
+    else {
+      h.n.g.scale.setScalar(1);
+      this.glide = { t: 0, ms: 500, moves: [{ n: h.n, from: h.n.at.clone(), to: h.origin }] };
+    }
   }
 
   private stepVanish(dt: number) {
@@ -594,7 +604,7 @@ export class DepthScene {
     v.t = Math.min(1, v.t + (dt * 1000) / VANISH_MS);
     const e = v.t * v.t; // 점점 빨라지며
     v.n.at.lerpVectors(v.from, v.to, e);
-    v.n.g.scale.setScalar(1 - e * 0.92);
+    v.n.g.scale.setScalar(0.82 * (1 - e * 0.9)); // 올려 둘 때의 0.82 에서 이어서
     v.n.g.rotation.z = e * 4.2; // 빨려 들며 돈다
     v.n.sprite.material.opacity = (v.n.p.count ? 1 : 0.7) * (1 - e);
     v.n.dotMat.opacity = 1 - e;

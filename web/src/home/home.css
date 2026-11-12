@@ -261,6 +261,10 @@ li.row--rec:active { transform: none; }
    빨려 들어가는 동안엔 블랙홀이 한 번 일렁인다 (Blackhole.tsx VANISH_MS) */
 .bh__img { transition: opacity 300ms ease; }
 .bh.is-holding .bh__img, .bh.is-eating .bh__img { opacity: 0.55; }
+/* 행성을 끌어 위에 올리면(is-over) 놓기 전부터 반응한다: 밝아지며 살짝 커지고 그림이 비친다 */
+.bh__img { transition: opacity 300ms ease, transform 250ms ease, filter 250ms ease; }
+.bh.is-over .bh__img { opacity: 0.7; transform: scale(1.06); filter: brightness(1.45); }
+.bh.is-over .bh__sub { color: var(--color-body); }
 .bh.is-eating .bh__img { animation: bh-eat 750ms ease-in-out; }
 @keyframes bh-eat { 0% { transform: scale(1); filter: brightness(1); } 55% { transform: scale(1.07); filter: brightness(1.7); } 100% { transform: scale(1); filter: brightness(1); } }
 @media (prefers-reduced-motion: reduce) { .bh.is-eating .bh__img { animation: none; } }

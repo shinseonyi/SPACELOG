@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { demo, useDemo } from "../demo/demoStore.ts";
 import { freeSpot } from "../demo/planets.ts";
 import { VANISH_MS } from "../home/Blackhole.tsx";
+import { overHole, setHoleOver, useHoleOver } from "../home/holeHover.ts";
 import { dimSide } from "../home/sideDim.ts";
 import { store, useStore } from "../state/store.ts";
 import heroUrl from "../assets/planet-hero.png";
@@ -41,6 +42,7 @@ export function Flat2D() {
   /** 블랙홀에 놓은 행성: 묻는 동안 그 자리에 있다가, 넣으면 블랙홀 가운데로 빨려 들어가고(is-vanishing) 취소하면 제자리로 미끄러진다(is-returning) */
   const held = useRef<{ id: string; x: number; y: number; holeX: number; holeY: number } | null>(null);
   const [holeAnim, setHoleAnim] = useState<{ id: string; kind: "vanish" | "return" } | null>(null);
+  const holeOver = useHoleOver();
   const pmeta = useRef<{ id: string; sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
   const shownNodes = useMemo(() => (pdrag ? nodes.map((n) => (n.id === pdrag.id ? { ...n, x: pdrag.x, y: pdrag.y } : n)) : nodes), [nodes, pdrag]);
   const at = useMemo(() => new Map(shownNodes.map((n) => [n.id, n])), [shownNodes]);
@@ -247,10 +249,12 @@ export function Flat2D() {
       if (!m.moved) return;
       const z = live.current.cam.z;
       setPdrag({ id: m.id, x: Math.round(m.px + (e.clientX - m.sx) / z), y: Math.round(m.py + (e.clientY - m.sy) / z) });
+      setHoleOver(overHole(e.clientX, e.clientY)); // 블랙홀 위에 올리면 놓기 전부터 반응
     };
     const onUp = (e: PointerEvent) => {
       const m = pmeta.current;
       pmeta.current = null;
+      setHoleOver(false);
       if (!m || !m.moved) return setPdrag(null);
       const z = live.current.cam.z;
       const x = Math.round(m.px + (e.clientX - m.sx) / z);
@@ -337,6 +341,7 @@ export function Flat2D() {
             labelScale={labelScale}
             editing={editPos}
             dragging={pdrag?.id === n.id}
+            overHole={pdrag?.id === n.id && holeOver}
             anim={holeAnim?.id === n.id ? holeAnim.kind : null}
             onEditDown={(e) => {
               if (e.button !== 0) return;
@@ -382,14 +387,14 @@ function blurOf(n: PlanetNode, focus: PlanetNode | undefined): number {
   return focusBlur(Math.hypot(n.x - focus.x, n.y - focus.y), FLAT_BLUR_REF, FLAT_NEAR_RATIO);
 }
 
-function PlanetButton({ node: n, blur, labelScale, editing, dragging, anim, onEditDown }: { node: PlanetNode; blur: number; labelScale: number; editing: boolean; dragging: boolean; anim: "vanish" | "return" | null; onEditDown(e: React.PointerEvent): void }) {
+function PlanetButton({ node: n, blur, labelScale, editing, dragging, overHole, anim, onEditDown }: { node: PlanetNode; blur: number; labelScale: number; editing: boolean; dragging: boolean; overHole: boolean; anim: "vanish" | "return" | null; onEditDown(e: React.PointerEvent): void }) {
   const { look } = n;
   const dots = Math.min(n.count, 12);
   const open = () => (n.count > 0 ? void store.getState().flyToPlanet(n.id, "openPanel") : store.getState().openPanel(n.id));
   return (
     <button
       type="button"
-      className={`flat__planet${editing ? " is-edit" : ""}${dragging ? " is-dragging" : ""}${anim === "vanish" ? " is-vanishing" : anim === "return" ? " is-returning" : ""}`}
+      className={`flat__planet${editing ? " is-edit" : ""}${dragging ? " is-dragging" : ""}${overHole ? " is-over-hole" : ""}${anim === "vanish" ? " is-vanishing" : anim === "return" ? " is-returning" : ""}`}
       style={{ left: n.x, top: n.y, width: n.size, height: n.size, opacity: n.count ? 1 : 0.45, filter: blur > 0.01 ? `blur(${(blur * FLAT_BLUR_PX).toFixed(2)}px) brightness(${(1 - blur * FLAT_DIM).toFixed(2)})` : undefined }}
       aria-label={`${n.name}, ${look.unit} ${n.count}개. 눌러서 착륙`}
       onPointerDown={editing ? onEditDown : undefined}
