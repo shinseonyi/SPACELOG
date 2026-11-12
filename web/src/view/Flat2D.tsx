@@ -4,6 +4,7 @@ import heroUrl from "../assets/planet-hero.png";
 import nebulaUrl from "../assets/planet-nebula.png";
 import ringUrl from "../assets/planet-ring.png";
 import { clampZoom, landCam, leftOccupied, overviewCam, planetNodes, rightOccupied, type Cam2D, type PlanetNode } from "./look.ts";
+import { marksOf, segmentsOf, useLinkPaths } from "./linkPaths.ts";
 import { viewApi } from "./viewApi.ts";
 import "./view.css";
 
@@ -25,6 +26,10 @@ const STARFIELD = (() => {
 export function Flat2D() {
   const planets = useStore((s) => s.planets);
   const nodes = useMemo(() => planetNodes(planets), [planets]);
+  const paths = useLinkPaths();
+  const segs = useMemo(() => segmentsOf(paths), [paths]);
+  const marks = useMemo(() => marksOf(paths), [paths]);
+  const at = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
   const [cam, setCam] = useState<Cam2D>({ x: 0, y: 0, z: 1 });
   const [anim, setAnim] = useState(0);
   const root = useRef<HTMLDivElement>(null);
@@ -248,9 +253,37 @@ export function Flat2D() {
         ))}
       </div>
       <div className="flat__world" style={{ transform: `translate(${-cam.x * cam.z}px, ${-cam.y * cam.z}px) scale(${cam.z})`, transition }}>
+        <svg className="flat__lines" aria-hidden width="1" height="1">
+          {segs.map((s, i) => {
+            const a = at.get(s.a);
+            const b = at.get(s.b);
+            return a && b ? <line key={`${s.linkId}-${i}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} /> : null;
+          })}
+        </svg>
         {nodes.map((n) => (
           <PlanetButton key={n.id} node={n} labelScale={labelScale} />
         ))}
+        {marks.map((m) => {
+          const a = at.get(m.a);
+          const b = at.get(m.b);
+          if (!a || !b) return null;
+          return (
+            <button
+              key={m.linkId}
+              type="button"
+              className="flat__linkmark"
+              title="별자리의 기록 보기"
+              style={{ left: (a.x + b.x) / 2, top: (a.y + b.y) / 2 + m.stack * 28, transform: `translate(-50%, -50%) scale(${labelScale})` }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                store.getState().openLinkView(m.linkId);
+              }}
+            >
+              {m.name}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -264,7 +297,7 @@ function PlanetButton({ node: n, labelScale }: { node: PlanetNode; labelScale: n
     <button
       type="button"
       className="flat__planet"
-      style={{ left: n.x, top: n.y, opacity: n.count ? 1 : 0.45 }}
+      style={{ left: n.x, top: n.y, width: n.size, height: n.size, opacity: n.count ? 1 : 0.45 }}
       aria-label={`${n.name}, ${look.unit} ${n.count}개. 눌러서 착륙`}
       onClick={open}
     >
@@ -284,7 +317,7 @@ function PlanetButton({ node: n, labelScale }: { node: PlanetNode; labelScale: n
         )}
         {look.shape === "ring" && <img className="flat__ring" src={ringUrl} alt="" draggable={false} style={{ filter: look.filter === "none" ? undefined : look.filter }} />}
       </span>
-      <span className="flat__label" style={{ transform: `scale(${labelScale})` }}>
+      <span className="flat__label" style={{ transform: `translateX(-50%) scale(${labelScale})` }}>
         <span className="flat__name">{n.name}</span>
         <span className="flat__count" style={{ color: look.accent }}>{look.unit} {n.count}</span>
       </span>

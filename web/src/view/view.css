@@ -5,7 +5,7 @@
 .flat__stars i { position: absolute; display: block; border-radius: 50%; background: #fff; }
 .flat__world { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-origin: 0 0; }
 
-.flat__planet { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; transition: opacity 200ms; }
+.flat__planet { position: absolute; transform: translate(-50%, -50%); display: block; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; transition: opacity 200ms; }
 .flat__planet:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 12px; border-radius: 50%; }
 .flat__body { position: relative; display: block; }
 .flat__disc { position: absolute; inset: 0; border-radius: 50%; background-color: #000; background-size: 230% auto; background-position: 49% 62%; display: block; }
@@ -13,7 +13,11 @@
 .flat__ring { position: absolute; left: -52.2%; top: -16.5%; width: 204.3%; height: 136.2%; pointer-events: none; }
 .flat__orbit { position: absolute; inset: -18px; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.16); animation: flat-spin 60s linear infinite; pointer-events: none; display: block; }
 .flat__orbit i { position: absolute; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; display: block; }
-.flat__label { display: flex; flex-direction: column; align-items: center; gap: 2px; white-space: nowrap; transform-origin: top center; }
+.flat__label { position: absolute; left: 50%; top: calc(100% + 14px); display: flex; flex-direction: column; align-items: center; gap: 2px; white-space: nowrap; transform-origin: top center; }
+.flat__lines { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.flat__lines line { stroke: rgba(255, 255, 255, 0.4); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.flat__linkmark { position: absolute; z-index: 101; padding: 3px 10px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: #000; color: #fff; font: var(--type-fine-print); letter-spacing: var(--tracking-fine-print); white-space: nowrap; cursor: pointer; }
+.flat__linkmark:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .flat__name { font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); color: #fff; }
 .flat__count { font: var(--type-fine-print); letter-spacing: var(--tracking-fine-print); }
 @keyframes flat-spin { to { transform: rotate(360deg); } }
@@ -22,6 +26,8 @@
 /* 2.5D 이름표 (Three.js 위 DOM 층) */
 .depth__label { position: absolute; left: 0; top: 0; transform: translate(-9999px, 0); display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 8px; border: 0; background: none; cursor: pointer; pointer-events: auto; white-space: nowrap; color: inherit; }
 .depth__label:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; border-radius: var(--r-item); }
+.depth__linkmark { position: absolute; left: 0; top: 0; transform: translate(-9999px, 0); padding: 3px 10px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: #000; color: #fff; font: var(--type-fine-print); letter-spacing: var(--tracking-fine-print); white-space: nowrap; cursor: pointer; pointer-events: auto; }
+.depth__linkmark:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .depth__name { font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); color: #fff; }
 .depth__count { font: var(--type-fine-print); letter-spacing: var(--tracking-fine-print); }
 

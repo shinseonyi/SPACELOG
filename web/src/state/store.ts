@@ -38,6 +38,8 @@ export interface Store extends WebState {
   obsDraft: string[] | null;
   /** 목록에서 체크한 기록. 행성·기간·패널을 넘어 유지된다 (별자리는 여러 행성의 기록을 묶는다, README 1-1) */
   picked: string[];
+  /** 오른쪽 창에서 기록 창이 열린 별자리 */
+  linkViewId: string | null;
   togglePicked(id: string): void;
   clearPicked(): void;
   /** 우주 보기 방식. 브라우저에만 저장하는 화면 설정 */
@@ -76,6 +78,8 @@ export interface Store extends WebState {
   refresh(): Promise<void>;
   setExportFormat(format: WebState["exportFormat"]): void;
   toggleSideTab(tab: SideTab): void;
+  /** 별자리의 기록 창을 연다 (우주의 별자리 이름표, 목록). 열려 있던 패널은 닫는다 */
+  openLinkView(linkId: string | null): void;
   /** 오른쪽 창의 목록을 연다 (이미 열려 있으면 그대로). 닫지 않는다 */
   openSideTab(tab: SideTab): void;
   setView(view: ViewMode): void;
@@ -131,6 +135,7 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
       view: savedView(),
       obsDraft: null,
       picked: [],
+      linkViewId: null,
       route: { name: "home" },
       loading: false,
       toasts: [],
@@ -299,6 +304,12 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
 
       openSideTab(tab) {
         set({ sideTab: tab });
+      },
+
+      openLinkView(linkId) {
+        if (linkId === null) return set({ linkViewId: null });
+        set({ linkViewId: linkId, sideTab: "link" });
+        if (get().route.name !== "home") get().closePanel(); // 패널·기록 상세가 열려 있으면 닫아야 오른쪽 창이 보인다
       },
 
       toggleSideTab(tab) {

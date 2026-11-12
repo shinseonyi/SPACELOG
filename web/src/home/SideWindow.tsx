@@ -124,9 +124,9 @@ function RecordCard() {
 function LinkCard() {
   const links = useDemo((s) => s.links);
   const hidden = useDemo((s) => s.hiddenLinkIds);
-  const [viewId, setViewId] = useState<string | null>(null);
+  const viewId = useStore((s) => s.linkViewId);
   const viewing = links.find((l) => l.id === viewId);
-  if (viewing) return <LinkView key={viewing.id} link={viewing} onBack={() => setViewId(null)} />;
+  if (viewing) return <LinkView key={viewing.id} link={viewing} onBack={() => store.getState().openLinkView(null)} />;
   return (
     <section className="card side__card">
       <div className="side__head">
@@ -146,7 +146,7 @@ function LinkCard() {
               return (
                 <li key={l.id} className="row row--rec">
                   <button type="button" role="checkbox" aria-checked={shown} aria-label={`${l.name} 우주에 ${shown ? "숨기기" : "보이기"}`} title="우주에 보이기 · 숨기기" className={`check${shown ? " is-on" : ""}`} onClick={() => toggleShown(l.id)} />
-                  <button type="button" className="row__main" title="별자리의 기록 보기" onClick={() => setViewId(l.id)}>
+                  <button type="button" className="row__main" title="별자리의 기록 보기" onClick={() => store.getState().openLinkView(l.id)}>
                     <span className="row__text">
                       <span className="row__title">{l.name}</span>
                       <span className="row__sub">기록 {l.starIds.length}{l.memo ? ` · ${l.memo}` : ""}</span>

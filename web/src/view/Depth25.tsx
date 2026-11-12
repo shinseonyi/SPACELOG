@@ -3,6 +3,7 @@ import { sceneState } from "../universe/sceneState.ts";
 import { webglSupported } from "../universe/webglSupport.ts";
 import { useStore } from "../state/store.ts";
 import { DepthScene, type DepthPlanet } from "./Depth25.ts";
+import { useLinkPaths } from "./linkPaths.ts";
 import { planetNodes, recencyRank } from "./look.ts";
 import "./view.css";
 
@@ -19,8 +20,11 @@ export function Depth25() {
     const rank = recencyRank(planets, stars);
     return planetNodes(planets).map((n) => ({ ...n, depth: (rank.get(n.id) ?? 0) * DEPTH_STEP }));
   }, [planets, stars]);
+  const paths = useLinkPaths();
   const latest = useRef(data);
   latest.current = data;
+  const latestPaths = useRef(paths);
+  latestPaths.current = paths;
 
   useEffect(() => {
     const ok = webglSupported();
@@ -33,6 +37,7 @@ export function Depth25() {
       made = s;
       scene.current = s;
       s.setPlanets(latest.current);
+      s.setLinks(latestPaths.current);
     });
     return () => {
       gone = true;
@@ -43,7 +48,12 @@ export function Depth25() {
 
   useEffect(() => {
     scene.current?.setPlanets(data);
+    scene.current?.setLinks(latestPaths.current);
   }, [data]);
+
+  useEffect(() => {
+    scene.current?.setLinks(paths);
+  }, [paths]);
 
   return <div ref={host} className="universe" />;
 }

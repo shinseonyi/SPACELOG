@@ -6,6 +6,7 @@ import { store } from "../state/store.ts";
 import heroUrl from "../assets/planet-hero.png";
 import nebulaUrl from "../assets/planet-nebula.png";
 import ringUrl from "../assets/planet-ring.png";
+import { marksOf, segmentsOf, type LinkPath } from "./linkPaths.ts";
 import { rightOccupied, type PlanetNode } from "./look.ts";
 import { viewApi } from "./viewApi.ts";
 
@@ -70,6 +71,9 @@ export class DepthScene {
   private readonly scene = new THREE.Scene();
   private readonly camera = new THREE.PerspectiveCamera(FOV, 1, 1, 30000);
   private readonly world = new THREE.Group();
+  private readonly lines = new THREE.Group();
+  private linkPaths: LinkPath[] = [];
+  private marks: { el: HTMLButtonElement; a: THREE.Vector3; b: THREE.Vector3; stack: number }[] = [];
   private readonly labels = document.createElement("div");
   private readonly nodes = new Map<string, Node3>();
   private readonly stars: THREE.Points;
@@ -129,7 +133,7 @@ export class DepthScene {
       return [9000 * s * Math.cos(th), 9000 * u, 9000 * s * Math.sin(th)];
     }, 1.6, 0.8, false);
     const dust = points(520, (i) => [(hash(i, 3) - 0.5) * 7000, (hash(i, 4) - 0.5) * 4200, (hash(i, 5) - 0.5) * 7000 - 600], 2.6, 0.5, true);
-    this.scene.add(this.stars, dust, this.world);
+    this.scene.add(this.stars, dust, this.world, this.lines);
 
     // 입력: 드래그 = 시점 회전, 휠 = 앞뒤 이동, 클릭 = 행성 고르기
     const on = <K extends keyof HTMLElementEventMap>(t: HTMLElement, type: K, fn: (e: HTMLElementEventMap[K]) => void, opt?: AddEventListenerOptions) => {
@@ -324,6 +328,47 @@ export class DepthScene {
       this.labels.appendChild(label);
       this.nodes.set(p.id, { p, g, orbit, pick, label, at: g.position, sx: 0, sy: 0, pr: 0, vis: false });
     });
+    this.rebuildLinks();
+  }
+
+  /** 별자리 선 · 이름표 (README 6-1): 행성 사이 흰 실선(투명도 0.4)과 검정 알약 이름표. 이름표를 누르면 별자리 기록 창 */
+  setLinks(paths: LinkPath[]) {
+    this.linkPaths = paths;
+    this.rebuildLinks();
+  }
+
+  private rebuildLinks() {
+    this.lines.traverse((o) => {
+      const m = o as THREE.Line;
+      m.geometry?.dispose();
+      (m.material as THREE.Material | undefined)?.dispose();
+    });
+    this.lines.clear();
+    this.marks.forEach((m) => m.el.remove());
+    this.marks = [];
+    for (const s of segmentsOf(this.linkPaths)) {
+      const a = this.nodes.get(s.a);
+      const b = this.nodes.get(s.b);
+      if (!a || !b) continue;
+      this.lines.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([a.at.clone(), b.at.clone()]), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 })));
+    }
+    for (const m of marksOf(this.linkPaths)) {
+      const a = this.nodes.get(m.a);
+      const b = this.nodes.get(m.b);
+      if (!a || !b) continue;
+      const el = document.createElement("button");
+      el.type = "button";
+      el.className = "depth__linkmark";
+      el.title = "별자리의 기록 보기";
+      el.textContent = m.name;
+      el.onpointerdown = (e) => e.stopPropagation();
+      el.onclick = (e) => {
+        e.stopPropagation();
+        store.getState().openLinkView(m.linkId);
+      };
+      this.labels.appendChild(el);
+      this.marks.push({ el, a: a.at.clone(), b: b.at.clone(), stack: m.stack });
+    }
   }
 
   private openPlanet(id: string) {
@@ -502,6 +547,17 @@ export class DepthScene {
       const f = Math.max(0, Math.min(1, (cam.pos.distanceTo(n.at) - fog.near) / (fog.far - fog.near)));
       n.label.style.opacity = Math.max(0.72, 1 - f * 0.5).toFixed(2);
     });
+    // 별자리 이름표: 첫 선분의 가운데. 화면 밖·뒤쪽이면 숨긴다
+    for (const m of this.marks) {
+      v.copy(m.a).lerp(m.b, 0.5).project(this.camera);
+      const sx = (v.x * 0.5 + 0.5) * w;
+      const sy = (-v.y * 0.5 + 0.5) * h + m.stack * 26;
+      if (v.z > 1 || v.z < -1 || sx < -40 || sx > w - this.occ + 40 || sy < -40 || sy > h + 40) {
+        m.el.style.transform = "translate(-9999px,0)";
+        continue;
+      }
+      m.el.style.transform = `translate(${(sx - m.el.offsetWidth / 2).toFixed(1)}px,${(sy - m.el.offsetHeight / 2).toFixed(1)}px)`;
+    }
   }
 
   dispose() {
@@ -517,6 +573,7 @@ export class DepthScene {
       (m.material as THREE.Material | undefined)?.dispose();
     });
     this.textures.forEach((t) => t.dispose());
+    this.marks.forEach((m) => m.el.remove());
     this.renderer.dispose();
     this.renderer.domElement.remove();
     this.labels.remove();
