@@ -41,7 +41,8 @@
 /* 큰 패널: 행성 패널 · 기록 상세 (오른쪽, 가장자리에서 16px 띄움) */
 .side-panel {
   position: fixed;
-  top: var(--gutter); right: var(--gutter); bottom: var(--gutter);
+  /* 위는 상단 바(위 20 · 높이 56) 아래 — 오른쪽 창(home.css .side)과 같은 88px. 상단 바의 보기 전환 · 기간 버튼을 가리지 않는다 */
+  top: 88px; right: var(--gutter); bottom: var(--gutter);
   width: min(var(--panel-width), calc(100vw - 2 * var(--gutter)));
   display: flex; flex-direction: column; overflow: hidden;
   z-index: 20;
