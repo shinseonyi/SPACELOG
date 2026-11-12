@@ -22,6 +22,10 @@ export interface Guide {
   over?: boolean;
   /** 옅어지며 사라지는 중 */
   fade?: boolean;
+  /** 위치를 가리키는 중: 위에 "Here!" 말풍선 (버튼 자리로 돌아갈 때는 없음) */
+  here?: boolean;
+  /** 버튼 아래쪽에 머문다(위가 좁을 때). 말풍선도 빛 아래에 띄워 버튼을 가리지 않는다 */
+  below?: boolean;
 }
 
 export interface ChatState {
@@ -32,6 +36,8 @@ export interface ChatState {
   typing: boolean;
   input: string;
   guide: Guide | null;
+  /** 날아가지 않고 버튼 자리에서 가리키는 중 (우주먼지가 가리킬 버튼 바로 위에 있을 때): 버튼의 말풍선이 "Here!" */
+  here: boolean;
   /** 재발견 혜성 답 뒤, 관측소가 열리기를 기다리는 중 (5-5 2단계) */
   cometWait: boolean;
 
@@ -41,6 +47,7 @@ export interface ChatState {
   patch(id: number, text: string, done?: boolean): void;
   setTyping(typing: boolean): void;
   setGuide(guide: Guide | null): void;
+  setHere(here: boolean): void;
   setCometWait(on: boolean): void;
 }
 
@@ -53,6 +60,7 @@ export function createChatStore() {
     typing: false,
     input: "",
     guide: null,
+    here: false,
     cometWait: false,
 
     setOpen(open, height) {
@@ -74,6 +82,9 @@ export function createChatStore() {
     },
     setGuide(guide) {
       set({ guide });
+    },
+    setHere(here) {
+      set({ here });
     },
     setCometWait(cometWait) {
       set({ cometWait });

@@ -19,6 +19,8 @@ export const GREETING = "안녕하세요, 우주먼지예요.\n작아서 이 우
 export const UNKNOWN = "거기까지는 아직 떠다녀 보지 못했어요.\n기록 넣기, 별자리, 관측소, 탐사선, 블랙홀에 대해 물어봐 주세요.";
 export const FAILED = "지금은 답을 떠올리지 못했어요.\n잠시 뒤에 다시 물어봐 주세요.";
 export const STAY = "제가 그 옆에 가 있을게요.";
+/** 우주먼지가 가리킬 버튼 바로 위에 있어 날아가지 않을 때 */
+export const STAY_HERE = "제 바로 아래 버튼이에요.";
 export const FOLLOW_UP = "다른 궁금한 게 있으신가요?";
 export const WAITING = "떠올리는 중이에요";
 

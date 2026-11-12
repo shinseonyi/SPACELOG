@@ -3,7 +3,7 @@
 import { store } from "../state/store.ts";
 import { askChatbot, CHATBOT_OK, type ChatTurn } from "./chatApi.ts";
 import { chat } from "./chatStore.ts";
-import { answerFor, FAILED, STAY, UNKNOWN, type ActionId, type GuideTarget } from "./faq.ts";
+import { answerFor, FAILED, STAY, STAY_HERE, UNKNOWN, type ActionId, type GuideTarget } from "./faq.ts";
 
 /** 챗봇 버튼(빛무리)의 표식. LeftStack 의 버튼에 붙어 있다 */
 export const SOURCE_SEL = '[data-guide-source="dust"]';
@@ -38,7 +38,7 @@ function sourcePoint(): { x: number; y: number } | null {
 }
 
 /** 답이 가리키는 요소의 바로 위 30px(위가 좁으면 아래 30px). 화면에 없거나 대화창 뒤면 null (5-5) */
-export function locate(target: GuideTarget): { x: number; y: number } | null {
+export function locate(target: GuideTarget): { x: number; y: number; below: boolean } | null {
   const r = rectOf(`[data-guide-target="${target}"]`);
   if (!r) return null;
   const cx = r.left + r.width / 2;
@@ -46,16 +46,45 @@ export function locate(target: GuideTarget): { x: number; y: number } | null {
   const panel = rectOf(PANEL_SEL);
   if (panel && cx > panel.left && cx < panel.right && cy > panel.top && cy < panel.bottom) return null;
   const above = r.top - 30;
-  return { x: cx, y: above < 76 ? r.bottom + 30 : above };
+  return above < 76 ? { x: cx, y: r.bottom + 30, below: true } : { x: cx, y: above, below: false };
 }
 
 /** 빛무리를 from 에 놓았다가 한 틱 뒤 to 로 미끄러뜨린다 */
-function fly(from: { x: number; y: number }, to: { x: number; y: number }, over = false) {
-  chat.getState().setGuide({ x: from.x, y: from.y, move: false, over });
+/** 위치를 알려 주러 날아간다. 가는 동안 · 머무는 동안 위에 "Here!" 말풍선 */
+function fly(from: { x: number; y: number }, to: { x: number; y: number; below?: boolean }, over = false) {
+  chat.getState().setGuide({ x: from.x, y: from.y, move: false, over, here: true });
   setTimeout(() => {
     const g = chat.getState().guide;
-    if (g && g.x === from.x && g.y === from.y) chat.getState().setGuide({ x: to.x, y: to.y, move: true, over });
+    if (g && g.x === from.x && g.y === from.y) chat.getState().setGuide({ x: to.x, y: to.y, move: true, over, here: true, below: to.below });
   }, 60);
+}
+
+/** 우주먼지가 가리킬 버튼 바로 위(빛 중심끼리 160px 안)에 있으면 날아가지 않는다 */
+const NEAR_PX = 160;
+function nearSource(target: GuideTarget): boolean {
+  const from = sourcePoint();
+  const r = rectOf(`[data-guide-target="${target}"]`);
+  if (!from || !r) return false;
+  return Math.hypot(r.left + r.width / 2 - from.x, r.top + r.height / 2 - from.y) < NEAR_PX;
+}
+
+let hereTimers: ReturnType<typeof setTimeout>[] = [];
+let hereCtrl: AbortController | null = null;
+function cancelHere() {
+  hereCtrl?.abort();
+  hereCtrl = null;
+  for (const t of hereTimers) clearTimeout(t);
+  hereTimers = [];
+  if (chat.getState().here) chat.getState().setHere(false);
+}
+/** 제자리에서 "Here!": 가리킨 버튼을 누르면 잠시 머문 뒤 거둔다 (날아간 빛무리와 같은 리듬) */
+function pointHere(target: GuideTarget) {
+  cancelHere();
+  chat.getState().setHere(true);
+  const el = document.querySelector<HTMLElement>(`[data-guide-target="${target}"]`);
+  if (!el) return;
+  hereCtrl = new AbortController();
+  el.addEventListener("click", () => hereTimers.push(setTimeout(cancelHere, COMET_STAY_MS)), { once: true, signal: hereCtrl.signal });
 }
 
 function cancelSettle() {
@@ -124,7 +153,7 @@ function relayout() {
     return;
   }
   if (Math.abs(spot.x - g.x) > 0.5 || Math.abs(spot.y - g.y) > 0.5) {
-    s.setGuide({ x: spot.x, y: spot.y, move: true });
+    s.setGuide({ x: spot.x, y: spot.y, move: true, here: true, below: spot.below });
     watchTarget(currentTarget); // 다시 그려진 버튼이면 클릭 감시도 새로 건다
   }
 }
@@ -154,6 +183,7 @@ export function installRelayout(): () => void {
 export function openChat() {
   cancelComet();
   cancelSettle();
+  cancelHere();
   chat.getState().setGuide(null);
   chat.getState().setOpen(true, panelHeight(window.innerHeight));
 }
@@ -165,6 +195,7 @@ export function closeChat() {
   stopThinking();
   cancelComet();
   cancelSettle();
+  cancelHere();
   chat.getState().setOpen(false);
   chat.getState().setTyping(false);
   const home = sourcePoint();
@@ -198,6 +229,7 @@ export function sendChat(raw: string) {
   stopThinking();
   cancelComet();
   cancelSettle();
+  cancelHere();
   s.push({ who: "user", text: q });
   s.setInput("");
   s.setTyping(true);
@@ -206,6 +238,15 @@ export function sendChat(raw: string) {
   if (a) {
     thinkTimer = setTimeout(() => {
       thinkTimer = null;
+      // 가리킬 버튼이 우주먼지 바로 아래면(넓은 화면의 "기록 넣기") 날아가지 않고 제자리에서 "Here!"
+      if (a.target && a.then !== "comet" && nearSource(a.target)) {
+        chat.getState().push({ who: "bot", text: `${a.text}\n${STAY_HERE}`, action: a.action });
+        chat.getState().setTyping(false);
+        currentTarget = null;
+        chat.getState().setGuide(null);
+        pointHere(a.target);
+        return;
+      }
       const spot = a.target ? locate(a.target) : null;
       const from = sourcePoint();
       chat.getState().push({ who: "bot", text: spot ? `${a.text}\n${STAY}` : a.text, action: a.action });

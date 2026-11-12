@@ -21,6 +21,7 @@
 .dust__name { font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); color: #fff; white-space: nowrap; }
 .dust__btn .glow, .dust__name, .dust__bubble { animation: fade-in 700ms ease; } /* 길잡이로 나갔다가 사라진 뒤 제자리에 천천히 돌아온다 (ui.css fade-in) */
 .dust__bubble { position: absolute; left: 50%; top: -32px; transform: translateX(-50%); pointer-events: none; }
+.dust__bubble--below { top: 56px; } /* 길잡이 빛이 버튼 아래에 머물 때: 말풍선도 빛 아래 */
 .dust__bubble span { display: block; padding: 3px 11px; border-radius: var(--r-pill); border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.07); box-shadow: 0 0 16px rgba(255, 255, 255, 0.16), inset 0 0 8px rgba(255, 255, 255, 0.1); color: #fff; font: 300 12px/1 var(--f-body); letter-spacing: 0.16em; white-space: nowrap; text-shadow: 0 0 6px rgba(255, 255, 255, 0.95), 0 0 16px rgba(255, 255, 255, 0.55); animation: sl-drift 4.4s ease-in-out infinite; }
 
 /* 길잡이 빛무리: 답이 가리키는 버튼 옆으로 날아가 머문다. 대화창(z 20)보다 아래, 2단계는 관측소(z 25)보다 위 */
@@ -32,6 +33,14 @@
 /* 대화창: 화면 가운데(가로 · 세로), 폭 440(1100px 미만 400). 높이는 열 때 잰다(controller panelHeight, 420 ~ 680). 상단 바(아래 끝 78)와 겹치지 않게 위아래 88px 을 비우고 넘치면 줄인다 */
 .chat { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 20; width: 440px; max-width: calc(100vw - 48px); max-height: calc(100vh - 176px); box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--r-panel); border: 1px solid var(--color-line-panel); background: var(--color-panel); box-shadow: var(--shadow-float); color: var(--color-body); transition: opacity 200ms ease; }
 @media (max-width: 1099px) { .chat { width: 400px; } }
+/* 넓은 화면(960px 이상): 가운데 아래에 우주먼지 · "기록 넣기"가 있다 (home.css .dust-dock). 그 위에서 멈춰 우주먼지와 "Here!" 말풍선을 가리지 않는다.
+   아래 = 기록 넣기 아래 24 + 높이 44 + 간격 16 + 우주먼지 약 107 + 16, 위는 상단 바(88) 아래까지 → 거의 가운데 */
+@media (min-width: 960px) {
+  .chat { top: auto; bottom: calc(207px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); max-height: calc(100vh - 207px - 88px); }
+}
+@media (min-width: 960px) and (max-width: 1279px) {
+  .chat { bottom: calc(263px + env(safe-area-inset-bottom, 0px)); max-height: calc(100vh - 263px - 88px); } /* 기록 넣기가 한 줄 위 (80) */
+}
 /* 761 ~ 991px: 가운데에 두면 오른쪽 창(폭 300 + 24)에 닿는다. 오른쪽 창이 열려 있으면 그 왼쪽 빈 곳의 가운데로 (홈 배너와 같은 폭. 760px 이하는 오른쪽 창이 가로를 꽉 채운다) */
 @media (min-width: 761px) and (max-width: 991px) { .side ~ .chat { left: calc((100vw - 324px) / 2); } }
 /* 대화창 뒤 덮개: 다른 화면을 조금 어둡고 흐리게. 누르면 닫는다. 길잡이 빛무리가 날아가 있거나 위치 편집 · 관측소 중엔 뺀다 (CosmicDust.tsx) */

@@ -35,6 +35,7 @@ export function CosmicDustButton() {
   const open = useChat((s) => s.open);
   const edit = useStore((s) => s.editPos);
   const away = useChat((s) => s.guide !== null) || edit;
+  const here = useChat((s) => s.here);
   const root = useRef<HTMLSpanElement>(null);
   const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
     if (e.button === 0 && root.current) startDustDrag(e.nativeEvent, root.current.getBoundingClientRect());
@@ -46,9 +47,10 @@ export function CosmicDustButton() {
 
   return (
     <span className="dust" ref={root}>
-      {!open && !away && (
+      {/* 제자리에서 버튼을 가리킬 땐 "Here!", 평소(대화창이 닫혀 있을 때)엔 "hello" */}
+      {!away && (here || !open) && (
         <span className="dust__bubble" aria-hidden>
-          <span>hello</span>
+          <span>{here ? "Here!" : "hello"}</span>
         </span>
       )}
       <button type="button" className="dust__btn" data-guide-source="dust" aria-label={`${BOT_NAME} 챗봇 ${open ? "닫기" : "열기"}`} aria-expanded={open} aria-haspopup="dialog" title="눌러서 열기 · 끌어서 옮기기" disabled={edit} onClick={onClick} onPointerDown={onPointerDown}>
@@ -77,6 +79,11 @@ function GuideGlow() {
   const cls = `guide${guide.move ? " guide--move" : ""}${guide.over ? " guide--over" : ""}${guide.fade ? " guide--fade" : ""}`;
   return (
     <span className={cls} style={{ left: guide.x, top: guide.y }} aria-hidden>
+      {guide.here && (
+        <span className={`dust__bubble${guide.below ? " dust__bubble--below" : ""}`}>
+          <span>Here!</span>
+        </span>
+      )}
       <Glow />
     </span>
   );
@@ -91,7 +98,7 @@ function ChatPanel() {
   const setInput = useChat((s) => s.setInput);
   const edit = useStore((s) => s.editPos);
   const obsOpen = useStore((s) => s.route.name === "observatory");
-  const guiding = useChat((s) => s.guide !== null);
+  const guiding = useChat((s) => s.guide !== null || s.here);
   const log = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLInputElement>(null);
 
