@@ -14,7 +14,7 @@ test("상자 합치기: 모두 감싸는 상자, 없으면 null", () => {
   );
 });
 
-test("구멍 마스크: 상자 가운데에 여유를 둔 타원, 안쪽은 투명", () => {
-  const m = spotMask({ left: 100, top: 100, right: 300, bottom: 150 }, 36);
-  assert.match(m, /^radial-gradient\(ellipse 170px 76px at 200px 125px, transparent 70%, #000 100%\)$/);
+test("구멍 마스크: 상자 가운데에 여유를 둔 타원, 안쪽은 투명하고 가장자리로 서서히 덮인다", () => {
+  const m = spotMask({ left: 100, top: 100, right: 300, bottom: 150 }, 120);
+  assert.match(m, /^radial-gradient\(ellipse 220px 145px at 200px 125px, transparent 35%, rgba\(0, 0, 0, 0\.55\) 70%, #000 100%\)$/);
 });
