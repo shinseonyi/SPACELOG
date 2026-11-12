@@ -36,6 +36,7 @@ export function CosmicDustButton() {
   const edit = useStore((s) => s.editPos);
   const away = useChat((s) => s.guide !== null) || edit;
   const here = useChat((s) => s.here);
+  const hereSeq = useChat((s) => s.hereSeq);
   const root = useRef<HTMLSpanElement>(null);
   const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
     if (e.button === 0 && root.current) startDustDrag(e.nativeEvent, root.current.getBoundingClientRect());
@@ -46,7 +47,8 @@ export function CosmicDustButton() {
   };
 
   return (
-    <span className="dust" ref={root}>
+    // key: "Here!"를 띄울 때마다 다시 그려 작은 원 두 바퀴(.is-here)를 처음부터 돈다
+    <span key={hereSeq} className={`dust${here ? " is-here" : ""}`} ref={root}>
       {/* 제자리에서 버튼을 가리킬 땐 "Here!", 평소(대화창이 닫혀 있을 때)엔 "hello" */}
       {!away && (here || !open) && (
         <span className="dust__bubble" aria-hidden>

@@ -21,7 +21,16 @@
 .dust__name { font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); color: #fff; white-space: nowrap; }
 .dust__btn .glow, .dust__name, .dust__bubble { animation: fade-in 700ms ease; } /* 길잡이로 나갔다가 사라진 뒤 제자리에 천천히 돌아온다 (ui.css fade-in) */
 .dust__bubble { position: absolute; left: 50%; top: -32px; transform: translateX(-50%); pointer-events: none; }
-.dust__bubble--below { top: 56px; } /* 길잡이 빛이 버튼 아래에 머물 때: 말풍선도 빛 아래 */
+.dust__bubble--below { top: 56px; }
+/* 제자리에서 "Here!"를 띄울 때: 눈에 띄게 작은 원을 두 바퀴 돈다 (말풍선 · 이름표도 함께) */
+.dust.is-here { animation: sl-here-loop 0.9s linear 2; }
+@keyframes sl-here-loop {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(9px, -9px); }
+  50% { transform: translate(0, -18px); }
+  75% { transform: translate(-9px, -9px); }
+  100% { transform: translate(0, 0); }
+} /* 길잡이 빛이 버튼 아래에 머물 때: 말풍선도 빛 아래 */
 .dust__bubble span { display: block; padding: 3px 11px; border-radius: var(--r-pill); border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.07); box-shadow: 0 0 16px rgba(255, 255, 255, 0.16), inset 0 0 8px rgba(255, 255, 255, 0.1); color: #fff; font: 300 12px/1 var(--f-body); letter-spacing: 0.16em; white-space: nowrap; text-shadow: 0 0 6px rgba(255, 255, 255, 0.95), 0 0 16px rgba(255, 255, 255, 0.55); animation: sl-drift 4.4s ease-in-out infinite; }
 
 /* 길잡이 빛무리: 답이 가리키는 버튼 옆으로 날아가 머문다. 대화창(z 20)보다 아래, 2단계는 관측소(z 25)보다 위 */
@@ -76,7 +85,7 @@
 .chat__send:disabled { opacity: 0.4; cursor: default; }
 
 @media (prefers-reduced-motion: reduce) {
-  .glow i, .glow__sparks, .dust__bubble span { animation: none; }
+  .glow i, .glow__sparks, .dust__bubble span, .dust.is-here { animation: none; }
   .guide, .guide--move, .chat { transition: none; }
   .chat-dim { animation: none; }
 }

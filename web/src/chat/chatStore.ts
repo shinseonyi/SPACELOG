@@ -38,6 +38,8 @@ export interface ChatState {
   guide: Guide | null;
   /** 날아가지 않고 버튼 자리에서 가리키는 중 (우주먼지가 가리킬 버튼 바로 위에 있을 때): 버튼의 말풍선이 "Here!" */
   here: boolean;
+  /** "Here!"를 띄운 횟수. 바뀔 때마다 버튼을 다시 그려 두 바퀴 도는 동작을 처음부터 다시 한다 */
+  hereSeq: number;
   /** 재발견 혜성 답 뒤, 관측소가 열리기를 기다리는 중 (5-5 2단계) */
   cometWait: boolean;
 
@@ -61,6 +63,7 @@ export function createChatStore() {
     input: "",
     guide: null,
     here: false,
+    hereSeq: 0,
     cometWait: false,
 
     setOpen(open, height) {
@@ -84,7 +87,7 @@ export function createChatStore() {
       set({ guide });
     },
     setHere(here) {
-      set({ here });
+      set(here ? { here, hereSeq: get().hereSeq + 1 } : { here });
     },
     setCometWait(cometWait) {
       set({ cometWait });
