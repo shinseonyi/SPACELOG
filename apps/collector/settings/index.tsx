@@ -53,56 +53,59 @@ function SettingsPage() {
 
   if (!v) return <p className="loading">불러오는 중…</p>;
   return (
-    <main className="settings">
-      <h1>SpaceLog 설정</h1>
+    <main className="set-wrap">
+      <header className="set-head">
+        <h1>설정</h1>
+      </header>
 
-      <section>
-        <h2>클립보드 넣기 단축키</h2>
-        <button
-          type="button"
-          className={`shortcut${capturing ? " is-capturing" : ""}`}
-          onClick={() => setCapturing(true)}
-          onBlur={() => setCapturing(false)}
-          onKeyDown={(e) => {
-            if (!capturing) return;
-            e.preventDefault();
-            if (e.key === "Escape") return setCapturing(false);
-            const acc = toAccelerator(e);
-            if (acc) {
-              setCapturing(false);
-              void update({ shortcut: acc });
-            }
-          }}
-        >
-          {capturing ? "새 단축키를 누르세요 (Esc 취소)" : label(v.shortcut)}
-        </button>
-        {!v.shortcutRegistered && <p className="warn">지금 단축키가 등록되지 않았어요. 다른 조합을 골라 주세요</p>}
+      <section className="set-box" aria-label="클립보드 기록 단축키">
+        <div className="set-line">
+          <span className="grow">클립보드 기록 단축키</span>
+          <button
+            type="button"
+            className={`key-btn${capturing ? " is-capturing" : ""}`}
+            onClick={() => setCapturing(true)}
+            onBlur={() => setCapturing(false)}
+            onKeyDown={(e) => {
+              if (!capturing) return;
+              e.preventDefault();
+              if (e.key === "Escape") return setCapturing(false);
+              const acc = toAccelerator(e);
+              if (acc) {
+                setCapturing(false);
+                void update({ shortcut: acc });
+              }
+            }}
+          >
+            {capturing ? "새 단축키를 누르세요 (Esc 취소)" : label(v.shortcut)}
+          </button>
+        </div>
+        {!v.shortcutRegistered && <p className="set-warn">지금 단축키가 등록되지 않았어요. 다른 조합을 골라 주세요</p>}
       </section>
 
-      <section>
-        <label className="check">
-          <input type="checkbox" checked={v.rediscoveryNotification} onChange={(e) => void update({ rediscoveryNotification: e.target.checked })} />
-          재발견 알림 받기 (하루 한 번, {v.notificationTimeEffective} 이후)
-        </label>
-        {v.notificationTimeEffective !== v.notificationTime && <p className="hint">개발용 SPACELOG_NOTIFY_AT로 알림 시각이 {v.notificationTimeEffective}로 바뀌어 있어요</p>}
-        <label className="check">
-          <input type="checkbox" checked={v.launchAtLogin} onChange={(e) => void update({ launchAtLogin: e.target.checked })} />
-          로그인할 때 자동으로 켜기
-        </label>
-        {!v.isPackaged && <p className="hint">개발 모드에서는 저장만 하고 운영체제에 등록하지 않아요</p>}
+      <section className="set-box" aria-label="재발견 알림">
+        <div className="set-line">
+          <div className="grow">
+            <span>재발견 알림</span>
+            <span className="set-hint">하루 1회 · {v.notificationTimeEffective} 이후 · 7일 전 오늘의 기록</span>
+          </div>
+          <button type="button" className="switch" role="switch" aria-checked={v.rediscoveryNotification} aria-label="재발견 알림" onClick={() => void update({ rediscoveryNotification: !v.rediscoveryNotification })} />
+        </div>
+        {v.notificationTimeEffective !== v.notificationTime && <p className="set-hint">개발용 SPACELOG_NOTIFY_AT로 알림 시각이 {v.notificationTimeEffective}로 바뀌어 있어요</p>}
       </section>
 
-      <section>
-        <h2>보관함</h2>
-        <p className="path" title={v.vaultPath}>
-          {v.vaultPath}
-        </p>
-        <div className="row">
-          <button type="button" onClick={() => s.openVault()}>
+      <section className="set-box" aria-label="보관함 위치">
+        <div className="set-line">
+          <div className="grow">
+            <span>보관함 위치</span>
+            <span className="set-hint">사용량 {formatBytes(storage?.usedBytes ?? null)} · 남은 공간 {formatBytes(storage?.freeBytes ?? null)}</span>
+          </div>
+          <button type="button" className="btn small" onClick={() => s.openVault()}>
             폴더 열기
           </button>
           <button
             type="button"
+            className="btn small"
             onClick={async () => {
               const r = await s.chooseVault();
               if (r) {
@@ -115,17 +118,22 @@ function SettingsPage() {
             위치 바꾸기
           </button>
         </div>
-        <p className="hint">위치를 바꿔도 이전 보관함의 기록은 옮기지 않아요</p>
-        <dl>
-          <dt>보관함 크기</dt>
-          <dd>{formatBytes(storage?.usedBytes ?? null)}</dd>
-          <dt>남은 공간</dt>
-          <dd>{formatBytes(storage?.freeBytes ?? null)}</dd>
-        </dl>
+        <p className="set-path" title={v.vaultPath}>
+          {v.vaultPath}
+        </p>
+        <p className="set-hint">위치를 바꿔도 이전 보관함의 기록은 옮기지 않아요</p>
+      </section>
+
+      <section className="set-box" aria-label="로그인 시 자동 실행">
+        <div className="set-line">
+          <span className="grow">로그인 시 자동 실행</span>
+          <button type="button" className="switch" role="switch" aria-checked={v.launchAtLogin} aria-label="로그인 시 자동 실행" onClick={() => void update({ launchAtLogin: !v.launchAtLogin })} />
+        </div>
+        {!v.isPackaged && <p className="set-hint">개발 모드에서는 저장만 하고 운영체제에 등록하지 않아요</p>}
       </section>
 
       {msg && (
-        <p className="msg" role="status">
+        <p className="set-msg" role="status">
           {msg}
         </p>
       )}

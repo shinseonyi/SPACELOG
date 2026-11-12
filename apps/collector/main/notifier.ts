@@ -1,6 +1,6 @@
 // 재발견 알림 (SPEC 1-3, 3-6 알림 보내기, POLICY 2-2). 별 고르기는 서버(개발 A)가 한다.
 // 알려진 문제: 윈도우 개발 모드에서 알림 클릭 이벤트가 오지 않았다 (ADR 0001 4-1).
-// 데모 대안 경로는 웹의 재발견 카드와 트레이 "오늘의 별 보기".
+// 데모 대안 경로는 웹의 재발견 카드와 트레이 "재발견 알림 보기".
 import type { Planet, RediscoveryEventRequest, RediscoveryTodayResponse, UniverseResponse } from "@spacelog/shared/types";
 import { Notification } from "electron";
 import { starTitle } from "../dropzone/precheck.ts";

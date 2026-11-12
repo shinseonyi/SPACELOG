@@ -72,6 +72,10 @@ export interface CollectorBridge {
   status(): Promise<DropzoneStatus>;
   setMode(mode: DropzoneMode, height?: number): void;
   openUniverse(): void;
+  /** 오늘의 재발견 기록을 웹에서 연다 (트레이의 "재발견 알림 보기"와 같다) */
+  openRediscovery(): void;
+  /** 방금 넣은 기록을 되돌린다 (넣기 취소) */
+  undo(ids: string[]): Promise<{ ok: boolean; error: string | null }>;
   openSettings(): void;
   metric(entry: Record<string, unknown>): void;
   onShortcutResult(cb: (r: SaveResult) => void): void;

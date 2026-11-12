@@ -19,5 +19,5 @@ export function shouldNotify(opts: { enabled: boolean; time: string; lastNotifie
 }
 
 export function notificationTitle(daysAgo: number): string {
-  return `${daysAgo}일 전 오늘의 별 ✦`;
+  return `${daysAgo}일 전 오늘의 기록 ✦`;
 }

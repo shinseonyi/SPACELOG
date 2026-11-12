@@ -25,6 +25,7 @@ export function DropZone() {
   const [previews, setPreviews] = useState<Preview[]>([]);
   const [error, setError] = useState<{ message: string; lines: string[] } | null>(null);
   const [progress, setProgress] = useState<string>("");
+  const [memo, setMemo] = useState("");
   const prevState = useRef<DropState>("collapsed");
   const leaveTimer = useRef<number | null>(null);
   const dragDepth = useRef(0);
@@ -34,7 +35,7 @@ export function DropZone() {
   // 창 크기는 상태에 맞춰 main이 바꾼다 (오른쪽 가장자리에 붙인 채)
   useEffect(() => {
     if (state === "collapsed") c.setMode("collapsed");
-    else if (state === "confirm") c.setMode("confirm", document.getElementById("card")?.scrollHeight);
+    else if (state === "confirm" || (state === "expanded" && result)) c.setMode("confirm", document.getElementById("card")?.scrollHeight);
     else c.setMode("expanded");
   }, [state, result]);
 
@@ -45,11 +46,11 @@ export function DropZone() {
     window.collectorEvents.onToast((m) => showError(m, []));
     c.onSaving(() => {
       if (stateRef.current === "confirm" || stateRef.current === "saving") return; // 열린 확인 카드를 덮지 않는다
-      setProgress("클립보드를 별로 만드는 중…");
+      setProgress("클립보드를 기록으로 만드는 중…");
       setState("saving");
     });
     c.onShortcutResult((r) => {
-      // 확인 카드가 열려 있는 동안 단축키로 넣은 별은 저장만 되고 카드는 바꾸지 않는다 (기본 배정 그대로)
+      // 확인 카드가 열려 있는 동안 단축키로 넣은 기록은 저장만 되고 카드는 바꾸지 않는다 (기본 배정 그대로)
       if (stateRef.current === "confirm") return;
       finish(r, [], performance.now());
     });
@@ -105,7 +106,7 @@ export function DropZone() {
     const uriList = dt.getData("text/uri-list");
     const text = dt.getData("text/plain");
     const pv: Preview[] = files.slice(0, 4).map((f) => ({ name: f.name, url: f.type.startsWith("image/") ? URL.createObjectURL(f) : null }));
-    setProgress(files.length > 0 ? `별을 만드는 중… (${files.length}개)` : "별을 만드는 중…");
+    setProgress(files.length > 0 ? `기록을 만드는 중… (${files.length}개)` : "기록을 만드는 중…");
     setState("saving");
     try {
       const r = files.length > 0 ? await c.saveFiles(files, dirs, source) : await c.saveText({ uriList, text }, source);
@@ -134,7 +135,7 @@ export function DropZone() {
   // 트레이·단축키·오류 뒤처럼 마우스 없이 펼쳐졌으면 마우스가 올라오지 않는 한 2초 뒤 접는다
   useEffect(() => {
     if (state !== "expanded") return;
-    if (document.querySelector(".panel:hover")) return;
+    if (document.querySelector(".panel:hover, .card:hover")) return;
     leaveTimer.current = window.setTimeout(() => setState((s) => (s === "expanded" ? "collapsed" : s)), COLLAPSE_AFTER_LEAVE_MS + 1000);
     return () => {
       if (leaveTimer.current) window.clearTimeout(leaveTimer.current);
@@ -174,11 +175,32 @@ export function DropZone() {
     void handleTransfer(e.dataTransfer, "drop");
   }
 
+  // 확인 카드를 닫아도 결과는 남긴다. 접었다 다시 펼치면 같은 확인 화면이 보이고, "새 기록 넣기"로 빈 화면으로 돌아간다 (README 6-5)
   function closeCard() {
+    setState("collapsed");
+  }
+
+  function newRecord() {
     previews.forEach((p) => p.url && URL.revokeObjectURL(p.url));
     setResult(null);
     setPreviews([]);
-    setState("collapsed"); // 한 번 접히면 다시 열 수 없다. 이후 정리는 웹에서 (SPEC 1-1)
+    setState("expanded");
+  }
+
+  // 간단한 메모도 기록으로 넣는다 (README 6-5): Enter 로 텍스트 기록 만들기
+  async function saveMemo() {
+    const text = memo.trim();
+    if (!text || stateRef.current === "saving") return;
+    const t0 = performance.now();
+    setMemo("");
+    setProgress("기록을 만드는 중…");
+    setState("saving");
+    try {
+      finish(await c.saveText({ uriList: "", text }, "paste"), [], t0);
+    } catch (err) {
+      console.error(err);
+      showError("저장하지 못했어요. 잠시 뒤 다시 넣어 주세요", []);
+    }
   }
 
   const lowDisk = isLowDisk(status?.freeBytes ?? null);
@@ -189,7 +211,7 @@ export function DropZone() {
     return (
       <div className="handle" onMouseEnter={onMouseEnter} {...dragHandlers} title="SpaceLog 드롭존" aria-label="SpaceLog 드롭존 펼치기">
         <span className={`planet-dot${serverDown ? " is-error" : lowDisk ? " is-warn" : ""}`} aria-hidden />
-        <span className="handle-count" aria-label="오늘 넣은 별">
+        <span className="handle-count" aria-label="오늘 넣은 기록">
           {status?.todayCount ?? "·"}
         </span>
         <span className="handle-label">오늘</span>
@@ -197,12 +219,21 @@ export function DropZone() {
     );
   }
 
-  if (state === "confirm" && result) {
-    return <ConfirmCard result={result} previews={previews} planets={status?.planets ?? []} onDone={closeCard} />;
+  if ((state === "confirm" || state === "expanded") && result) {
+    return (
+      <div style={{ height: "100%" }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        <ConfirmCard key={result.stars[0]?.id} result={result} previews={previews} planets={status?.planets ?? []} revisit={state === "expanded"} onDone={closeCard} onNew={newRecord} />
+      </div>
+    );
   }
 
   return (
     <div className="panel" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...dragHandlers}>
+      <header className="p-head">
+        <span className="p-logo" aria-hidden><i /></span>
+        <span className="p-brand">SPACELOG</span>
+        <button type="button" className="icon-btn" title="접기" aria-label="접기" onClick={() => setState("collapsed")}>»</button>
+      </header>
       {lowDisk && status?.freeBytes != null && (
         <div className="band band-warn" role="status">
           디스크 공간이 부족해요 (남은 공간 {Math.floor(status.freeBytes / 1024 / 1024)} MB)
@@ -217,15 +248,24 @@ export function DropZone() {
         {state === "saving" && (
           <>
             <span className="spinner" aria-hidden />
-            <p>{progress}</p>
+            <p className="zone-sub">{progress}</p>
           </>
         )}
-        {state === "dragOver" && <p className="zone-big">놓으면 별이 돼요</p>}
+        {state === "dragOver" && (
+          <>
+            <p className="zone-big">놓으면 기록이 됩니다</p>
+            <p className="zone-sub">여러 개를 놓으면 각각 기록돼요</p>
+          </>
+        )}
         {state === "expanded" && (
           <>
-            <p className="zone-big">여기에 끌어다 놓으세요</p>
-            <p className="zone-sub">파일 · 이미지 · 링크 · 텍스트 · Ctrl/⌘+V</p>
-            <p className="zone-sub">클립보드 넣기 {status?.shortcut ?? ""}</p>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+            </svg>
+            <p className="zone-big">
+              끌어다 놓으면<br />기록이 됩니다.
+            </p>
+            <p className="zone-sub">클립보드에서 바로 붙여넣을 수도 있어요.</p>
           </>
         )}
         {state === "error" && error && (
@@ -241,14 +281,49 @@ export function DropZone() {
           </div>
         )}
       </div>
-      <div className="actions">
-        <button type="button" onClick={() => c.openUniverse()}>
-          우주 보기
-        </button>
-        <button type="button" className="ghost" onClick={() => c.openSettings()} aria-label="설정">
-          ⚙ 설정
-        </button>
+      <input
+        className="memo-in"
+        value={memo}
+        maxLength={10000}
+        placeholder="간단한 메모를 남겨 보세요 · Enter"
+        aria-label="간단한 메모"
+        onChange={(e) => setMemo(e.target.value.replace(/[\r\n]+/g, " "))}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+            e.preventDefault();
+            void saveMemo();
+          }
+        }}
+      />
+      <div className="keys">
+        <span>붙여넣기</span>
+        <kbd>Ctrl/⌘ V</kbd>
+        <span>· 클립보드 바로 기록</span>
+        <kbd>{status?.shortcut ?? ""}</kbd>
       </div>
+      <div className="tools" aria-label="다른 도구에서 가져오기">
+        <span className="tools-title">다른 도구에서도 가져오기</span>
+        <div className="tools-row">
+          {["Google Drive", "Notion", "Slack"].map((t) => (
+            <button key={t} type="button" className="tool" disabled aria-disabled>
+              {t} <b>연결 예정</b>
+            </button>
+          ))}
+        </div>
+      </div>
+      <footer className="foot">
+        <div className="foot-main">
+          <button type="button" className="btn primary" onClick={() => c.openUniverse()}>
+            우주 보기
+          </button>
+          <button type="button" className="btn" onClick={() => c.openRediscovery()}>
+            재발견 알림 보기
+          </button>
+        </div>
+        <button type="button" className="icon-btn outline" onClick={() => c.openSettings()} title="설정" aria-label="설정">
+          ⚙
+        </button>
+      </footer>
     </div>
   );
 }

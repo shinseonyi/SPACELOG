@@ -90,8 +90,8 @@ function showError(message: string): void {
 // ---------- 드롭존 창 (SPEC 1-1) ----------
 const MODE_SIZE: Record<DropzoneMode, { width: number; height: number }> = {
   collapsed: { width: 52, height: 116 },
-  expanded: { width: 288, height: 236 },
-  confirm: { width: 332, height: 360 },
+  expanded: { width: 340, height: 520 },
+  confirm: { width: 340, height: 380 },
 };
 const EDGE_GAP = 6;
 
@@ -129,7 +129,7 @@ function createDropzone(): void {
     alwaysOnTop: true,
     skipTaskbar: true, // 작업 표시줄 아이콘 없음 (맥은 app.dock.hide)
     show: false,
-    backgroundColor: "#0e0f24",
+    backgroundColor: "#1e1e20",
     title: "SpaceLog 드롭존",
     webPreferences: { preload: path.join(DIST, "preload.cjs"), contextIsolation: true, nodeIntegration: false, sandbox: true },
   });
@@ -236,7 +236,7 @@ function openSettings(): void {
     resizable: false,
     maximizable: false,
     autoHideMenuBar: true,
-    backgroundColor: "#0e0f24",
+    backgroundColor: "#1e1e20",
     webPreferences: { preload: path.join(DIST, "preload.cjs"), contextIsolation: true, nodeIntegration: false, sandbox: true },
   });
   void settingsWin.loadFile(path.join(DIST, "settings.html"));
@@ -291,6 +291,8 @@ ipcMain.handle("confirm", (_e, input: ConfirmInput) => ingest.confirm(input));
 ipcMain.handle("status", () => lastStatus ?? refreshStatus());
 ipcMain.on("set-mode", (_e, mode: DropzoneMode, height?: number) => placeDropzone(mode, height));
 ipcMain.on("open-universe", () => openWeb("#/"));
+ipcMain.on("open-rediscovery", () => void openRediscovery());
+ipcMain.handle("undo", (_e, ids: string[]) => ingest.undo(ids));
 ipcMain.on("open-settings", () => openSettings());
 ipcMain.on("metric", (_e, entry: Record<string, unknown>) => metric({ kind: "dropzone", ...entry }));
 ipcMain.handle("settings:get", () => settingsView());

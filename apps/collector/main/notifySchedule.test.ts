@@ -26,7 +26,7 @@ test("개발용 알림 시각(SPACELOG_NOTIFY_AT) 형식 그대로 비교", () =
 
 test("현지 날짜와 제목", () => {
   assert.equal(localDateOf(at(0, 5)), "2026-11-11");
-  assert.equal(notificationTitle(7), "7일 전 오늘의 별 ✦");
+  assert.equal(notificationTitle(7), "7일 전 오늘의 기록 ✦");
 });
 
 test("단축키 표시 이름", () => {

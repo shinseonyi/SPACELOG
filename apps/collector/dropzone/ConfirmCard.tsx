@@ -1,5 +1,6 @@
-// 넣은 직후 확인 카드 (SPEC 1-1, POLICY 2-3·2-6).
-// 행성·메모는 이번에 넣은 모든 별에 같이 적용. 입력이 없으면 10초 후 지금 값으로 확정하고 접힌다.
+// 넣은 직후 확인 카드 (SPEC 1-1, POLICY 2-3·2-6, 시안 S02_Confirm).
+// 행성·메모는 이번에 넣은 모든 기록에 같이 적용. 입력이 없으면 10초 후 지금 값으로 확정하고 접힌다.
+// 접어도 결과는 남아, 다시 펼치면 같은 확인 화면이 보이고 "새 기록 넣기"로 빈 화면으로 돌아간다 (README 6-5).
 import { useEffect, useRef, useState } from "react";
 import type { PlanetOption, SaveResult } from "../main/ipcTypes.ts";
 import { MEMO_MAX, cleanMemo } from "./precheck.ts";
@@ -11,15 +12,24 @@ export interface Preview {
 
 export const AUTO_CONFIRM_MS = 10_000; // SPEC 6장 S2 확정
 
-const KIND_ICON = { image: "🖼", file: "📄", link: "🔗", text: "✎" } as const;
+const KIND_LABEL = { image: "이미지", file: "파일", link: "링크", text: "텍스트" } as const;
+const KIND_ICON = { image: "🖼", file: "📄", link: "🔗", text: "T" } as const;
 
-export function ConfirmCard({ result, previews, planets, onDone }: { result: SaveResult; previews: Preview[]; planets: PlanetOption[]; onDone(): void }) {
+export function ConfirmCard({ result, previews, planets, revisit = false, onDone, onNew }: {
+  result: SaveResult;
+  previews: Preview[];
+  planets: PlanetOption[];
+  /** 접었다가 다시 펼친 화면: 자동으로 닫지 않고 "새 기록 넣기"를 보인다 */
+  revisit?: boolean;
+  onDone(): void;
+  onNew(): void;
+}) {
   const stars = result.stars;
   const assigned = stars[0].planetId;
   const samePlanet = stars.every((s) => s.planetId === assigned);
   const [planetId, setPlanetId] = useState<string>(samePlanet ? assigned : "");
   const [memo, setMemo] = useState("");
-  const [touched, setTouched] = useState(false);
+  const [touched, setTouched] = useState(revisit);
   const [left, setLeft] = useState(AUTO_CONFIRM_MS / 1000);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +52,19 @@ export function ConfirmCard({ result, previews, planets, onDone }: { result: Sav
     else {
       setError(r.error);
       setTouched(true); // 오류를 읽을 수 있게 자동 접힘을 멈춘다
+    }
+  }
+
+  // 넣기 취소: 방금 넣은 기록을 되돌린다. 서버가 못 하면 이유를 보이고 카드는 그대로 둔다
+  async function cancel() {
+    if (saving) return;
+    setSaving(true);
+    const r = await window.collector.undo(stars.map((s) => s.id));
+    setSaving(false);
+    if (r.ok) onNew();
+    else {
+      setError(r.error);
+      setTouched(true);
     }
   }
 
@@ -80,17 +103,22 @@ export function ConfirmCard({ result, previews, planets, onDone }: { result: Sav
   }, [error]);
 
   const one = stars.length === 1 ? stars[0] : null;
+  const first = stars[0];
+  const thumb = previews[0];
+  const title = one ? one.title : `기록 ${stars.length}개를 넣었어요`;
+  const sub = one ? KIND_LABEL[one.kind] : stars.map((s) => KIND_LABEL[s.kind]).filter((k, i, a) => a.indexOf(k) === i).join(" · ");
   return (
     <div className="card" id="card" role="dialog" aria-label="넣은 직후 확인">
-      <p className="card-head">{one ? "별을 넣었어요 ✦" : `별 ${stars.length}개를 넣었어요 ✦`}</p>
-      <div className="thumbs">
-        {(previews.length > 0 ? previews : stars.slice(0, 4).map((s) => ({ name: s.title, url: null }))).slice(0, 4).map((p, i) => (
-          <div className="thumb" key={i} title={p.name}>
-            {p.url ? <img src={p.url} alt="" /> : <span aria-hidden>{KIND_ICON[stars[i]?.kind ?? "file"]}</span>}
-          </div>
-        ))}
+      <div className="card-item">
+        <span className="card-thumb" aria-hidden>
+          {thumb?.url ? <img src={thumb.url} alt="" /> : <span>{KIND_ICON[first.kind]}</span>}
+        </span>
+        <div className="card-text">
+          <p className="card-title" title={title}>{title}</p>
+          <span className="card-sub">{sub} · 저장했어요</span>
+          <i className="card-bar" />
+        </div>
       </div>
-      {one && <p className="card-title">{one.title}</p>}
       {result.lines.length > 0 && (
         <ul className="card-lines">
           {result.lines.map((l, i) => (
@@ -98,10 +126,11 @@ export function ConfirmCard({ result, previews, planets, onDone }: { result: Sav
           ))}
         </ul>
       )}
-      <label className="field">
-        <span>배정된 행성</span>
+      <label className="card-row">
+        <span>행성</span>
         <select
           value={planetId}
+          aria-label="배정된 행성"
           onChange={(e) => {
             setPlanetId(e.target.value);
             setTouched(true);
@@ -116,36 +145,41 @@ export function ConfirmCard({ result, previews, planets, onDone }: { result: Sav
           ))}
         </select>
       </label>
-      <label className="field">
-        <span>
-          한 줄 메모 <em className="count">{memo.length}/{MEMO_MAX}</em>
-        </span>
-        <input
-          ref={memoRef}
-          value={memo}
-          maxLength={MEMO_MAX}
-          placeholder="나중에 알아볼 한 마디"
-          onChange={(e) => {
-            setMemo(e.target.value.replace(/[\r\n]+/g, " "));
-            setTouched(true);
-          }}
-          onFocus={() => setTouched(true)}
-        />
-      </label>
+      <p className="card-sub" style={{ padding: "0 4px" }}>새 행성은 웹에서 만들 수 있어요.</p>
+      <input
+        ref={memoRef}
+        className="memo-in"
+        value={memo}
+        maxLength={MEMO_MAX}
+        placeholder="한 줄 메모 (선택) · Enter로 저장"
+        aria-label="한 줄 메모"
+        onChange={(e) => {
+          setMemo(e.target.value.replace(/[\r\n]+/g, " "));
+          setTouched(true);
+        }}
+        onFocus={() => setTouched(true)}
+      />
+      {memo.length > 0 && <span className="card-sub" style={{ marginTop: -6, textAlign: "right" }}>{memo.length}/{MEMO_MAX}</span>}
       {error && (
         <p className="card-error" role="alert">
           {error}
         </p>
       )}
-      <div className="actions">
-        <button type="button" onClick={() => void commit(true)} disabled={saving}>
-          완료
+      <footer className="card-foot">
+        {revisit ? (
+          <button type="button" className="btn small" onClick={onNew} disabled={saving}>
+            새 기록 넣기
+          </button>
+        ) : (
+          <span className="card-hint">{touched ? "입력을 마치면 닫기를 누르세요" : `${left}초 후 닫혀요`}</span>
+        )}
+        <button type="button" className="link-btn" onClick={() => void cancel()} disabled={saving}>
+          넣기 취소
         </button>
-        <button type="button" className="ghost" onClick={() => void commit(false)} disabled={saving}>
-          건너뛰기
+        <button type="button" className="btn small" onClick={() => void commit(true)} disabled={saving}>
+          닫기
         </button>
-        {!touched && <span className="auto">{left}초 후 접혀요</span>}
-      </div>
+      </footer>
     </div>
   );
 }

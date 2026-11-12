@@ -26,6 +26,8 @@ const collector: CollectorBridge = {
   status: () => ipcRenderer.invoke("status"),
   setMode: (mode, height) => ipcRenderer.send("set-mode", mode, height),
   openUniverse: () => ipcRenderer.send("open-universe"),
+  openRediscovery: () => ipcRenderer.send("open-rediscovery"),
+  undo: (ids) => ipcRenderer.invoke("undo", ids),
   openSettings: () => ipcRenderer.send("open-settings"),
   metric: (entry) => ipcRenderer.send("metric", entry),
   onShortcutResult: (cb) => void ipcRenderer.on("shortcut-result", (_e, r) => cb(r)),

@@ -71,7 +71,7 @@ export class AppTray {
       { label: "드롭존 보이기/숨기기", click: a.toggleDropzone },
       { label: `클립보드 넣기\t${a.shortcutLabel()}`, click: a.saveClipboard },
       // 알림 클릭이 윈도우 개발 모드에서 오지 않는 문제의 대안 경로 (ADR 0001 4장)
-      { label: "오늘의 별 보기", click: a.openRediscovery },
+      { label: "재발견 알림 보기", click: a.openRediscovery },
       { type: "separator" },
       { label: "설정", click: a.openSettings },
     ];

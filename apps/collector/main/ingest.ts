@@ -11,7 +11,7 @@ type Source = SaveResult["source"];
 
 function failureText(f: ApiFailure): string {
   // NOT_FOUND는 별이나 행성을 못 찾았다는 뜻이다 (서버 2/4 머지 전 "아직 지원하지 않아요" 문구는 2026-11-11에 걷어냈다)
-  if (f.code === "NOT_FOUND") return "그 별이나 행성을 찾을 수 없어요";
+  if (f.code === "NOT_FOUND") return "그 기록이나 행성을 찾을 수 없어요";
   return f.message ?? errorText(f.code);
 }
 
@@ -21,7 +21,7 @@ function toResult(source: Source, res: CreateStarsResponse, extra: Rejected[], s
     source,
     stars: res.created.map((s: Star) => ({ id: s.id, kind: s.kind, title: starTitle(s), planetId: s.planetId })),
     lines,
-    error: res.created.length === 0 && lines.length === 0 ? "저장된 별이 없어요" : null,
+    error: res.created.length === 0 && lines.length === 0 ? "저장된 기록이 없어요" : null,
     serverMs,
   };
 }
@@ -107,6 +107,18 @@ export class Ingest {
   }
 
   /** 넣은 직후 확인 카드 [완료]·자동 확정 → PATCH /api/stars (SPEC 2-6) */
+  /**
+   * 넣기 취소: 방금 넣은 기록을 되돌린다 (README 6-5). 서버의 기록 삭제(DELETE /api/stars/:id)를 쓴다.
+   * 서버가 아직 그 API를 만들지 않았으면(404) 그렇게 알린다. 하나라도 못 지우면 거기서 멈추고 알린다.
+   */
+  async undo(ids: string[]): Promise<{ ok: boolean; error: string | null }> {
+    for (const id of ids) {
+      const res = await this.api.request<null>("DELETE", `/api/stars/${encodeURIComponent(id)}`);
+      if (!res.ok) return { ok: false, error: res.status === 404 ? "이 서버는 아직 넣기 취소를 지원하지 않아요" : (res.message ?? errorText(res.code)) };
+    }
+    return { ok: true, error: null };
+  }
+
   async confirm(input: ConfirmInput): Promise<{ ok: boolean; error: string | null }> {
     const body: BulkUpdateStarsRequest = { ids: input.ids };
     if (input.planetId) body.planetId = input.planetId;
@@ -114,7 +126,7 @@ export class Ingest {
     if (body.planetId === undefined && body.memo === undefined) return { ok: true, error: null };
     const res = await this.api.request<StarsResponse>("PATCH", "/api/stars", body);
     if (res.ok) return { ok: true, error: null };
-    return { ok: false, error: res.code === "NOT_FOUND" ? "그 별이나 행성을 찾을 수 없어요" : (res.message ?? errorText(res.code)) };
+    return { ok: false, error: res.code === "NOT_FOUND" ? "그 기록이나 행성을 찾을 수 없어요" : (res.message ?? errorText(res.code)) };
   }
 
   private async post(body: FormData | string, extra: Rejected[], source: Source, json = false): Promise<SaveResult> {
