@@ -6,6 +6,7 @@ import heroUrl from "../assets/planet-hero.png";
 import nebulaUrl from "../assets/planet-nebula.png";
 import ringUrl from "../assets/planet-ring.png";
 import { clampZoom, landCam, leftOccupied, overviewCam, planetNodes, rightOccupied, type Cam2D, type PlanetNode } from "./look.ts";
+import { FLAT_BLUR_PX, FLAT_BLUR_REF, FLAT_DIM, focusBlur } from "./focusBlur.ts";
 import { marksOf, segmentsOf, useLinkPaths } from "./linkPaths.ts";
 import { viewApi } from "./viewApi.ts";
 import "./view.css";
@@ -33,6 +34,7 @@ export function Flat2D() {
   const segs = useMemo(() => segmentsOf(paths), [paths]);
   const marks = useMemo(() => marksOf(paths), [paths]);
   const editPos = useStore((s) => s.editPos);
+  const focusId = useStore((s) => s.selectedPlanetId);
   const [pdrag, setPdrag] = useState<{ id: string; x: number; y: number } | null>(null);
   const pmeta = useRef<{ id: string; sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
   const shownNodes = useMemo(() => (pdrag ? nodes.map((n) => (n.id === pdrag.id ? { ...n, x: pdrag.x, y: pdrag.y } : n)) : nodes), [nodes, pdrag]);
@@ -300,6 +302,7 @@ export function Flat2D() {
           <PlanetButton
             key={n.id}
             node={n}
+            blur={blurOf(n, focusId ? at.get(focusId) : undefined)}
             labelScale={labelScale}
             editing={editPos}
             dragging={pdrag?.id === n.id}
@@ -341,7 +344,13 @@ export function Flat2D() {
   );
 }
 
-function PlanetButton({ node: n, labelScale, editing, dragging, onEditDown }: { node: PlanetNode; labelScale: number; editing: boolean; dragging: boolean; onEditDown(e: React.PointerEvent): void }) {
+/** 심도 효과: 고른 행성(패널 열림)에서 멀수록 흐리게. 고른 행성 · 고른 것이 없으면 0 */
+function blurOf(n: PlanetNode, focus: PlanetNode | undefined): number {
+  if (!focus || focus.id === n.id) return 0;
+  return focusBlur(Math.hypot(n.x - focus.x, n.y - focus.y), FLAT_BLUR_REF);
+}
+
+function PlanetButton({ node: n, blur, labelScale, editing, dragging, onEditDown }: { node: PlanetNode; blur: number; labelScale: number; editing: boolean; dragging: boolean; onEditDown(e: React.PointerEvent): void }) {
   const { look } = n;
   const dots = Math.min(n.count, 12);
   const open = () => (n.count > 0 ? void store.getState().flyToPlanet(n.id, "openPanel") : store.getState().openPanel(n.id));
@@ -349,7 +358,7 @@ function PlanetButton({ node: n, labelScale, editing, dragging, onEditDown }: { 
     <button
       type="button"
       className={`flat__planet${editing ? " is-edit" : ""}${dragging ? " is-dragging" : ""}`}
-      style={{ left: n.x, top: n.y, width: n.size, height: n.size, opacity: n.count ? 1 : 0.45 }}
+      style={{ left: n.x, top: n.y, width: n.size, height: n.size, opacity: n.count ? 1 : 0.45, filter: blur > 0.01 ? `blur(${(blur * FLAT_BLUR_PX).toFixed(2)}px) brightness(${(1 - blur * FLAT_DIM).toFixed(2)})` : undefined }}
       aria-label={`${n.name}, ${look.unit} ${n.count}개. 눌러서 착륙`}
       onPointerDown={editing ? onEditDown : undefined}
       onClick={editing ? undefined : open}

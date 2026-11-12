@@ -5,7 +5,7 @@
 .flat__stars i { position: absolute; display: block; border-radius: 50%; background: #fff; }
 .flat__world { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-origin: 0 0; }
 
-.flat__planet { position: absolute; transform: translate(-50%, -50%); display: block; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; transition: opacity 200ms; }
+.flat__planet { position: absolute; transform: translate(-50%, -50%); display: block; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; transition: opacity 200ms, filter 600ms ease; } /* filter = 심도 효과 (focusBlur.ts) */
 .flat__planet.is-edit { cursor: grab; touch-action: none; }
 .flat__planet.is-edit .flat__body { outline: 1px dashed rgba(255, 255, 255, 0.35); outline-offset: 10px; border-radius: 50%; }
 .flat__planet.is-dragging { cursor: grabbing; z-index: 50; }

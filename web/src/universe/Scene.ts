@@ -1,6 +1,7 @@
 // 3D 우주 장면 (SPEC 3-5). React 바깥에서 돌고, 웹 스토어와는 계약 함수로만 주고받는다.
 // - 스토어 → 장면: planets·stars·selectedStarId·camera 를 구독해 다시 그린다
 // - 장면 → 스토어: openPanel · openStar · flyToPlanet · setCamera, 자동 비행은 registerFlyToPlanet 로 등록
+import { DepthOfField } from "./dof.ts";
 import * as THREE from "three";
 import { store, type Store } from "../state/store.ts";
 import { CameraController } from "./CameraController.ts";
@@ -21,6 +22,8 @@ const MOVE_KEYS = new Set(["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowDown
 
 export class UniverseScene {
   private readonly renderer: THREE.WebGLRenderer;
+  /** 행성을 고르면 그 행성에 초점, 나머지는 흐리게 (dof.ts) */
+  private readonly dof: DepthOfField;
   private readonly scene = new THREE.Scene();
   private readonly toon = new Toon();
   private readonly cam: CameraController;
@@ -51,6 +54,8 @@ export class UniverseScene {
     this.renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(this.renderer.domElement);
     this.cam = new CameraController(container.clientWidth / Math.max(container.clientHeight, 1));
+    this.dof = new DepthOfField(this.renderer, this.scene, this.cam.camera);
+    this.dof.setSize(container.clientWidth, container.clientHeight);
 
     this.scene.background = cssColor("scene-bg", "#15103a");
     this.scene.add(new THREE.HemisphereLight(0xcfd6ff, 0x3a2a6a, 1.6));
@@ -83,6 +88,7 @@ export class UniverseScene {
     this.stars?.dispose();
     disposeTree(this.scene);
     this.toon.dispose();
+    this.dof.dispose();
     this.renderer.dispose();
     this.renderer.domElement.remove();
     sceneState.setState({ nearPlanetId: null, starsHidden: false });
@@ -262,6 +268,7 @@ export class UniverseScene {
     const w = this.container.clientWidth;
     const h = Math.max(this.container.clientHeight, 1);
     this.renderer.setSize(w, h);
+    this.dof.setSize(w, h);
     this.cam.setAspect(w / h);
   }
 
@@ -343,7 +350,8 @@ export class UniverseScene {
     this.stars?.tick(dt, this.t, this.planets, reduced);
     this.player.animate(dt, this.t, this.vel, this.vel.length() / MAX_SPEED, reduced);
     this.cam.update(dt, s.camera, pos);
-    this.renderer.render(this.scene, this.cam.camera);
+    const focus = panelPlanet?.visible ? panelPlanet.position : null;
+    this.dof.render(dt, focus);
     this.frames++;
     if (this.t - this.fpsSince >= 1) {
       sceneState.setState({ fps: Math.round(this.frames / (this.t - this.fpsSince)) });

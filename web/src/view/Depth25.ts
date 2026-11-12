@@ -7,6 +7,7 @@ import heroUrl from "../assets/planet-hero.png";
 import nebulaUrl from "../assets/planet-nebula.png";
 import ringUrl from "../assets/planet-ring.png";
 import { marksOf, segmentsOf, type LinkPath } from "./linkPaths.ts";
+import { focusBlur } from "./focusBlur.ts";
 import { rightOccupied, type PlanetNode } from "./look.ts";
 import { viewApi } from "./viewApi.ts";
 
@@ -39,10 +40,18 @@ interface Imgs {
 let imgs: Promise<Imgs> | null = null;
 const loadImgs = () => (imgs ??= Promise.all([loadImage(heroUrl), loadImage(ringUrl), loadImage(nebulaUrl)]).then(([hero, ring, nebula]) => ({ hero, ring, nebula })));
 
+/** 심도 효과의 흐림 단계 (256px 사진 기준 흐림 px). 0 = 원본 */
+const BLUR_STEPS = [0, 2, 4, 7, 10, 14];
+
 interface Node3 {
   p: DepthPlanet;
   g: THREE.Group;
   orbit: THREE.Group;
+  sprite: THREE.Sprite;
+  dotMat: THREE.MeshBasicMaterial;
+  /** 심도 효과: 지금 흐림 정도 0 ~ 1 과 쓰고 있는 흐림 단계 */
+  blur: number;
+  level: number;
   pick: THREE.Mesh;
   label: HTMLButtonElement;
   at: THREE.Vector3;
@@ -235,6 +244,49 @@ export class DepthScene {
   }
 
   /** 행성 사진 텍스처. 색조 필터를 캔버스에 미리 입혀 둔다 */
+  /** 심도 효과용 흐린 사진. 단계 0 = 원본, 1 ~ BLUR_STEPS.length-1 = 점점 흐리게 (256px 기준 흐림 px) */
+  private blurred(p: DepthPlanet, level: number): THREE.CanvasTexture {
+    const base = this.photo(p);
+    if (level <= 0) return base;
+    const key = `${p.look.shape}|${p.look.filter}|b${level}`;
+    const cached = this.textures.get(key);
+    if (cached) return cached;
+    const src = base.image as HTMLCanvasElement;
+    const c = document.createElement("canvas");
+    c.width = src.width;
+    c.height = src.height;
+    const g = c.getContext("2d")!;
+    g.filter = `blur(${((BLUR_STEPS[level] * src.width) / 256).toFixed(1)}px)`;
+    g.drawImage(src, 0, 0);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    this.textures.set(key, tex);
+    return tex;
+  }
+
+  /**
+   * 심도 효과: 행성을 고르면(패널 열림) 그 행성에 초점을 맞추고, 다른 행성은 카메라에서의 거리가 초점과 다를수록 흐리고 어둡게.
+   * 흐림 정도는 천천히 따라가고, 사진은 흐림 단계 그림으로 바꿔 끼운다. 공전 점 · 이름표도 같이 흐려진다
+   */
+  private applyFocus(dt: number, camPos: THREE.Vector3) {
+    const focusId = store.getState().selectedPlanetId;
+    const f = focusId ? this.nodes.get(focusId) : undefined;
+    const fd = f ? camPos.distanceTo(f.at) : 0;
+    const k = 1 - Math.exp(-dt * 4);
+    this.nodes.forEach((n) => {
+      const want = f && n !== f ? focusBlur(camPos.distanceTo(n.at) - fd, Math.max(400, fd * 1.2)) : 0;
+      n.blur += (want - n.blur) * k;
+      if (Math.abs(want - n.blur) < 0.002) n.blur = want;
+      const level = Math.round(n.blur * (BLUR_STEPS.length - 1));
+      if (level !== n.level) {
+        n.level = level;
+        n.sprite.material.map = this.blurred(n.p, level);
+      }
+      n.sprite.material.color.setScalar(1 - n.blur * 0.4);
+      n.dotMat.opacity = 1 - n.blur * 0.75;
+    });
+  }
+
   private photo(p: DepthPlanet): THREE.CanvasTexture {
     const key = `${p.look.shape}|${p.look.filter}`;
     const cached = this.textures.get(key);
@@ -303,7 +355,7 @@ export class DepthScene {
       const orbit = new THREE.Group();
       orbit.rotation.set(1.15, 0, 0.35 + hash(idx, 7));
       const n = Math.min(12, p.count);
-      const dotMat = new THREE.MeshBasicMaterial({ color: p.look.accentHex });
+      const dotMat = new THREE.MeshBasicMaterial({ color: p.look.accentHex, transparent: true });
       const k = p.look.shape === "ring" ? 2.5 : 1.45;
       for (let i = 0; i < n; i++) {
         const a = (i / n) * Math.PI * 2, rr = r * (k + hash(i, idx) * 0.45);
@@ -330,7 +382,7 @@ export class DepthScene {
         this.openPlanet(p.id);
       };
       this.labels.appendChild(label);
-      this.nodes.set(p.id, { p, g, orbit, pick, label, at: g.position, sx: 0, sy: 0, pr: 0, vis: false });
+      this.nodes.set(p.id, { p, g, orbit, sprite: mesh, dotMat, blur: 0, level: 0, pick, label, at: g.position, sx: 0, sy: 0, pr: 0, vis: false });
     });
     this.rebuildLinks();
   }
@@ -547,6 +599,7 @@ export class DepthScene {
       fog.near = dmin * 0.9;
       fog.far = fog.near + Math.max(400, dmax - fog.near) / 0.55;
     }
+    this.applyFocus(dt, cam.pos);
     this.renderer.render(this.scene, this.camera);
 
     // 이름표: 행성 아래. 화면 밖·뒤쪽이거나 지금 열린 행성이면 숨긴다
@@ -566,7 +619,8 @@ export class DepthScene {
       const lw = n.label.offsetWidth;
       n.label.style.transform = `translate(${(sx - lw / 2).toFixed(1)}px,${(sy + pr * (n.p.look.shape === "ring" ? 1.35 : 1.08) + 6).toFixed(1)}px)`;
       const f = Math.max(0, Math.min(1, (cam.pos.distanceTo(n.at) - fog.near) / (fog.far - fog.near)));
-      n.label.style.opacity = Math.max(0.72, 1 - f * 0.5).toFixed(2);
+      n.label.style.opacity = (Math.max(0.72, 1 - f * 0.5) * (1 - n.blur * 0.5)).toFixed(2);
+      n.label.style.filter = n.blur > 0.01 ? `blur(${(n.blur * 2.5).toFixed(2)}px)` : "";
     });
     // 별자리 이름표: 첫 선분의 가운데. 한 행성 안의 별자리는 그 행성 바로 위에서 위로 쌓는다. 화면 밖·뒤쪽이면 숨긴다
     for (const m of this.marks) {
