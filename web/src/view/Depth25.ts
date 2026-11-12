@@ -41,7 +41,7 @@ let imgs: Promise<Imgs> | null = null;
 const loadImgs = () => (imgs ??= Promise.all([loadImage(heroUrl), loadImage(ringUrl), loadImage(nebulaUrl)]).then(([hero, ring, nebula]) => ({ hero, ring, nebula })));
 
 /** 심도 효과의 흐림 단계 (256px 사진 기준 흐림 px). 0 = 원본. 촘촘해야 스크롤할 때 튀지 않는다 */
-const BLUR_STEPS = [0, 1.5, 3, 4.5, 6, 8, 10, 12, 14];
+const BLUR_STEPS = [0, 1.5, 3, 4.5, 6, 7.5, 9, 10.5, 12];
 
 interface Node3 {
   p: DepthPlanet;
@@ -273,7 +273,7 @@ export class DepthScene {
     const focusId = store.getState().selectedPlanetId;
     const f = focusId ? this.nodes.get(focusId) : undefined;
     const fd = f ? camPos.distanceTo(f.at) : 0;
-    const ref = Math.max(300, fd * 0.8);
+    const ref = Math.max(500, fd * 1.4); // 이웃 행성끼리는 약하게
     const k = 1 - Math.exp(-dt * 4);
     this.nodes.forEach((n) => {
       const want = f && n !== f ? focusBlur(camPos.distanceTo(n.at) - fd, ref) : 0;
@@ -284,8 +284,8 @@ export class DepthScene {
         n.level = level;
         n.sprite.material.map = this.blurred(n.p, level);
       }
-      n.sprite.material.color.setScalar(1 - n.blur * 0.4);
-      n.dotMat.opacity = 1 - n.blur * 0.75;
+      n.sprite.material.color.setScalar(1 - n.blur * 0.3);
+      n.dotMat.opacity = 1 - n.blur * 0.6;
     });
   }
 

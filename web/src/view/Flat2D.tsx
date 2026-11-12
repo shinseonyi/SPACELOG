@@ -6,7 +6,7 @@ import heroUrl from "../assets/planet-hero.png";
 import nebulaUrl from "../assets/planet-nebula.png";
 import ringUrl from "../assets/planet-ring.png";
 import { clampZoom, landCam, leftOccupied, overviewCam, planetNodes, rightOccupied, type Cam2D, type PlanetNode } from "./look.ts";
-import { FLAT_BLUR_PX, FLAT_BLUR_REF, FLAT_DIM, focusBlur } from "./focusBlur.ts";
+import { FLAT_BLUR_PX, FLAT_BLUR_REF, FLAT_DIM, FLAT_NEAR_RATIO, focusBlur } from "./focusBlur.ts";
 import { marksOf, segmentsOf, useLinkPaths } from "./linkPaths.ts";
 import { viewApi } from "./viewApi.ts";
 import "./view.css";
@@ -347,7 +347,7 @@ export function Flat2D() {
 /** 심도 효과: 고른 행성(패널 열림)에서 멀수록 흐리게. 고른 행성 · 고른 것이 없으면 0 */
 function blurOf(n: PlanetNode, focus: PlanetNode | undefined): number {
   if (!focus || focus.id === n.id) return 0;
-  return focusBlur(Math.hypot(n.x - focus.x, n.y - focus.y), FLAT_BLUR_REF);
+  return focusBlur(Math.hypot(n.x - focus.x, n.y - focus.y), FLAT_BLUR_REF, FLAT_NEAR_RATIO);
 }
 
 function PlanetButton({ node: n, blur, labelScale, editing, dragging, onEditDown }: { node: PlanetNode; blur: number; labelScale: number; editing: boolean; dragging: boolean; onEditDown(e: React.PointerEvent): void }) {
