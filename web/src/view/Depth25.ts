@@ -73,7 +73,7 @@ export class DepthScene {
   private readonly world = new THREE.Group();
   private readonly lines = new THREE.Group();
   private linkPaths: LinkPath[] = [];
-  private marks: { el: HTMLButtonElement; a: THREE.Vector3; b: THREE.Vector3; stack: number }[] = [];
+  private marks: { el: HTMLButtonElement; a: THREE.Vector3; b: THREE.Vector3; stack: number; solo: Node3 | null }[] = [];
   private readonly labels = document.createElement("div");
   private readonly nodes = new Map<string, Node3>();
   private readonly stars: THREE.Points;
@@ -371,7 +371,7 @@ export class DepthScene {
         store.getState().openLinkView(m.linkId);
       };
       this.labels.appendChild(el);
-      this.marks.push({ el, a: a.at.clone(), b: b.at.clone(), stack: m.stack });
+      this.marks.push({ el, a: a.at.clone(), b: b.at.clone(), stack: m.stack, solo: m.solo ? a : null });
     }
   }
 
@@ -558,6 +558,7 @@ export class DepthScene {
       const sx = (v.x * 0.5 + 0.5) * w, sy = (-v.y * 0.5 + 0.5) * h;
       const pr = (n.p.size / 2 / Math.max(1, cam.pos.distanceTo(n.at))) * pxK;
       const visible = v.z <= 1 && v.z >= -1 && n.p.id !== focus && sx > -40 && sx < w - this.occ + 40 && sy > -40 && sy < h + 40;
+      n.sx = sx; n.sy = sy; n.pr = pr; n.vis = visible; // 한 행성 안의 별자리 이름표가 쓴다
       if (!visible) {
         n.label.style.transform = "translate(-9999px,0)";
         return;
@@ -567,8 +568,18 @@ export class DepthScene {
       const f = Math.max(0, Math.min(1, (cam.pos.distanceTo(n.at) - fog.near) / (fog.far - fog.near)));
       n.label.style.opacity = Math.max(0.72, 1 - f * 0.5).toFixed(2);
     });
-    // 별자리 이름표: 첫 선분의 가운데. 화면 밖·뒤쪽이면 숨긴다
+    // 별자리 이름표: 첫 선분의 가운데. 한 행성 안의 별자리는 그 행성 바로 위에서 위로 쌓는다. 화면 밖·뒤쪽이면 숨긴다
     for (const m of this.marks) {
+      if (m.solo) {
+        const n = m.solo;
+        if (!n.vis) {
+          m.el.style.transform = "translate(-9999px,0)";
+          continue;
+        }
+        const top = n.sy - n.pr * (n.p.look.shape === "ring" ? 1.35 : 1.08) - 8 - m.stack * 26;
+        m.el.style.transform = `translate(${(n.sx - m.el.offsetWidth / 2).toFixed(1)}px,${(top - m.el.offsetHeight).toFixed(1)}px)`;
+        continue;
+      }
       v.copy(m.a).lerp(m.b, 0.5).project(this.camera);
       const sx = (v.x * 0.5 + 0.5) * w;
       const sy = (-v.y * 0.5 + 0.5) * h + m.stack * 26;

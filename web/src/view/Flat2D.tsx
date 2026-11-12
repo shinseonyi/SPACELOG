@@ -315,13 +315,17 @@ export function Flat2D() {
           const a = at.get(m.a);
           const b = at.get(m.b);
           if (!a || !b) return null;
+          // 한 행성 안의 별자리: 선 없이 그 행성 바로 위(이름은 아래에 있으므로)에서 위로 쌓는다
+          const style = m.solo
+            ? { left: a.x, top: a.y - a.size / 2 - 10, transformOrigin: "50% 100%", transform: `translate(-50%, -100%) translateY(${-m.stack * 28 * labelScale}px) scale(${labelScale})` }
+            : { left: (a.x + b.x) / 2, top: (a.y + b.y) / 2 + m.stack * 28, transform: `translate(-50%, -50%) scale(${labelScale})` };
           return (
             <button
               key={m.linkId}
               type="button"
               className="flat__linkmark"
               title="별자리의 기록 보기"
-              style={{ left: (a.x + b.x) / 2, top: (a.y + b.y) / 2 + m.stack * 28, transform: `translate(-50%, -50%) scale(${labelScale})` }}
+              style={style}
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation();
