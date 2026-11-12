@@ -33,6 +33,31 @@ kbd { font: var(--type-fine-print); background: var(--color-chip); color: var(--
 .side__card--list .side__title { padding: 0 16px; }
 .side__note { margin: 0; padding: 0 8px 8px; color: var(--color-body-muted); font: var(--type-fine-print); line-height: 1.4; }
 .side__empty { margin: 0; padding: 12px 8px; color: var(--color-body-muted); font: var(--type-caption); }
+
+/* 별자리 목록 (시안 W01): 줄 = 아이콘 · 이름/아랫줄 · ＞, 오른쪽 연필 → 줄 아래에서 바로 고치기 */
+.lmenu { gap: 2px; }
+.lmenu__item { border-radius: var(--r-field); }
+.lmenu__item.is-editing { background: var(--color-inset); }
+.lmenu__row { display: flex; align-items: center; gap: 2px; padding-right: 6px; }
+.lmenu__open { flex: 1; min-width: 0; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 6px 8px 10px; border: 0; border-radius: var(--r-item); background: transparent; color: var(--color-body); text-align: left; cursor: pointer; transition: transform var(--press-time); }
+.lmenu__open:active { transform: scale(0.98); }
+.lmenu__icon { flex: none; color: var(--color-body-sub); }
+.lmenu__chev { flex: none; opacity: 0.6; }
+.lmenu__edit { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--color-body); opacity: 0.75; cursor: pointer; }
+.lmenu__edit[aria-expanded="true"] { background: var(--color-chip); opacity: 1; }
+.lmenu__open:focus-visible, .lmenu__edit:focus-visible, .lmenu__btn:focus-visible, .lmenu__remove:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.lmenu__form { display: flex; flex-direction: column; gap: 10px; padding: 4px 10px 12px; }
+.lmenu__form input:not([type]), .lmenu__form input[type="text"] { box-sizing: border-box; height: 38px; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: var(--color-chip); color: var(--color-body); font: var(--type-caption); }
+.lmenu__form textarea { box-sizing: border-box; padding: 10px 14px; border-radius: var(--r-field); border: 1px solid var(--color-line-btn); background: var(--color-chip); color: var(--color-body); font: var(--type-caption); font-family: inherit; line-height: 1.5; resize: vertical; }
+.lmenu__form input:focus-visible, .lmenu__form textarea:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
+.lmenu__show { display: flex; align-items: center; gap: 8px; font: var(--type-fine-print); color: var(--color-body-sub); cursor: pointer; }
+.lmenu__show input { width: 16px; height: 16px; accent-color: #fff; margin: 0; }
+.lmenu__actions { display: flex; align-items: center; gap: 6px; }
+.lmenu__actions > span { flex: 1; }
+.lmenu__remove { height: 32px; padding: 0 4px; border: 0; background: none; color: #ff8a80; font: var(--type-fine-print); cursor: pointer; }
+.lmenu__btn { height: 32px; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: transparent; color: var(--color-body); font: var(--type-fine-print); cursor: pointer; }
+.lmenu__btn--primary { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.lmenu__btn:disabled { opacity: 0.4; cursor: default; }
 .rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .rows--scroll { overflow-y: auto; min-height: 0; padding: 0 0 4px; }
 .row { width: 100%; height: 36px; padding: 0 8px; display: flex; align-items: center; gap: 12px; border: 0; border-radius: var(--r-item); background: transparent; color: var(--color-body); font: var(--type-caption-strong); text-align: left; cursor: pointer; transition: transform var(--press-time); }

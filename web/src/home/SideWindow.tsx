@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowUpRight, X } from "lucide-react";
+import { ArrowUpRight, ChevronRight, Pencil, Waypoints, X } from "lucide-react";
 import type { Star } from "@spacelog/shared/types";
 import { demo, useDemo } from "../demo/demoStore.ts";
 import { LinkView } from "./LinkSheets.tsx";
@@ -120,11 +120,15 @@ function RecordCard() {
   );
 }
 
-/** 별자리 목록. 체크한 별자리만 우주에 선으로 보인다 (README 6-1). 줄을 누르면 그 별자리의 기록 창 */
+/**
+ * 별자리 목록 (시안 W01 "별자리 목록"). 줄 = 별자리 아이콘 · 이름 · "기록 N · 관측 목적" · ＞(눌러서 그 별자리의 기록 창).
+ * 오른쪽 연필을 누르면 그 줄 아래에서 바로 고친다: 이름 · 관측 목적 · 우주에 선 보이기 · [별자리 풀기] [취소] [저장].
+ */
 function LinkCard() {
   const links = useDemo((s) => s.links);
   const hidden = useDemo((s) => s.hiddenLinkIds);
   const viewId = useStore((s) => s.linkViewId);
+  const [editId, setEditId] = useState<string | null>(null);
   const viewing = links.find((l) => l.id === viewId);
   if (viewing) return <LinkView key={viewing.id} link={viewing} onBack={() => store.getState().openLinkView(null)} />;
   return (
@@ -138,29 +142,67 @@ function LinkCard() {
       {links.length === 0 ? (
         <p className="side__empty">아직 별자리가 없어요. 기록을 체크해 별자리를 만들면 여기에 모입니다.</p>
       ) : (
-        <>
-          <p className="side__note">체크한 별자리만 우주에 선으로 보여요</p>
-          <ul className="rows">
-            {links.map((l) => {
-              const shown = !hidden.includes(l.id);
-              return (
-                <li key={l.id} className="row row--rec">
-                  <button type="button" role="checkbox" aria-checked={shown} aria-label={`${l.name} 우주에 ${shown ? "숨기기" : "보이기"}`} title="우주에 보이기 · 숨기기" className={`check${shown ? " is-on" : ""}`} onClick={() => toggleShown(l.id)} />
-                  <button type="button" className="row__main" title="별자리의 기록 보기" onClick={() => store.getState().openLinkView(l.id)}>
-                    <span className="row__text">
-                      <span className="row__title">{l.name}</span>
-                      <span className="row__sub">기록 {l.starIds.length}{l.memo ? ` · ${l.memo}` : ""}</span>
-                    </span>
-                    <ArrowUpRight size={14} aria-hidden className="row__go" />
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </>
+        <ul className="rows lmenu">
+          {links.map((l) => (
+            <li key={l.id} className={`lmenu__item${editId === l.id ? " is-editing" : ""}`}>
+              <div className="lmenu__row">
+                <button type="button" className="lmenu__open" title="별자리의 기록 보기" onClick={() => store.getState().openLinkView(l.id)}>
+                  <Waypoints size={16} aria-hidden className="lmenu__icon" />
+                  <span className="row__text">
+                    <span className="row__title">{l.name}</span>
+                    <span className="row__sub">기록 {l.starIds.length}{l.memo ? ` · ${l.memo}` : ""}{hidden.includes(l.id) ? " · 선 숨김" : ""}</span>
+                  </span>
+                  <ChevronRight size={14} aria-hidden className="lmenu__chev" />
+                </button>
+                <button type="button" className="lmenu__edit" aria-label={`${l.name} 별자리 수정`} aria-expanded={editId === l.id} title="별자리 수정" onClick={() => setEditId(editId === l.id ? null : l.id)}>
+                  <Pencil size={14} aria-hidden />
+                </button>
+              </div>
+              {editId === l.id && <LinkInlineEdit link={l} shown={!hidden.includes(l.id)} onDone={() => setEditId(null)} />}
+            </li>
+          ))}
+        </ul>
       )}
     </section>
   );
 }
 
-const toggleShown = (id: string) => demo.getState().toggleLinkShown(id);
+/** 별자리 목록 안에서 바로 고치기 (시안 W01 lkEdit) */
+function LinkInlineEdit({ link, shown, onDone }: { link: { id: string; name: string; memo: string }; shown: boolean; onDone(): void }) {
+  const [name, setName] = useState(link.name);
+  const [memo, setMemo] = useState(link.memo ?? "");
+  const [show, setShow] = useState(shown);
+  const save = () => {
+    if (!name.trim()) return;
+    demo.getState().editLink(link.id, { name: name.trim(), memo });
+    if (show !== shown) demo.getState().toggleLinkShown(link.id);
+    store.getState().showToast("별자리를 수정했어요", "success");
+    onDone();
+  };
+  const remove = () => {
+    demo.getState().removeLink(link.id);
+    store.getState().showToast(`‘${link.name}’ 별자리를 풀었어요. 기록은 그대로 있어요`);
+    onDone();
+  };
+  const key = (e: React.KeyboardEvent) => {
+    e.stopPropagation(); // 우주 비행 키로 가지 않게
+    if (e.key === "Escape") onDone();
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && e.currentTarget.tagName === "INPUT") save();
+  };
+  return (
+    <div className="lmenu__form">
+      <input value={name} maxLength={24} autoFocus aria-label="별자리 이름" placeholder="별자리 이름" onChange={(e) => setName(e.target.value)} onKeyDown={key} />
+      <textarea value={memo} rows={2} aria-label="관측 목적" placeholder="관측 목적: 이 기록들로 무엇을 보고 싶나요?" onChange={(e) => setMemo(e.target.value)} onKeyDown={key} />
+      <label className="lmenu__show">
+        <input type="checkbox" checked={show} onChange={(e) => setShow(e.target.checked)} />
+        우주에 선으로 보이기
+      </label>
+      <div className="lmenu__actions">
+        <button type="button" className="lmenu__remove" onClick={remove}>별자리 풀기</button>
+        <span />
+        <button type="button" className="lmenu__btn" onClick={onDone}>취소</button>
+        <button type="button" className="lmenu__btn lmenu__btn--primary" disabled={!name.trim()} onClick={save}>저장</button>
+      </div>
+    </div>
+  );
+}
