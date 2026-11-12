@@ -1,0 +1,70 @@
+/* 행성 패널 · 기록 상세. 값은 README 6-2 · 6-3, tokens.css */
+.ppanel__title { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.ppanel__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chipcount { flex: none; padding: 2px 10px; border-radius: var(--r-pill); background: var(--color-chip); font: var(--type-fine-print); line-height: 1.4; white-space: nowrap; }
+.ppanel__menu { position: relative; }
+.ppanel__menu .menu { right: 0; top: 44px; min-width: 190px; }
+.menu__item:disabled { color: var(--color-body-muted); cursor: not-allowed; }
+
+.note { margin: 0; padding: 10px 12px; border-radius: var(--r-field); background: var(--color-inset); color: var(--color-body-sub); font: var(--type-caption); }
+.note--warn { color: #fff; background: rgba(215, 0, 21, 0.24); }
+.empty-note { margin: 0; padding: 16px 4px; color: var(--color-body-muted); font: var(--type-caption); }
+.plist__title { margin: 4px 0 0; font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); }
+.plist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.prow { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 4px 8px 4px 10px; border-radius: var(--r-field); }
+.prow.is-picked { background: var(--color-inset); }
+.prow__main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; border-radius: var(--r-item); }
+.prow__main:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.prow__icon { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: var(--r-item); background: var(--color-chip); }
+.prow__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.prow__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption-strong); }
+.prow__sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-fine-print); color: var(--color-body-muted); }
+
+.prange { display: flex; gap: 2px; margin-top: auto; padding: 2px; border-radius: var(--r-pill); background: var(--color-chip); position: sticky; bottom: 0; }
+.prange button { flex: 1; height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--color-body-sub); font: var(--type-fine-print); white-space: nowrap; cursor: pointer; transition: transform var(--press-time); }
+.prange button:active { transform: scale(var(--press-scale)); }
+.prange button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.prange button.is-on { background: #fff; color: var(--color-ink-on-light); }
+.prange__n { font-variant-numeric: tabular-nums; opacity: 0.7; }
+.pfoot { display: flex; gap: 8px; }
+.pfoot .btn:first-child { flex: 1; }
+
+.sheet { display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: var(--r-field); background: var(--color-inset); border: 1px solid var(--color-line-inset); }
+.sheet__title { margin: 0; font: var(--type-caption-strong); }
+.sheet__actions { display: flex; gap: 8px; justify-content: flex-end; }
+.sheet__actions .btn { height: 36px; }
+.field { display: flex; flex-direction: column; gap: 6px; font: var(--type-fine-print); color: var(--color-body-sub); }
+.field__row { display: flex; justify-content: space-between; align-items: baseline; }
+.field__hint { color: var(--color-body-muted); font-variant-numeric: tabular-nums; }
+.field__error { margin: -4px 0 0; font: var(--type-fine-print); color: #ff8a80; }
+.field input, .field select, .field textarea { box-sizing: border-box; width: 100%; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: transparent; color: var(--color-body); color-scheme: dark; font: var(--type-caption); }
+.field input, .field select { height: 40px; }
+.field select option { background: var(--color-card-solid); }
+.field textarea { padding: 10px 14px; border-radius: var(--r-field); resize: vertical; line-height: 1.5; font-family: inherit; }
+.field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
+.field input[aria-invalid="true"] { border-color: #ff8a80; }
+
+.dnav { display: inline-flex; min-width: 0; }
+.dnav__back { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; padding: 6px 10px 6px 4px; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--color-primary-on-dark); font: var(--type-caption-strong); cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dnav__back:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.dnav__pager { display: inline-flex; align-items: center; gap: 4px; }
+.dnav__pager .btn--icon { width: 32px; height: 32px; }
+.dnav__count { min-width: 52px; text-align: center; font: var(--type-fine-print); color: var(--color-body-sub); font-variant-numeric: tabular-nums; }
+
+.detail { display: flex; flex-direction: column; gap: 14px; }
+.detail__title { margin: 0; font: var(--type-tagline); letter-spacing: var(--tracking-tagline); overflow-wrap: anywhere; }
+.detail__meta { margin: -8px 0 0; font: var(--type-fine-print); color: var(--color-body-muted); }
+.detail__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.detail__actions .btn { height: 36px; padding: 0 14px; }
+.detail__delete { align-self: flex-start; color: var(--color-body-muted); }
+.move { display: flex; align-items: flex-end; gap: 8px; }
+.move .field { flex: 1; min-width: 0; }
+.move .btn { height: 40px; }
+
+.preview { margin: 0; border-radius: var(--r-field); background: var(--color-inset); border: 1px solid var(--color-line-inset); overflow: hidden; }
+.preview--image { width: 100%; max-height: 320px; object-fit: contain; display: block; background: #000; }
+.preview--text { max-height: 260px; overflow: auto; padding: 14px; white-space: pre-wrap; overflow-wrap: anywhere; font: var(--type-caption); line-height: 1.6; color: var(--color-body); }
+.preview--link { display: flex; align-items: center; gap: 10px; padding: 14px; font: var(--type-caption); }
+.preview--link a { color: var(--color-primary-on-dark); overflow-wrap: anywhere; }
+.preview--placeholder { display: flex; align-items: center; gap: 14px; padding: 18px 14px; font: var(--type-caption); color: var(--color-body-sub); }
+.skeleton { height: 120px; border-radius: var(--r-field); background: var(--color-inset); }

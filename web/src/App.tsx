@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Rocket } from "lucide-react";
 import { ERROR_MESSAGES } from "@spacelog/shared/errors";
 import { ControlsHint } from "./home/ControlsHint.tsx";
 import { EmptyState } from "./home/EmptyState.tsx";
@@ -9,9 +8,8 @@ import { LeftStack } from "./home/LeftStack.tsx";
 import { SideWindow } from "./home/SideWindow.tsx";
 import { TopBar } from "./home/TopBar.tsx";
 import "./home/home.css";
+import { PanelHost } from "./panel/PanelHost.tsx";
 import { store, useStore } from "./state/store.ts";
-import { Button } from "./ui/Button.tsx";
-import { SidePanel } from "./ui/SidePanel.tsx";
 import { ToastHost } from "./ui/Toast.tsx";
 import { PerfMeter } from "./universe/PerfMeter.tsx";
 import { UniverseCanvas } from "./universe/UniverseCanvas.tsx";
@@ -22,9 +20,8 @@ import { ProbeModal } from "./probe/ProbeModal.tsx";
 /**
  * 웹 껍데기. 화면 자리만 잡는다.
  * - 우주 홈: 개발 C, 이슈 #3. 재발견 카드 데이터·이벤트는 개발 A(#7)의 useRediscoveryCard()
- * - 행성 패널·별 상세: 개발 B, 이슈 #5
+ * - 행성 패널·기록 상세: 개발 B, 이슈 #5 → panel/ (2.5D 디자인 4단계)
  * - 탐사선: 개발 A, 이슈 #8
- * 각자 화면이 나오면 아래 "자리 표시" 컴포넌트를 바꿔 끼운다.
  */
 export function App() {
   const auth = useStore((s) => s.auth);
@@ -42,7 +39,7 @@ export function App() {
       <LeftStack />
       <HomeBanner />
       <PerfMeter />
-      <PanelPlaceholder />
+      <PanelHost />
       <ProbeModal />
       <ToastHost />
     </div>
@@ -80,40 +77,4 @@ function useEscape() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-}
-
-// ───────── 자리 표시 (각 담당 이슈에서 교체) ─────────
-
-function PanelPlaceholder() {
-  const planetId = useStore((s) => s.selectedPlanetId);
-  const starId = useStore((s) => s.selectedStarId);
-  const planet = useStore((s) => s.planets.find((p) => p.id === planetId));
-  const stars = useStore((s) => s.stars);
-  if (!planetId && !starId) return null;
-  const close = () => store.getState().closePanel();
-
-  if (starId) {
-    return (
-      <SidePanel title="기록 상세 자리 (이슈 #5)" onClose={close}>
-        <Button variant="ghost" onClick={() => planetId && store.getState().openPanel(planetId)} disabled={!planetId}>← 행성으로</Button>
-        <p className="placeholder">기록 {starId}</p>
-        <Button onClick={() => store.getState().addToCargo({ type: "star", starId }) || store.getState().showToast("이미 실은 기록이에요")}><Rocket size={16} aria-hidden /> 싣기</Button>
-      </SidePanel>
-    );
-  }
-  const own = stars.filter((s) => s.planetId === planetId);
-  return (
-    <SidePanel title={planet?.name ?? "행성"} onClose={close}>
-      <p className="placeholder">행성 패널 자리 (이슈 #5)</p>
-      <ul className="placeholder-list">
-        {own.map((s) => (
-          <li key={s.id}>
-            <Button variant="ghost" onClick={() => store.getState().openStar(s.id)}>
-              {s.linkTitle ?? s.originalName ?? s.textBody?.slice(0, 30) ?? s.id}
-            </Button>
-          </li>
-        ))}
-      </ul>
-    </SidePanel>
-  );
 }

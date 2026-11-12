@@ -6,10 +6,13 @@ import { ERROR_MESSAGES, isApiError, type ErrorCode } from "@spacelog/shared/err
 import type {
   ExportRequest,
   ExportResponse,
+  OpenStarRequest,
+  Planet,
   RediscoveryEventRequest,
   RediscoveryTodayResponse,
   StarResponse,
   UniverseResponse,
+  UpdateStarRequest,
 } from "@spacelog/shared/types";
 
 const TOKEN_KEY = "space-archive.sessionToken";
@@ -100,6 +103,15 @@ export async function requestObjectUrl(path: string): Promise<string> {
   return URL.createObjectURL(await res.blob());
 }
 
+/**
+ * 서버가 아직 이 API를 만들지 않았을 때(경로 없음)도 404 로 온다. 시연용으로 서버를 바꾸지 않는 동안
+ * 기록·행성 수정 화면이 이 경우를 알아보고 안내할 수 있게 한다 (README 4-1 결정 기록).
+ */
+export const NOT_SUPPORTED_MESSAGE = "이 기능은 서버가 아직 지원하지 않아요";
+export function isNotSupported(e: unknown): boolean {
+  return e instanceof RequestError && e.status === 404;
+}
+
 export const api = {
   universe: (from: string, to: string) =>
     request<UniverseResponse>("GET", `/api/universe?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`),
@@ -110,4 +122,13 @@ export const api = {
   rediscoveryToday: () => request<RediscoveryTodayResponse>("GET", "/api/rediscovery/today"),
   /** 재발견 이벤트 기록 (POST /api/rediscovery/events) */
   rediscoveryEvent: (body: RediscoveryEventRequest) => request<null>("POST", "/api/rediscovery/events", body),
+
+  // ── 기록·행성 수정 (SPEC 2-6). 서버 담당(#5)이 만들면 바로 동작한다 ──
+  updateStar: (id: string, body: UpdateStarRequest) => request<StarResponse>("PATCH", `/api/stars/${encodeURIComponent(id)}`, body),
+  deleteStar: (id: string) => request<null>("DELETE", `/api/stars/${encodeURIComponent(id)}`),
+  openStarFile: (id: string, body: OpenStarRequest) => request<null>("POST", `/api/stars/${encodeURIComponent(id)}/open`, body),
+  createPlanet: (name: string) => request<Planet>("POST", "/api/planets", { name }),
+  renamePlanet: (id: string, name: string) => request<Planet>("PATCH", `/api/planets/${encodeURIComponent(id)}`, { name }),
+  deletePlanet: (id: string) => request<null>("DELETE", `/api/planets/${encodeURIComponent(id)}`),
+  mergePlanet: (id: string, targetId: string) => request<null>("POST", `/api/planets/${encodeURIComponent(id)}/merge`, { targetId }),
 };
