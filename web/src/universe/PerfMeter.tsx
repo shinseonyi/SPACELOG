@@ -9,7 +9,7 @@ export function PerfMeter() {
   if (!import.meta.env.DEV || !new URLSearchParams(location.hash.split("?")[1]).has("perf")) return null;
   return (
     <output className="perf card" aria-live="off">
-      별 {stars}개{hidden ? " (안 그림)" : ""} · {fps} fps
+      기록 {stars}개{hidden ? " (안 그림)" : ""} · {fps} fps
     </output>
   );
 }

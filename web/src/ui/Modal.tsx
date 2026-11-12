@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import { X } from "lucide-react";
 import { Button } from "./Button.tsx";
 
 type Props = { open: boolean; title: ReactNode; onClose(): void; children: ReactNode; footer?: ReactNode; wide?: boolean };
@@ -26,7 +27,7 @@ export function Modal({ open, title, onClose, children, footer, wide }: Props) {
         <>
           <header className="modal__header">
             <h2 className="modal__title">{title}</h2>
-            <Button className="btn--icon" onClick={onClose} aria-label="닫기">✕</Button>
+            <Button className="btn--icon" onClick={onClose} aria-label="닫기"><X size={16} aria-hidden /></Button>
           </header>
           <div className="modal__body">{children}</div>
           {footer && <footer className="modal__footer">{footer}</footer>}

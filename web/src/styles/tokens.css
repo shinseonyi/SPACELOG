@@ -1,104 +1,141 @@
-/* 디자인 토큰. 값은 docs/DESIGN.md 3장(컬러 · 타이포 · 모양)을 그대로 옮겼다.
-   서체는 인터넷 없이도 나오도록 앱에 같이 넣는다 (3-2, POLICY 1-1).
-   예전 이름(--radius-*, --color-* 등)은 다른 화면 CSS가 쓰고 있어 아래 "호환 이름"으로 남겨 둔다. */
-@import "@fontsource/black-han-sans/400.css";
+/* 디자인 토큰. 값은 docs/design/2.5d/.../README.md 5장과 design/design.md 2~8절을 옮겼다.
+   검정 바탕, 반투명 어두운 카드, 포인트 컬러 하나, Pretendard 하나, 1px 테두리, 그림자는 떠 있는 창에만.
+   서체는 인터넷 없이도 나오도록 앱에 같이 넣는다 (POLICY 1-1).
+   예전 이름(--ink, --yellow, --radius-*, --color-* 등)은 아직 옮기지 않은 화면 CSS와 3D 장면(universe/)이
+   읽고 있어 아래 "호환 이름"으로 남겨 두고 새 값에 연결했다. 새 코드는 위쪽 새 이름을 쓴다. */
 @import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
-@import "@fontsource/ibm-plex-mono/400.css";
-@import "@fontsource/ibm-plex-mono/600.css";
 
 :root {
   color-scheme: dark;
 
-  /* 3-1 컬러 */
-  --ink: #1a1430;
-  --space: #15103a;
-  --panel: #f4f2ff;
-  --panel-2: #e6e2ff;
-  --mute: #5b5480;
-  --white: #ffffff;
-  --yellow: #ffd23f;
-  --pink: #ff5d8f;
-  --violet: #7a6cff;
-  --sky: #5ec8ff;
-  --notice: #fff4c2;
-  --danger-text: #c2185b;
+  /* 색: 바탕과 면 */
+  --color-canvas: #000000;                       /* 우주 */
+  --color-panel: rgb(24, 24, 26);                /* 큰 패널(행성 패널, 관측소), 모달 */
+  --color-card: rgba(37, 37, 39, 0.86);          /* 떠 있는 카드 */
+  --color-card-solid: rgb(37, 37, 39);           /* 불투명이 필요한 카드 */
+  --color-inset: rgba(255, 255, 255, 0.05);      /* 카드 안의 면 */
+  --color-chip: rgba(255, 255, 255, 0.08);       /* 칩 · 아이콘 버튼 면 */
+  --color-selected: rgba(255, 255, 255, 0.14);   /* 선택된 탭 · 행 */
+  --color-line-panel: rgba(255, 255, 255, 0.12); /* 패널 · 창 테두리 */
+  --color-line-card: rgba(255, 255, 255, 0.14);  /* 카드 테두리 */
+  --color-line-inset: rgba(255, 255, 255, 0.08); /* 카드 안 면 테두리 */
+  --color-line-btn: rgba(255, 255, 255, 0.24);   /* 버튼 테두리 */
+  --color-line-list: rgba(255, 255, 255, 0.06);  /* 목록 구분선 */
 
-  /* 행성 색: 면 색(3D 행성 · 색 점 · 아이콘)과 진한 색(밝은 패널 위 글자 · 선, 흰 글자를 올리는 면).
-     카테고리가 생긴 순서대로 쓰고 9번째부터 처음으로 돌아간다 (ui/planetColor.ts) */
-  --planet-1: #ff7a59;  --planet-1-dark: #b23a1c;
-  --planet-2: #5ec8ff;  --planet-2-dark: #0f6aa8;
-  --planet-3: #8fdc5a;  --planet-3-dark: #2f7a1e;
-  --planet-4: #c29bff;  --planet-4-dark: #6a3fc8;
-  --planet-5: #ffb13b;  --planet-5-dark: #8f5a00;
-  --planet-6: #ff6fb5;  --planet-6-dark: #b0246f;
-  --planet-7: #4fd1c5;  --planet-7-dark: #0d7068;
-  --planet-8: #9aa7ff;  --planet-8-dark: #3f4fc0;
+  /* 색: 글자와 포인트 */
+  --color-body: #ffffff;
+  --color-body-sub: #cccccc;                     /* 보조 글자 */
+  --color-body-muted: #7a7a7a;                   /* 비활성 · 미확인 값 */
+  --color-ink-on-light: #1d1d1f;                 /* 흰 면 위 글자 (토스트, 선택된 칩) */
+  --color-primary: #0066cc;                      /* 주 버튼, 켜진 스위치. 행성 패널 안에서는 그 행성 색으로 덮어쓴다 */
+  --color-primary-on-dark: #2997ff;              /* 어두운 바탕 위 링크 · 강조 */
+  --color-focus: #0071e3;
+  --color-danger: #d70015;                       /* 시안에 없는 값: 삭제 · 오류용 임시 (README 5장에 없음) */
 
-  /* 3-2 타이포그래피 */
-  --f-display: "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --f-body: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  /* 행성 색: accent(밝은 색, 글자 · 점 · 링 · 3D 행성 면)와 base(진한 색, 흰 글자를 올리는 면).
+     생긴 순서대로 쓰고 9번째부터 처음으로 돌아간다 (ui/planetColor.ts). 값은 design/spacelog-data.js 의 planets · EXTRA */
+  --planet-1: #8fb4ff;  --planet-1-dark: #2f6fe0;  /* 파랑 */
+  --planet-2: #ffb07a;  --planet-2-dark: #c2561f;  /* 주황 */
+  --planet-3: #c4a8ff;  --planet-3-dark: #7a4fd6;  /* 보라 */
+  --planet-4: #ff8fcf;  --planet-4-dark: #b8327f;  /* 분홍 */
+  --planet-5: #6fdcaa;  --planet-5-dark: #1f7a55;  /* 초록 */
+  --planet-6: #ffd36f;  --planet-6-dark: #9a6a00;  /* 노랑 (design.md "새 행성 1") */
+  --planet-7: #7fe3ff;  --planet-7-dark: #0d7490;  /* 하늘 */
+  --planet-8: #ff8f7a;  --planet-8-dark: #c2402a;  /* 빨강 */
 
-  /* 3-3 모양과 간격 */
-  --line: 3px;
-  --line-thin: 2.5px;
-  --r-card: 16px;
-  --r-btn: 12px;
-  --r-item: 12px;
-  --r-thumb: 8px;
-  --r-pill: 999px;
-  --drop-card: 0 5px 0 var(--ink);
-  --drop-btn: 0 4px 0 var(--ink);
-  --gap-1: 6px;
+  /* 글자: Pretendard Variable 하나. 굵기는 400 / 600 / 700만 */
+  --f-body: "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --type-tagline: 600 21px/1.19 var(--f-body);          --tracking-tagline: 0.231px;
+  --type-body-strong: 600 17px/1.24 var(--f-body);      --tracking-body-strong: -0.374px;
+  --type-body: 400 17px/1.47 var(--f-body);             --tracking-body: -0.374px;
+  --type-caption: 400 14px/1.43 var(--f-body);          --tracking-caption: -0.224px;
+  --type-caption-strong: 600 14px/1.29 var(--f-body);   --tracking-caption-strong: -0.224px;
+  --type-button-utility: 400 14px/1.29 var(--f-body);   --tracking-button-utility: -0.224px;
+  --type-fine-print: 400 12px/1 var(--f-body);          --tracking-fine-print: -0.12px;
+  --type-micro: 400 10px/1.3 var(--f-body);             --tracking-micro: -0.08px;
+
+  /* 모양 */
+  --r-panel: 18px;   /* 카드 · 패널 */
+  --r-field: 14px;   /* 패널 안 행 · 작은 카드 · 입력 */
+  --r-item: 11px;    /* 카드 안의 작은 면 · 썸네일 */
+  --r-pill: 9999px;  /* 버튼 · 칩 · 입력 · 토글 */
+  --shadow-float: rgba(0, 0, 0, 0.22) 3px 5px 30px 0; /* 떠 있는 창 · 토스트에만 */
+  --blur-float: saturate(180%) blur(20px);            /* 우주 위에 올라가는 패널 · 카드에만 */
+  --press-scale: 0.95;
+  --press-time: 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* 간격 */
+  --gap-1: 4px;
   --gap-2: 8px;
   --gap-3: 12px;
   --gap-4: 16px;
   --gap-5: 24px;
-  --edge: 14px;
+  --edge: 16px;
+  --panel-width: 440px;
 
-  /* ── 호환 이름: 기존 CSS가 쓰는 이름. 새 코드는 위 이름을 쓴다 ── */
-  --color-bg: var(--space);
-  --color-text-on-bg: var(--panel);
-  --color-surface: var(--panel);
-  --color-surface-2: var(--panel-2);
-  --color-field: var(--white);
-  --color-text: var(--ink);
-  --color-text-muted: var(--mute);
-  --color-border: var(--ink);
-  --color-primary: var(--yellow);
-  --color-primary-text: var(--ink);
-  --color-accent: var(--violet);
-  --color-accent-text: var(--white);
-  --color-danger: var(--pink);
-  --color-danger-text: var(--white);
-  --color-warning: var(--yellow);
-  --color-info: var(--sky);
-  --color-focus: var(--sky);
-  --color-overlay: rgb(10 6 30 / 0.6);
-  --kind-image: #ffd23f;
-  --kind-file: #ff9a3c;
-  --kind-link: #5ec8ff;
+  /* ── 호환 이름: 기존 CSS · 3D 장면이 읽는 이름. 새 코드는 위 이름을 쓴다 ── */
+  --ink: #000000;
+  --space: #000000;
+  --panel: #ffffff;
+  --panel-2: var(--color-chip);
+  --mute: var(--color-body-sub);
+  --white: #ffffff;
+  --yellow: #ffd36f;
+  --pink: #ff8fcf;
+  --violet: #c4a8ff;
+  --sky: #7fe3ff;
+  --notice: var(--color-card-solid);
+  --danger-text: #ffffff;
+  --color-bg: var(--color-canvas);
+  --color-text-on-bg: var(--color-body);
+  --color-surface: var(--color-card);
+  --color-surface-2: var(--color-inset);
+  --color-field: var(--color-chip);
+  --color-text: var(--color-body);
+  --color-text-muted: var(--color-body-sub);
+  --color-border: var(--color-line-card);
+  --color-primary-text: #ffffff;
+  --color-accent: var(--color-primary-on-dark);
+  --color-accent-text: #ffffff;
+  --color-danger-text: #ffffff;
+  --color-warning: var(--color-ink-on-light);
+  --color-info: var(--color-card-solid);
+  --color-overlay: rgb(0 0 0 / 0.6);
+  --kind-image: var(--planet-6);
+  --kind-file: var(--planet-2);
+  --kind-link: var(--planet-7);
   --kind-text: #ffffff;
-  --scene-bg: var(--space);
-  --star-selected: var(--pink);
-  --font-display: var(--f-display);
+  --scene-bg: var(--color-canvas);
+  --star-selected: #ffffff;
+  --f-display: var(--f-body);
+  --f-mono: var(--f-body);
+  --font-display: var(--f-body);
   --font-body: var(--f-body);
-  --font-mono: var(--f-mono);
-  --font-size-xs: 11.5px;
+  --font-mono: var(--f-body);
+  --font-size-xs: 12px;
   --font-size-sm: 13px;
   --font-size-md: 14px;
-  --font-size-lg: 20px;
-  --font-size-xl: 26px;
-  --radius-sm: 10px;
-  --radius-md: var(--r-btn);
-  --radius-lg: var(--r-card);
-  --drop: var(--drop-card);
-  --drop-sm: var(--drop-btn);
+  --font-size-lg: 21px;
+  --font-size-xl: 28px;
+  --line: 1px;
+  --line-thin: 1px;
+  --r-card: var(--r-panel);
+  --r-btn: var(--r-pill);
+  --r-thumb: var(--r-item);
+  --radius-sm: var(--r-item);
+  --radius-md: var(--r-field);
+  --radius-lg: var(--r-panel);
+  --drop: none;
+  --drop-sm: none;
+  --drop-card: none;
+  --drop-btn: none;
   --space-1: 4px;
   --space-2: var(--gap-2);
   --space-3: var(--gap-3);
   --space-4: var(--gap-4);
   --space-6: var(--gap-5);
   --gutter: var(--edge);
-  --panel-width: 380px;
 }

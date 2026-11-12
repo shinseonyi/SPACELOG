@@ -1,5 +1,6 @@
 // 탐사선 (W-04, SPEC 1-7·3-8, 이슈 #8). 고른 기록만 Claude가 읽기 좋은 형식으로 만들어 복사한다.
 import { useEffect, useRef, useState } from "react";
+import { Rocket, X } from "lucide-react";
 import type { ExportFormat, ExportResponse } from "@spacelog/shared/types";
 import { api, RequestError } from "../api/client.ts";
 import { store, useStore } from "../state/store.ts";
@@ -44,7 +45,7 @@ export function ProbeModal() {
     <Modal
       open={open}
       wide
-      title="🚀 탐사선"
+      title={<><Rocket size={18} aria-hidden /> 탐사선</>}
       onClose={() => store.getState().goBack()}
       footer={
         <>
@@ -87,7 +88,7 @@ function CargoList() {
       </div>
       {cargo.length === 0 ? (
         <p className="probe__empty">
-          아직 실은 게 없어요. 행성 패널이나 별 상세에서 [싣기]를 누르거나, 위 버튼으로 {periodText(period)} 우주 전체를 실어 보세요.
+          아직 실은 게 없어요. 행성 패널이나 기록 상세에서 [싣기]를 누르거나, 위 버튼으로 {periodText(period)} 우주 전체를 실어 보세요.
         </p>
       ) : (
         <ul className="probe__list">
@@ -103,7 +104,7 @@ function CargoList() {
                   aria-label={`${row.title} 빼기`}
                   onClick={() => store.getState().removeFromCargo(i)}
                 >
-                  ✕
+                  <X size={14} aria-hidden />
                 </Button>
               </li>
             );

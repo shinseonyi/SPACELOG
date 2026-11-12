@@ -1,0 +1,10 @@
+/* 글자 크기 단계. design/_ds/.../tokens/typography.css 의 .cc-type-* 중 쓰는 것만 옮겼다.
+   값은 tokens.css 의 --type-* · --tracking-* . 한글은 단어 단위로 줄바꿈한다 (design.md 3장). */
+.cc-type-tagline { font: var(--type-tagline); letter-spacing: var(--tracking-tagline); }
+.cc-type-body-strong { font: var(--type-body-strong); letter-spacing: var(--tracking-body-strong); }
+.cc-type-body { font: var(--type-body); letter-spacing: var(--tracking-body); }
+.cc-type-caption { font: var(--type-caption); letter-spacing: var(--tracking-caption); }
+.cc-type-caption-strong { font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); }
+.cc-type-button-utility { font: var(--type-button-utility); letter-spacing: var(--tracking-button-utility); }
+.cc-type-fine-print { font: var(--type-fine-print); letter-spacing: var(--tracking-fine-print); }
+.cc-type-micro { font: var(--type-micro); letter-spacing: var(--tracking-micro); }

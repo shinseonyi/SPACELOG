@@ -4,7 +4,7 @@ import { starTitle as sharedStarTitle } from "../ui/starTitle.ts";
 
 export const UNNAMED_STAR = "이름 없는 기록";
 
-/** 별 한 줄 제목. 다른 화면과 같은 규칙(POLICY 2-7, ui/starTitle)을 쓰고, 목록에서 빠진 별은 "이름 없는 기록" */
+/** 기록 한 줄 제목. 다른 화면과 같은 규칙(POLICY 2-7, ui/starTitle)을 쓰고, 목록에서 빠진 기록은 "이름 없는 기록" */
 export function starTitle(star: Star | undefined): string {
   return star ? sharedStarTitle(star) : UNNAMED_STAR;
 }
@@ -30,7 +30,7 @@ export interface CargoLookup {
 export function cargoRow(item: CargoItem, index: number, lookup: CargoLookup): CargoRow {
   const key = `${index}:${item.type}`;
   if (item.type === "star") {
-    return { key, kind: "star", title: starTitle(lookup.stars.find((s) => s.id === item.starId)), detail: "별" };
+    return { key, kind: "star", title: starTitle(lookup.stars.find((s) => s.id === item.starId)), detail: "기록" };
   }
   if (item.type === "planet") {
     const planet = lookup.planets.find((p) => p.id === item.planetId);

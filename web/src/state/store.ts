@@ -271,7 +271,7 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
               (e) => {
                 if (!(e instanceof RequestError) || get().selectedStarId !== route.id) return;
                 if (e.code === "NOT_FOUND") {
-                  get().showToast("별을 찾을 수 없어요", "error");
+                  get().showToast("기록을 찾을 수 없어요", "error");
                   go({ name: "home" });
                 }
               },

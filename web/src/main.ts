@@ -7,6 +7,7 @@ import { parseHash, takeToken } from "./router.ts";
 import { store } from "./state/store.ts";
 import { handleRediscoveryDeepLink } from "./rediscovery/rediscovery.ts";
 import "./styles/tokens.css";
+import "./styles/typography.css";
 import "./styles/app.css";
 import "./ui/ui.css";
 

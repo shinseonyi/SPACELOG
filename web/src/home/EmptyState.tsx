@@ -9,8 +9,8 @@ export function EmptyState() {
   if (total === 0)
     return (
       <div className="empty card" role="status">
-        <h2>첫 별을 띄워 보세요 ✦</h2>
-        <p>화면 가장자리의 드롭존에 파일·링크·글을 끌어다 놓으면 별이 돼요.</p>
+        <h2>첫 기록을 남겨 보세요.</h2>
+        <p>화면 가장자리의 드롭존에 파일·링크·글을 끌어다 놓으면 기록이 돼요.</p>
         <p>
           클립보드는 <kbd>⌘⇧Space</kbd> (윈도우 <kbd>Ctrl+Shift+Space</kbd>)로 바로 넣을 수 있어요.
         </p>
@@ -18,7 +18,7 @@ export function EmptyState() {
     );
   return (
     <div className="empty card" role="status">
-      <p>{custom ? "이 기간에는 별이 없어요. 기간을 넓혀 보세요" : "드롭존에 첫 별을 끌어다 놓아 보세요"}</p>
+      <p>{custom ? "이 기간에는 기록이 없어요. 기간을 넓혀 보세요" : "드롭존에 첫 기록을 끌어다 놓아 보세요"}</p>
     </div>
   );
 }

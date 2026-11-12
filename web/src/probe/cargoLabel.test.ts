@@ -16,7 +16,7 @@ const star = (over: Partial<Star>): Star =>
 
 const planet = { id: "p1", name: "메모", system: null, defaultFor: null, colorToken: "planet-1", createdAtUtc: "" } as Planet;
 
-test("별 제목: 다른 화면과 같은 규칙 (POLICY 2-7, ui/starTitle)", () => {
+test("기록 제목: 다른 화면과 같은 규칙 (POLICY 2-7, ui/starTitle)", () => {
   assert.equal(starTitle(star({ kind: "link", linkTitle: "제목", linkDomain: "a.com" })), "제목");
   assert.equal(starTitle(star({ kind: "link", linkDomain: "a.com" })), "a.com");
   assert.equal(starTitle(star({ kind: "file", originalName: "초안.pdf" })), "초안.pdf");
@@ -34,9 +34,9 @@ test("기간 표시: 하루면 날짜 하나, 아니면 범위", () => {
   assert.equal(periodText(WEEK), "2026.11.09 ~ 2026.11.11");
 });
 
-test("실은 항목 줄: 별·행성·우주", () => {
+test("실은 항목 줄: 기록·행성·우주", () => {
   const lookup = { stars: [star({ textBody: "메모 하나" })], planets: [planet] };
-  assert.deepEqual(cargoRow({ type: "star", starId: "s1" }, 0, lookup), { key: "0:star", kind: "star", title: "메모 하나", detail: "별" });
+  assert.deepEqual(cargoRow({ type: "star", starId: "s1" }, 0, lookup), { key: "0:star", kind: "star", title: "메모 하나", detail: "기록" });
   assert.equal(cargoRow({ type: "star", starId: "gone" }, 1, lookup).title, UNNAMED_STAR);
   assert.deepEqual(cargoRow({ type: "planet", planetId: "p1", period: WEEK }, 2, lookup).detail, "행성 · 2026.11.09 ~ 2026.11.11");
   assert.deepEqual(cargoRow({ type: "universe", period: TODAY }, 3, lookup).title, "우주 전체");

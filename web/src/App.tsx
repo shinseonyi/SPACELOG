@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Rocket } from "lucide-react";
 import { ERROR_MESSAGES } from "@spacelog/shared/errors";
 import { ControlsHint } from "./home/ControlsHint.tsx";
 import { EmptyState } from "./home/EmptyState.tsx";
@@ -83,10 +84,10 @@ function PanelPlaceholder() {
 
   if (starId) {
     return (
-      <SidePanel title="별 상세 자리 (이슈 #5)" onClose={close}>
+      <SidePanel title="기록 상세 자리 (이슈 #5)" onClose={close}>
         <Button variant="ghost" onClick={() => planetId && store.getState().openPanel(planetId)} disabled={!planetId}>← 행성으로</Button>
-        <p className="placeholder">별 {starId}</p>
-        <Button onClick={() => store.getState().addToCargo({ type: "star", starId }) || store.getState().showToast("이미 실은 별이에요")}>🚀 싣기</Button>
+        <p className="placeholder">기록 {starId}</p>
+        <Button onClick={() => store.getState().addToCargo({ type: "star", starId }) || store.getState().showToast("이미 실은 기록이에요")}><Rocket size={16} aria-hidden /> 싣기</Button>
       </SidePanel>
     );
   }

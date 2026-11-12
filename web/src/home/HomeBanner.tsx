@@ -22,12 +22,12 @@ export function HomeBanner() {
     );
   else if (webgl === false) banner = <Banner tone="info">이 브라우저에서는 3D 우주를 볼 수 없어요. 왼쪽 목록에서 행성을 골라 보세요</Banner>;
   else if (starsHidden)
-    // 별 상한 초과 상태 (DESIGN W-01): 기간이 이미 오늘이면 버튼을 넣지 않는다
+    // 기록 상한 초과 상태 (DESIGN W-01): 기간이 이미 오늘이면 버튼을 넣지 않는다
     banner = (
       <Banner tone="warning" action={isToday ? undefined : { label: "오늘만 보기", onClick: () => void store.getState().setPeriod(todayPeriod()) }}>
-        기간을 좁히면 별이 보여요
+        기간을 좁히면 기록이 보여요
       </Banner>
     );
-  else if (expanded) banner = <Banner tone="info">오늘은 별이 없어 이번 주 우주를 보여드려요</Banner>;
+  else if (expanded) banner = <Banner tone="info">오늘은 기록이 없어 이번 주 우주를 보여드려요</Banner>;
   return banner && <div className="home-banner card">{banner}</div>;
 }

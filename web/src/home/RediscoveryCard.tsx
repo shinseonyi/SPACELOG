@@ -26,12 +26,12 @@ export function RediscoverySlot() {
   return <RediscoveryCard star={today.star} daysAgo={today.daysAgo} planetName={planetName ?? "행성"} onOpen={open} onDismiss={dismiss} />;
 }
 
-/** "N일 전 오늘의 별" 카드 화면. 데이터·이벤트는 props 로 받는다 */
+/** "재발견 혜성 · N일 전 오늘의 기록" 카드 화면. 데이터·이벤트는 props 로 받는다 */
 export function RediscoveryCard({ star, daysAgo, planetName, onOpen, onDismiss }: Props) {
   const title = starTitle(star);
   return (
-    <aside className="rediscovery card" aria-label={`${daysAgo}일 전 오늘의 별`}>
-      <div className="rediscovery__eyebrow">{daysAgo}일 전 오늘의 별 ✦</div>
+    <aside className="rediscovery card" aria-label={`재발견 혜성 · ${daysAgo}일 전 오늘의 기록`}>
+      <div className="rediscovery__eyebrow">재발견 혜성 · {daysAgo}일 전 오늘의 기록</div>
       <div className="rediscovery__body">
         <Thumbnail star={star} size={56} />
         <div className="rediscovery__text">

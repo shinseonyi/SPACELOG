@@ -1,4 +1,4 @@
-/* 탐사선 (W-04). 공통 토큰만 쓴다. 디자이너 2(#10) 시안이 나오면 바꾼다 */
+/* 탐사선 (W-04). 공통 토큰만 쓴다. 1단계에서는 새 토큰으로 색 · 모양만 맞췄다. 오른쪽 480px 패널 배치(README 6-4b)는 6단계에서 한다 */
 .probe { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(0, 1.6fr); gap: var(--space-4); min-height: 0; }
 .probe__cargo, .probe__output { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
 .probe__cargo-head { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
@@ -11,11 +11,11 @@
 .probe__empty { margin: 0; opacity: 0.75; }
 .probe__formats { border: 0; margin: 0; padding: 0; display: flex; gap: var(--space-2); flex-wrap: wrap; }
 .probe__formats legend { font-weight: 700; margin-bottom: var(--space-2); }
-.probe__format { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: var(--line-thin) solid var(--color-border); border-radius: var(--radius-sm); cursor: pointer; }
-.probe__format.is-selected { background: var(--color-primary); color: var(--color-primary-text); }
-.probe__format:focus-within { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+.probe__format { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: var(--line-thin) solid var(--color-border); border-radius: var(--r-pill); cursor: pointer; }
+.probe__format.is-selected { background: #ffffff; border-color: #ffffff; color: var(--color-ink-on-light); } /* 선택된 토글 · 칩: 흰 바탕, 검정 글자 (README 5장) */
+.probe__format:focus-within { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .probe__format input { margin: 0; }
-.probe__preview { width: 100%; min-height: 320px; flex: 1; resize: vertical; font-family: var(--font-mono, monospace); font-size: 13px; line-height: 1.5; padding: var(--space-3); border: var(--line-thin) solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); color: inherit; white-space: pre; }
+.probe__preview { width: 100%; min-height: 320px; flex: 1; resize: vertical; font-family: var(--f-body); font-size: 13px; line-height: 1.5; padding: var(--space-3); border: 1px solid var(--color-line-inset); border-radius: var(--r-field); background: rgba(0, 0, 0, 0.35); color: inherit; white-space: pre; }
 .probe__count { margin: 0; text-align: right; font-size: var(--font-size-sm, 13px); opacity: 0.75; }
 .probe__privacy { flex: 1; margin: 0; align-self: center; font-size: var(--font-size-sm, 13px); }
 

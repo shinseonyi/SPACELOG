@@ -156,9 +156,9 @@ export class PlanetView {
     g.fillText(this.name, 384, 100);
     g.font = `600 38px ${fontVar("font-body")}`;
     g.lineWidth = 12;
-    g.strokeText(`별 ${this.count.toLocaleString("ko-KR")}개`, 384, 160);
+    g.strokeText(`기록 ${this.count.toLocaleString("ko-KR")}`, 384, 160);
     g.fillStyle = "#" + cssColor("yellow", "#ffd23f").getHexString();
-    g.fillText(`별 ${this.count.toLocaleString("ko-KR")}개`, 384, 160);
+    g.fillText(`기록 ${this.count.toLocaleString("ko-KR")}`, 384, 160);
     (this.label.material as THREE.SpriteMaterial).map!.needsUpdate = true;
   }
 
