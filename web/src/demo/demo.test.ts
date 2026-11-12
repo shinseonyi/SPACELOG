@@ -37,11 +37,15 @@ test("CSV: 12열 · 300행에서 자르고 알려 준다", () => {
 });
 
 test("CSV: 숫자 열 · 값 가짓수 · 1씩 이어지는 번호 열", () => {
-  const t = parseCsv("id,type,minutes\n1,run,30\n2,swim,45\n3,run,1,200\n4,run,")!;
-  const [id, type, minutes] = analyzeColumns(t);
-  assert.deepEqual([id.numeric, id.sequential], [true, true]);
-  assert.deepEqual([type.numeric, type.distinct], [false, 2]);
-  assert.deepEqual([minutes.numeric, minutes.sequential], [true, false]);
+  const t = parseCsv("id,type,minutes,memo\n1,run,30,a\n2,swim,45,b\n3,run,,c\n4,run,50,")!;
+  const [id, type, minutes, memo] = analyzeColumns(t);
+  assert.deepEqual([id.numeric, id.isId], [true, true]);
+  assert.deepEqual([type.numeric, type.distinct, type.isId], [false, 2, false]);
+  assert.deepEqual([minutes.numeric, minutes.isId, minutes.nums], [true, false, [30, 45, 50]]);
+  assert.deepEqual([memo.numeric, memo.distinct], [false, 3]);
+  // 이름이 id 가 아니어도 1씩 이어지는 정수 열이면 번호 열
+  assert.equal(analyzeColumns(parseCsv("순서값,x\n5,a\n6,b\n7,c")!)[0].isId, true);
+  assert.equal(analyzeColumns(parseCsv("점수,x\n5,a\n9,b\n7,c")!)[0].isId, false);
 });
 
 // ── 별자리 ──

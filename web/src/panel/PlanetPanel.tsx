@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { MoreHorizontal, Rocket } from "lucide-react";
 import { PLANET_NAME_MAX, type Planet, type Star } from "@spacelog/shared/types";
 import { api } from "../api/client.ts";
+import { PickedTools } from "../home/PickedTools.tsx";
 import { PERIOD_LABEL, periodFor, periodKey } from "../home/periodOptions.ts";
 import { store, useStore } from "../state/store.ts";
 import { Button } from "../ui/Button.tsx";
@@ -31,14 +32,13 @@ export function PlanetPanel({ planetId }: { planetId: string }) {
   const [sheet, setSheet] = useState<Sheet>(null);
   const [confirm, setConfirm] = useState<null | "merge" | "delete">(null);
   const [mergeTo, setMergeTo] = useState("");
-  const [picked, setPicked] = useState<string[]>([]);
+  const picked = useStore((s) => s.picked); // 전역 선택: 행성 패널을 옮겨도 유지된다 (별자리는 여러 행성의 기록을 묶는다)
   const { busy, run } = useSave();
   const menuRoot = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setSheet(null);
     setConfirm(null);
-    setPicked([]);
     setMenu(false);
   }, [planetId]);
   useEffect(() => {
@@ -62,15 +62,6 @@ export function PlanetPanel({ planetId }: { planetId: string }) {
   const system = planet.system !== null;
   const total = planet.starCountTotal ?? 0;
   const others = planets.filter((p) => p.id !== planetId);
-  const alive = picked.filter((id) => stars.some((s) => s.id === id));
-  const toggle = (id: string) => setPicked((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
-
-  const load = () => {
-    const { addToCargo, showToast } = store.getState();
-    const added = alive.filter((starId) => addToCargo({ type: "star", starId })).length;
-    showToast(added === alive.length ? `기록 ${added}개를 탐사선에 실었어요` : `${added}개를 실었어요. 나머지는 이미 실려 있어요`, "success");
-    setPicked([]);
-  };
   const loadPlanet = () => {
     const ok = store.getState().addToCargo({ type: "planet", planetId, period });
     store.getState().showToast(ok ? `‘${planet.name}’ 행성을 탐사선에 실었어요` : "이미 실은 행성이에요", ok ? "success" : "info");
@@ -99,11 +90,8 @@ export function PlanetPanel({ planetId }: { planetId: string }) {
         </div>
       }
       footer={
-        alive.length > 0 ? (
-          <div className="pfoot">
-            <Button variant="primary" onClick={load}><Rocket size={16} aria-hidden /> 탐사선에 싣기 · {alive.length}</Button>
-            <Button variant="ghost" onClick={() => setPicked([])}>해제</Button>
-          </div>
+        picked.length > 0 ? (
+          <PickedTools />
         ) : total > 0 ? (
           <Button onClick={loadPlanet}><Rocket size={16} aria-hidden /> 행성 전체를 탐사선에 싣기</Button>
         ) : undefined
@@ -167,7 +155,7 @@ export function PlanetPanel({ planetId }: { planetId: string }) {
         </p>
       ) : (
         <ul className="plist">
-          {stars.map((s) => <StarRow key={s.id} star={s} planet={planet} checked={alive.includes(s.id)} onToggle={() => toggle(s.id)} />)}
+          {stars.map((s) => <StarRow key={s.id} star={s} planet={planet} checked={picked.includes(s.id)} onToggle={() => store.getState().togglePicked(s.id)} />)}
         </ul>
       )}
 

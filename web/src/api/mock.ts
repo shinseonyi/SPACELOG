@@ -7,6 +7,11 @@ import { buildExport } from "../../../apps/server/export/buildExport.ts";
 import universe from "../../../mocks/api/universe.json";
 import universeEmpty from "../../../mocks/api/universe.empty.json";
 import rediscoveryToday from "../../../mocks/api/rediscovery/today.json";
+import { localDate } from "@spacelog/shared/period";
+import { registerCsvTables } from "../demo/csvSource.ts";
+import { buildSeed, universeIn, type SeedPlanet, type SeedRecord } from "../demo/seed.ts";
+import seedPlanets from "../../../docs/design/2.5d/design_handoff_spacelog_2_5d/mock-data/planets.json";
+import seedRecords from "../../../docs/design/2.5d/design_handoff_spacelog_2_5d/mock-data/records.json";
 import { RequestError } from "./client.ts";
 
 // JSON import 는 리터럴 타입이 넓혀져 있다. 형식은 mocks/api/mocks.test.ts 가 검사한다
@@ -14,7 +19,10 @@ const starFiles = Object.values(import.meta.glob("../../../mocks/api/stars/*.jso
 
 const params = new URLSearchParams(location.hash.split("?")[1]);
 const empty = params.get("mock") === "empty";
-let data = withStarCount((empty ? universeEmpty : universe) as unknown as UniverseResponse, Number(params.get("stars")) || 0);
+/** `#/?token=dev&mock=seed`: 디자이너의 예시 데이터(행성 6 · 기록 41, CSV 6개 포함)로 연다. 기간별로 거르고, 7일 전 기록으로 재발견 혜성이 뜬다 */
+const seed = params.get("mock") === "seed" ? buildSeed(seedPlanets as unknown as SeedPlanet[], seedRecords as unknown as SeedRecord[]) : null;
+if (seed) registerCsvTables(seed.tables);
+let data = seed ? { stars: seed.stars, planets: seed.planets } : withStarCount((empty ? universeEmpty : universe) as unknown as UniverseResponse, Number(params.get("stars")) || 0);
 
 /** 성능 측정용: `&stars=2000` 이면 별 N개를 만들어 행성에 나눠 준다 */
 function withStarCount(u: UniverseResponse, n: number): UniverseResponse {
@@ -100,7 +108,10 @@ export async function mockApi(method: string, path: string, body?: unknown): Pro
     if (done !== undefined) return done;
   }
   if (method === "GET" && url.pathname === "/api/health") return { ok: true };
-  if (method === "GET" && url.pathname === "/api/universe") return data;
+  if (method === "GET" && url.pathname === "/api/universe") {
+    if (!seed) return data;
+    return universeIn({ stars: data.stars, planets: data.planets }, url.searchParams.get("from") ?? "0000-01-01", url.searchParams.get("to") ?? "9999-12-31", (iso) => localDate(iso));
+  }
   const m = url.pathname.match(/^\/api\/stars\/([^/]+)$/);
   if (method === "GET" && m) {
     const id = decodeURIComponent(m[1]);
@@ -117,6 +128,12 @@ export async function mockApi(method: string, path: string, body?: unknown): Pro
     console.info("[mock] 재발견 이벤트", body);
     return null;
   }
-  if (method === "GET" && url.pathname === "/api/rediscovery/today") return empty ? null : rediscoveryToday;
+  if (method === "GET" && url.pathname === "/api/rediscovery/today") {
+    if (seed) {
+      const star = data.stars.find((s) => s.id === seed.rediscoveryId);
+      return star ? { star, daysAgo: 7 } : null;
+    }
+    return empty ? null : rediscoveryToday;
+  }
   throw new RequestError("NOT_FOUND", `${ERROR_MESSAGES.NOT_FOUND} (목업에 없는 API: ${method} ${url.pathname})`, 404);
 }

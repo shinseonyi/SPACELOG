@@ -99,7 +99,7 @@ export class DepthScene {
     this.renderer.setClearColor(0x000000, 1);
     const el = this.renderer.domElement;
     el.style.cssText = "position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab";
-    this.labels.style.cssText = "position:absolute;inset:0;overflow:hidden;pointer-events:none";
+    this.labels.style.cssText = "position:absolute;inset:0;overflow:hidden;overflow:clip;pointer-events:none";
     host.append(el, this.labels);
 
     this.scene.fog = new THREE.Fog(0x000000, 1, 20000); // 거리 안개
@@ -179,7 +179,7 @@ export class DepthScene {
         e.metaKey || e.ctrlKey || e.altKey ||
         (e.target instanceof Element && !!e.target.closest("input, textarea, select, [contenteditable='true']")) ||
         !!document.querySelector("dialog[open]") ||
-        s.selectedPlanetId !== null || s.selectedStarId !== null || s.route.name === "probe"
+        s.selectedPlanetId !== null || s.selectedStarId !== null || s.route.name === "probe" || s.route.name === "observatory"
       );
     };
     const kd = (e: KeyboardEvent) => {

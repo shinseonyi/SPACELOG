@@ -34,6 +34,12 @@ export interface Store extends WebState {
   auth: "checking" | "ok" | "required";
   /** 오른쪽 창에 열린 목록. 같은 칩을 다시 누르면 닫힌다. 화면 설정이라 서버와 무관 */
   sideTab: SideTab | null;
+  /** 관측소의 "선택한 기록"(저장 전 묶음). 목록에서 "관측소에서 바로 보기"로 들어왔을 때만 있다 */
+  obsDraft: string[] | null;
+  /** 목록에서 체크한 기록. 행성·기간·패널을 넘어 유지된다 (별자리는 여러 행성의 기록을 묶는다, README 1-1) */
+  picked: string[];
+  togglePicked(id: string): void;
+  clearPicked(): void;
   /** 우주 보기 방식. 브라우저에만 저장하는 화면 설정 */
   view: ViewMode;
   route: Route;
@@ -70,8 +76,12 @@ export interface Store extends WebState {
   refresh(): Promise<void>;
   setExportFormat(format: WebState["exportFormat"]): void;
   toggleSideTab(tab: SideTab): void;
+  /** 오른쪽 창의 목록을 연다 (이미 열려 있으면 그대로). 닫지 않는다 */
+  openSideTab(tab: SideTab): void;
   setView(view: ViewMode): void;
   openProbe(): void;
+  /** 관측소 열기. linkId = 저장된 별자리, draftIds = 아직 저장하지 않은 "선택한 기록", comet = 재발견 혜성 관측 (README 6-4) */
+  openObservatory(opts?: { linkId?: string; draftIds?: string[]; comet?: boolean }): void;
 
   // ── 라우팅·알림 ──
   applyRoute(route: Route): void;
@@ -119,6 +129,8 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
       auth: "checking",
       sideTab: "planet",
       view: savedView(),
+      obsDraft: null,
+      picked: [],
       route: { name: "home" },
       loading: false,
       toasts: [],
@@ -189,6 +201,7 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
         set({
           stars: get().stars.filter((s) => !gone.has(s.id)),
           cargo: get().cargo.filter((c) => !(c.type === "star" && gone.has(c.starId))),
+          picked: get().picked.filter((id) => !gone.has(id)),
         });
         if (selectedStarId && gone.has(selectedStarId)) {
           if (selectedPlanetId) get().openPanel(selectedPlanetId);
@@ -219,7 +232,7 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
 
       goBack() {
         const { route, selectedStarId, selectedPlanetId } = get();
-        if (route.name === "probe") go({ name: "home" });
+        if (route.name === "probe" || route.name === "observatory") go({ name: "home" });
         else if (selectedStarId && selectedPlanetId) get().openPanel(selectedPlanetId);
         else if (selectedPlanetId) get().closePanel();
         else get().returnToOverview();
@@ -284,12 +297,30 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
         set({ view, camera: "overview" });
       },
 
+      openSideTab(tab) {
+        set({ sideTab: tab });
+      },
+
       toggleSideTab(tab) {
         set({ sideTab: get().sideTab === tab ? null : tab });
       },
 
       openProbe() {
         go({ name: "probe" });
+      },
+
+      togglePicked(id) {
+        const cur = get().picked;
+        set({ picked: cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id] });
+      },
+
+      clearPicked() {
+        if (get().picked.length) set({ picked: [] });
+      },
+
+      openObservatory(opts = {}) {
+        set({ obsDraft: opts.draftIds && opts.draftIds.length > 0 ? [...new Set(opts.draftIds)] : null });
+        go(opts.comet ? { name: "observatory", comet: true } : opts.linkId ? { name: "observatory", linkId: opts.linkId } : { name: "observatory" });
       },
 
       applyRoute(route) {

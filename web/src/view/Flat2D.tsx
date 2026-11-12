@@ -152,7 +152,7 @@ export function Flat2D() {
         e.metaKey || e.ctrlKey || e.altKey ||
         (e.target instanceof Element && !!e.target.closest("input, textarea, select, [contenteditable='true']")) ||
         !!document.querySelector("dialog[open]") ||
-        s.selectedPlanetId !== null || s.selectedStarId !== null || s.route.name === "probe"
+        s.selectedPlanetId !== null || s.selectedStarId !== null || s.route.name === "probe" || s.route.name === "observatory"
       );
     };
     const down = (e: KeyboardEvent) => {

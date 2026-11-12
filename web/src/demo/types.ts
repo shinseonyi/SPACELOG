@@ -16,8 +16,8 @@ export interface LinkViz {
   /** 값 열. 없으면 행 수 */
   val?: string;
   agg?: Aggregate;
-  /** 대시보드에서 뺀 열 */
-  hide?: string[];
+  /** CSV 기록(id)별로 사용자가 켜고 끈 열: 열 이름 → 쓸지 여부. 없는 열은 기본(번호 열만 끔)을 따른다 */
+  cols?: Record<string, Record<string, boolean>>;
 }
 
 /** 별자리: 기록에 관측 목적을 붙여 묶은 것. 사용자가 직접 묶는 그룹 */

@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
-import { ArrowUpRight, Rocket, X } from "lucide-react";
+import { ArrowUpRight, X } from "lucide-react";
 import type { Star } from "@spacelog/shared/types";
 import { demo, useDemo } from "../demo/demoStore.ts";
+import { LinkView } from "./LinkSheets.tsx";
+import { PickedTools } from "./PickedTools.tsx";
 import { store, useStore } from "../state/store.ts";
 import { planetColorToken } from "../ui/planetColor.ts";
 import { starTitle } from "../ui/starTitle.ts";
@@ -65,25 +67,16 @@ function RecordCard() {
   const planets = useStore((s) => s.planets);
   const label = useStore((s) => (s.period.preset === "today" ? "오늘" : s.period.preset === "week" ? "이번 주" : "이 기간"));
   const [mode, setMode] = useState<"all" | "planet">("all");
-  const [picked, setPicked] = useState<string[]>([]);
+  const picked = useStore((s) => s.picked); // 전역 선택: 다른 행성·패널로 옮겨도 유지된다
   const planetOf = useMemo(() => new Map(planets.map((p) => [p.id, p])), [planets]);
   const rows = useMemo(() => [...stars].sort((a, b) => b.createdAtUtc.localeCompare(a.createdAtUtc)), [stars]);
-  const alive = picked.filter((id) => stars.some((s) => s.id === id)); // 목록에서 사라진 기록은 선택에서도 뺀다
-
-  const toggle = (id: string) => setPicked((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
-  const load = () => {
-    const { addToCargo, showToast } = store.getState();
-    const added = alive.filter((starId) => addToCargo({ type: "star", starId })).length;
-    showToast(added === alive.length ? `기록 ${added}개를 탐사선에 실었어요` : `${added}개를 실었어요. 나머지는 이미 실려 있어요`, "success");
-    setPicked([]);
-  };
 
   const row = (s: Star) => {
     const planet = planetOf.get(s.planetId);
-    const on = alive.includes(s.id);
+    const on = picked.includes(s.id);
     return (
       <li key={s.id} className={`row row--rec${on ? " is-picked" : ""}`}>
-        <button type="button" role="checkbox" aria-checked={on} aria-label={`${starTitle(s)} 선택`} className={`check${on ? " is-on" : ""}`} onClick={() => toggle(s.id)} />
+        <button type="button" role="checkbox" aria-checked={on} aria-label={`${starTitle(s)} 선택`} className={`check${on ? " is-on" : ""}`} onClick={() => store.getState().togglePicked(s.id)} />
         <button type="button" className="row__main" onClick={() => store.getState().openStar(s.id)}>
           <i className="row__dot" style={{ background: accent(planet?.colorToken ?? "planet-1") }} />
           <span className="row__text">
@@ -122,22 +115,18 @@ function RecordCard() {
                 ))}
         </ul>
       )}
-      {alive.length > 0 && (
-        <div className="side__bar">
-          <button type="button" className="btn btn--primary" onClick={load}>
-            <Rocket size={16} aria-hidden /> 탐사선에 싣기 · {alive.length}
-          </button>
-          <button type="button" className="side__clear" onClick={() => setPicked([])}>해제</button>
-        </div>
-      )}
+      <PickedTools />
     </section>
   );
 }
 
-/** 별자리 목록. 체크한 별자리만 우주에 선으로 보인다 (README 6-1). 만들기·수정은 6단계 */
+/** 별자리 목록. 체크한 별자리만 우주에 선으로 보인다 (README 6-1). 줄을 누르면 그 별자리의 기록 창 */
 function LinkCard() {
   const links = useDemo((s) => s.links);
   const hidden = useDemo((s) => s.hiddenLinkIds);
+  const [viewId, setViewId] = useState<string | null>(null);
+  const viewing = links.find((l) => l.id === viewId);
+  if (viewing) return <LinkView key={viewing.id} link={viewing} onBack={() => setViewId(null)} />;
   return (
     <section className="card side__card">
       <div className="side__head">
@@ -157,12 +146,13 @@ function LinkCard() {
               return (
                 <li key={l.id} className="row row--rec">
                   <button type="button" role="checkbox" aria-checked={shown} aria-label={`${l.name} 우주에 ${shown ? "숨기기" : "보이기"}`} title="우주에 보이기 · 숨기기" className={`check${shown ? " is-on" : ""}`} onClick={() => toggleShown(l.id)} />
-                  <span className="row__main">
+                  <button type="button" className="row__main" title="별자리의 기록 보기" onClick={() => setViewId(l.id)}>
                     <span className="row__text">
                       <span className="row__title">{l.name}</span>
-                      <span className="row__sub">기록 {l.starIds.length}</span>
+                      <span className="row__sub">기록 {l.starIds.length}{l.memo ? ` · ${l.memo}` : ""}</span>
                     </span>
-                  </span>
+                    <ArrowUpRight size={14} aria-hidden className="row__go" />
+                  </button>
                 </li>
               );
             })}

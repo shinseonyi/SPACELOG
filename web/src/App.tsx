@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { ERROR_MESSAGES } from "@spacelog/shared/errors";
+import { ActionBar } from "./home/ActionBar.tsx";
 import { ControlsHint } from "./home/ControlsHint.tsx";
 import { EmptyState } from "./home/EmptyState.tsx";
 import { HomeBanner } from "./home/HomeBanner.tsx";
@@ -15,6 +16,7 @@ import { PerfMeter } from "./universe/PerfMeter.tsx";
 import { UniverseCanvas } from "./universe/UniverseCanvas.tsx";
 import { Depth25 } from "./view/Depth25.tsx";
 import { Flat2D } from "./view/Flat2D.tsx";
+import { Observatory } from "./observatory/Observatory.tsx";
 import { ProbeModal } from "./probe/ProbeModal.tsx";
 
 /**
@@ -40,6 +42,8 @@ export function App() {
       <HomeBanner />
       <PerfMeter />
       <PanelHost />
+      <ActionBar />
+      <Observatory />
       <ProbeModal />
       <ToastHost />
     </div>

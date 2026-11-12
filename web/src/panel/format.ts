@@ -8,6 +8,12 @@ export function addedAt(iso: string, now: Date = new Date()): string {
   return `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")} ${t}`;
 }
 
+/** "11.10" (월.일). 관측소의 기록 줄 */
+export function shortDate(iso: string): string {
+  const d = new Date(iso);
+  return `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+
 const PREVIEW_MAX = 90;
 
 /** 기록 줄의 내용 앞부분. 텍스트는 글자 수가 아니라 실제 내용 앞 90자 (README 6-2) */

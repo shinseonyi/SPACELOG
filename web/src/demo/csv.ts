@@ -56,31 +56,37 @@ export function parseCsv(input: string): CsvTable | null {
 export interface ColumnInfo {
   name: string;
   index: number;
-  /** 비어 있지 않은 값이 모두 숫자 */
+  /** 비어 있지 않은 값의 80% 이상이 숫자 (시안 규칙) */
   numeric: boolean;
   /** 서로 다른 값 수 */
   distinct: number;
-  /** 1, 2, 3… 처럼 1씩 이어지는 번호 열. 대시보드에서 기본 제외한다 (README 6-4) */
-  sequential: boolean;
+  /** 숫자로 읽은 값들 */
+  nums: number[];
+  /** 행을 구분하는 번호 열(id · no · 번호 …, 또는 값이 전부 다른 이어지는 정수). 계산·차트에서 기본으로 뺀다 (README 6-4) */
+  isId: boolean;
 }
 
-const toNumber = (v: string): number | null => {
-  const t = v.replace(/,/g, "").trim();
-  if (t === "") return null;
-  const n = Number(t);
-  return Number.isFinite(n) ? n : null;
+export const toNumber = (v: unknown): number | null => {
+  const t = String(v ?? "").trim().replace(/,/g, "");
+  return t !== "" && Number.isFinite(+t) ? +t : null;
 };
 
-export { toNumber };
+const ID_NAME = /^(id|_id|no|no\.|num|index|idx|번호|순번|연번)$/i;
+const ID_SUFFIX = /(_id|Id|ID)$/;
 
 /** 열마다 숫자 열인지, 값이 몇 가지인지, 번호 열인지를 읽는다. 대시보드가 쓸 열을 고르는 기준 */
 export function analyzeColumns(table: CsvTable): ColumnInfo[] {
+  const n = table.rows.length;
   return table.cols.map((name, index) => {
-    const values = table.rows.map((r) => r[index]).filter((v) => v !== "");
-    const nums = values.map(toNumber);
-    const numeric = values.length > 0 && nums.every((n) => n !== null);
-    const distinct = new Set(values).size;
-    const sequential = numeric && values.length > 1 && nums.every((n, i) => i === 0 || n === (nums[i - 1] as number) + 1);
-    return { name, index, numeric, distinct, sequential };
+    const vals = table.rows.map((r) => r[index]).filter((v) => v !== "" && v != null);
+    const nums = vals.map(toNumber).filter((x): x is number => x !== null);
+    const numeric = vals.length > 0 && nums.length >= vals.length * 0.8;
+    const distinct = new Set(vals.map(String)).size;
+    const label = name.trim();
+    const isId =
+      ID_NAME.test(label) ||
+      ID_SUFFIX.test(label) ||
+      (numeric && n > 2 && distinct === n && nums.every(Number.isInteger) && Math.max(...nums) - Math.min(...nums) === n - 1);
+    return { name, index, numeric, distinct, nums, isId };
   });
 }

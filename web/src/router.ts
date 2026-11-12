@@ -1,11 +1,13 @@
-// 해시 라우팅 (SPEC 2-5): #/ · #/planet/:id · #/star/:id · #/probe
+// 해시 라우팅 (SPEC 2-5): #/ · #/planet/:id · #/star/:id · #/probe · #/observatory · #/observatory/:linkId · #/observatory/comet
 // 해시 뒤의 ?query(token, from 등)도 함께 읽는다. 해시는 서버로 전송되지 않는다 (SPEC 3-3).
 
 export type Route =
   | { name: "home" }
   | { name: "planet"; id: string }
   | { name: "star"; id: string }
-  | { name: "probe" };
+  | { name: "probe" }
+  /** 관측소. linkId 가 있으면 그 별자리, comet 이면 재발견 혜성 관측, 없으면 별자리 관측 (README 6-4) */
+  | { name: "observatory"; linkId?: string; comet?: boolean };
 
 export function parseHash(hash: string): { route: Route; params: URLSearchParams } {
   const raw = hash.replace(/^#/, "");
@@ -17,12 +19,23 @@ export function parseHash(hash: string): { route: Route; params: URLSearchParams
   if (a === "planet" && b) route = { name: "planet", id: decodeURIComponent(b) };
   else if (a === "star" && b) route = { name: "star", id: decodeURIComponent(b) };
   else if (a === "probe") route = { name: "probe" };
+  else if (a === "observatory") route = b === "comet" ? { name: "observatory", comet: true } : b ? { name: "observatory", linkId: decodeURIComponent(b) } : { name: "observatory" };
   return { route, params };
 }
 
 export function formatHash(route: Route, params?: URLSearchParams): string {
   const path =
-    route.name === "planet" || route.name === "star" ? `#/${route.name}/${encodeURIComponent(route.id)}` : route.name === "probe" ? "#/probe" : "#/";
+    route.name === "planet" || route.name === "star"
+      ? `#/${route.name}/${encodeURIComponent(route.id)}`
+      : route.name === "probe"
+        ? "#/probe"
+        : route.name === "observatory"
+          ? route.comet
+            ? "#/observatory/comet"
+            : route.linkId
+              ? `#/observatory/${encodeURIComponent(route.linkId)}`
+              : "#/observatory"
+          : "#/";
   const qs = params?.toString();
   return qs ? `${path}?${qs}` : path;
 }

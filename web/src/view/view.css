@@ -1,5 +1,5 @@
 /* 2D · 2.5D 보기. 우주 위 요소의 값은 README 6-1 */
-.flat { position: absolute; inset: 0; overflow: hidden; background: var(--color-canvas); user-select: none; touch-action: none; cursor: grab; }
+.flat { position: absolute; inset: 0; overflow: hidden; overflow: clip; background: var(--color-canvas); user-select: none; touch-action: none; cursor: grab; }
 .flat:active { cursor: grabbing; }
 .flat__stars { position: absolute; inset: -200px; pointer-events: none; }
 .flat__stars i { position: absolute; display: block; border-radius: 50%; background: #fff; }

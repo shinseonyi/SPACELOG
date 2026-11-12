@@ -1,4 +1,4 @@
-import { Rocket } from "lucide-react";
+import { X } from "lucide-react";
 import { store, useStore, type SideTab, type ViewMode } from "../state/store.ts";
 import { useDemo } from "../demo/demoStore.ts";
 import { PeriodPicker } from "./PeriodPicker.tsx";
@@ -10,14 +10,14 @@ const VIEWS: { key: ViewMode; label: string; hint: string }[] = [
   { key: "3d", label: "3D", hint: "3D 우주를 날아다니며 보기" },
 ];
 
-/** 상단 바: 로고, 목록 칩 3개(기록 · 행성 · 별자리), 기간, 탐사선 (README 6-1) */
+/** 상단 바: 로고, 목록 칩 3개(기록 · 행성 · 별자리), 보기 방식, 기간 (README 6-1). 탐사선·관측소는 오른쪽 아래 (ActionBar) */
 export function TopBar() {
   const stars = useStore((s) => s.stars.length);
   const planets = useStore((s) => s.planets.filter((p) => (p.starCountInPeriod ?? 0) > 0).length);
-  const cargo = useStore((s) => s.cargo.length);
   const tab = useStore((s) => s.sideTab);
   const view = useStore((s) => s.view);
   const links = useDemo((s) => s.links.length);
+  const picked = useStore((s) => s.picked.length);
   const chip = (key: SideTab, label: string, n: number) => (
     <button
       type="button"
@@ -35,6 +35,12 @@ export function TopBar() {
       {chip("rec", "기록", stars)}
       {chip("planet", "행성", planets)}
       {chip("link", "별자리", links)}
+      {picked > 0 && (
+        <span className="chip chip--pick" role="group" aria-label={`선택한 기록 ${picked}개`}>
+          <button type="button" className="chip__label" title="선택한 기록 보기" onClick={() => store.getState().openSideTab("rec")}>선택 {picked}</button>
+          <button type="button" className="chip__x" aria-label="선택 해제" title="선택 해제" onClick={() => store.getState().clearPicked()}><X size={12} aria-hidden /></button>
+        </span>
+      )}
       <span className="topbar__spacer" />
       <div className="viewseg" role="radiogroup" aria-label="보기 방식">
         {VIEWS.map((v) => (
@@ -44,10 +50,6 @@ export function TopBar() {
         ))}
       </div>
       <PeriodPicker />
-      <button type="button" className="pill-btn" onClick={() => store.getState().openProbe()}>
-        <Rocket size={16} aria-hidden /> 탐사선
-        {cargo > 0 && <span className="badge">{cargo}</span>}
-      </button>
     </header>
   );
 }
