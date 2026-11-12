@@ -4,6 +4,7 @@ import { analyzeColumns, CSV_MAX_COLS, CSV_MAX_ROWS, parseCsv } from "./csv.ts";
 import { createDemoStore } from "./demoStore.ts";
 import { addLinkStars, autoLinkName, createLink, editLink, linksOfPlanet, planetsOfLink, removeStarsFromLinks, setLinkStars, unlink } from "./links.ts";
 import { applyDemoToUniverse, forgetPlanet, freeSpot, PLANET_GAP, purgePlanet, restorePlanet, setPlanetOverride, trashedIds, trashPlanet } from "./planets.ts";
+import { CSV_KEY, getCsvTable, readCsvTables, saveCsvTable } from "./csvStore.ts";
 import { DEMO_KEY, loadDemo, saveDemo, type KeyValue } from "./storage.ts";
 import { emptyDemoData, type Link } from "./types.ts";
 
@@ -166,4 +167,27 @@ test("블랙홀 보관: 행성과 그 기록을 우주에서 빼고, 고른 색�
   // 꺼내면 다시 보인다
   const back = applyDemoToUniverse(restorePlanet(d, "p2").data, planets, stars);
   assert.deepEqual(back.planets.map((p) => p.id), ["p1", "p2"]);
+});
+
+test("사용자가 고른 CSV 내용을 저장하고 다시 읽는다 (서버가 내용을 주지 않을 때의 시연용 경로)", () => {
+  const kv = memory();
+  const t = parseCsv("id,종목,시간\n1,러닝,60\n2,요가,30")!;
+  assert.equal(getCsvTable("s1", kv), null);
+  assert.equal(saveCsvTable("s1", t, kv), true);
+  assert.equal(saveCsvTable("s2", t, kv), true);
+  assert.deepEqual(getCsvTable("s1", kv), t);
+  assert.deepEqual(Object.keys(readCsvTables(kv)), ["s1", "s2"]); // 하나를 저장해도 다른 기록의 내용이 남는다
+});
+
+test("CSV 저장: 깨진 값은 읽을 수 있는 만큼만, 저장소를 못 쓰면 던지지 않는다", () => {
+  const kv = memory();
+  kv.map.set(CSV_KEY, JSON.stringify({ ok: { cols: ["a"], rows: [["1"]], truncated: false }, bad: { cols: [1], rows: "x" }, worse: 7 }));
+  assert.deepEqual(Object.keys(readCsvTables(kv)), ["ok"]);
+  kv.map.set(CSV_KEY, "{깨짐");
+  assert.deepEqual(readCsvTables(kv), {});
+  const broken: KeyValue = { getItem: () => { throw new Error("막힘"); }, setItem: () => { throw new Error("막힘"); } };
+  assert.deepEqual(readCsvTables(broken), {});
+  const small = parseCsv("a,b\n1,2")!;
+  assert.equal(saveCsvTable("s1", small, broken), false);
+  assert.equal(saveCsvTable("s1", small, null), false);
 });

@@ -5,7 +5,7 @@ import { Copy, Download, Orbit, Pencil, Waypoints, X } from "lucide-react";
 import type { Planet, Star } from "@spacelog/shared/types";
 import { api, RequestError } from "../api/client.ts";
 import type { CsvTable } from "../demo/csv.ts";
-import { loadCsvTable, isCsvStar } from "../demo/csvSource.ts";
+import { isCsvStar, loadCsvTable, provideCsvText } from "../demo/csvSource.ts";
 import { buildDashboard, COUNT_KEY, toCsv } from "../demo/dashboard.ts";
 import { demo, useDemo } from "../demo/demoStore.ts";
 import { DEFAULT_VIZ, type Link, type LinkViz, type VizMode } from "../demo/types.ts";
@@ -95,6 +95,15 @@ function Panel({ initialComet, routeLinkId }: { initialComet: boolean; routeLink
   const viz: LinkViz = { agg: "avg", ...cur.l.viz };
   const setViz = (patch: Partial<LinkViz>) => (isDraft ? setDraftViz({ ...viz, ...patch }) : demo.getState().setLinkViz(cur.l.id, { ...viz, ...patch }));
   const datas = csvStars.filter((s) => tables[s.id]);
+  // 내용을 읽지 못한 CSV(서버가 원본 내용을 주지 않을 때): 사용자가 같은 파일을 골라 주면 이 브라우저에서만 대시보드로 본다
+  const missing = csvStars.filter((s) => s.id in tables && tables[s.id] === null);
+  const chooseCsv = async (star: Star, file: File | undefined) => {
+    if (!file) return;
+    const table = provideCsvText(star.id, await file.text());
+    if (!table) return store.getState().showToast("CSV로 읽지 못했어요. 머리글과 한 줄 이상이 있는 파일인지 확인해 주세요", "error");
+    setTables((cur0) => ({ ...cur0, [star.id]: table }));
+    store.getState().showToast(`‘${starTitle(star)}’ 내용을 읽었어요`, "success");
+  };
   const pick = datas.find((s) => s.id === viz.csvId) ?? datas[0];
   const table = pick ? (tables[pick.id] as CsvTable) : null;
   const imgs = list.filter((s) => s.kind === "image");
@@ -242,11 +251,28 @@ function Panel({ initialComet, routeLinkId }: { initialComet: boolean; routeLink
         </div>
       </section>
 
+      {missing.length > 0 && (
+        <section className="obs-card obs-missing" aria-label="CSV 내용을 읽지 못한 기록">
+          <strong>CSV 내용을 읽지 못해 대시보드·표로 볼 수 없어요</strong>
+          <p className="obs-note">서버가 아직 CSV 파일의 내용을 주지 않아요. 같은 CSV 파일을 골라 주시면 이 브라우저에서만 대시보드와 표로 볼 수 있어요. 서버로는 올라가지 않아요.</p>
+          <ul>
+            {missing.map((s) => (
+              <li key={s.id}>
+                <span className="obs-missing__name">{starTitle(s)}</span>
+                <label className="obs-pill obs-pill--file">
+                  CSV 파일 고르기
+                  <input type="file" accept=".csv,text/csv" onChange={(e) => { void chooseCsv(s, e.target.files?.[0]); e.target.value = ""; }} />
+                </label>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {vmode === "dash" && dash && <Dashboard_ dash={dash} chart={viz.chart} />}
       {vmode === "table" && pick && table && <TableView title={starTitle(pick)} table={table} csv={csvText} />}
       {vmode === "photos" && (imgs.length > 0 || !!pick) && <PhotosView items={photoItems} onOpen={open} />}
       {vmode === "texts" && <TextsView items={textItems} onOpen={open} />}
-      {!pick && imgs.length === 0 && vmode !== "texts" && (
+      {!pick && imgs.length === 0 && vmode !== "texts" && missing.length === 0 && (
         <div className="obs-empty">
           <strong>이 묶음에는 대시보드로 볼 CSV 데이터나 모아 볼 사진이 없어요.</strong>
           <span>{list.some((s) => /\.csv$/i.test(s.originalName ?? "")) ? "CSV 파일이 있지만 내용을 읽지 못했어요. 서버가 원본을 주지 않으면 대시보드로 볼 수 없어요." : "CSV 파일을 기록으로 넣고 이 묶음에 포함하면, 그 데이터의 열을 기준으로 대시보드가 만들어집니다."}</span>

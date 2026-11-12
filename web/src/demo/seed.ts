@@ -108,3 +108,14 @@ export function universeIn(seed: Pick<Seed, "planets" | "stars">, from: string, 
     })),
   };
 }
+
+/**
+ * 팀원이 만든 목 데이터(mocks/api) 위에 더할 CSV 기록: CSV 가 든 행성 하나와 CSV 기록들, 그리고 대시보드가 읽을 표.
+ * 팀원 데이터는 건드리지 않고 덧붙이기만 한다. 날짜는 목업의 가상 "오늘"(now) 기준이다.
+ */
+export function csvAddon(planets: SeedPlanet[], records: SeedRecord[], now: Date): Pick<Seed, "stars" | "tables"> & { planets: Planet[] } {
+  const csv = records.filter((r) => r.kind === "csv");
+  const holders = new Set(csv.map((r) => r.planetId));
+  const seed = buildSeed(planets.filter((p) => holders.has(p.id)), csv, now);
+  return { planets: seed.planets.map((p) => ({ ...p, starCountInPeriod: p.starCountTotal })), stars: seed.stars, tables: seed.tables };
+}

@@ -92,6 +92,14 @@
 .obs-photo__title { font: var(--type-caption-strong); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .obs-photo__sub { color: var(--color-body-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+.obs-missing { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; border-color: rgba(255, 211, 111, 0.4); }
+.obs-missing strong { font: var(--type-caption-strong); }
+.obs-missing ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.obs-missing li { display: flex; align-items: center; gap: 12px; }
+.obs-missing__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption); }
+.obs-pill--file { display: inline-flex; align-items: center; cursor: pointer; background: #fff; color: var(--color-ink-on-light); border-color: #fff; }
+.obs-pill--file:focus-within { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.obs-pill--file input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
 .obs-empty { display: flex; flex-direction: column; gap: 6px; padding: 20px; border-radius: var(--r-panel); border: 1px dashed var(--color-line-btn); }
 .obs-empty strong { font: var(--type-caption-strong); }
 .obs-empty span { font: var(--type-caption); color: var(--color-body-muted); text-wrap: pretty; }

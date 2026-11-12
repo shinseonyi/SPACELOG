@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { localDate } from "@spacelog/shared/period";
-import { buildSeed, seedTime, universeIn, type SeedPlanet, type SeedRecord } from "./seed.ts";
+import { buildSeed, csvAddon, seedTime, universeIn, type SeedPlanet, type SeedRecord } from "./seed.ts";
 
 const now = new Date(2026, 10, 12, 16, 0); // 2026-11-12 16:00 현지
 const planets: SeedPlanet[] = [
@@ -51,4 +51,12 @@ test("기간으로 거르면 기간 내 · 전체 개수가 따로 나온다", (
   assert.deepEqual(today.planets.map((p) => [p.starCountInPeriod, p.starCountTotal]), [[1, 2], [1, 1]]);
   const week = universeIn(s, "2026-11-05", "2026-11-12", (iso) => localDate(iso, now));
   assert.equal(week.stars.length, 3);
+});
+
+test("CSV 더하기: 팀원의 데이터는 그대로 두고 CSV 행성·기록·표만 덧붙인다", () => {
+  const a = csvAddon(planets, records, now);
+  assert.deepEqual(a.planets.map((p) => [p.id, p.name, p.starCountInPeriod, p.starCountTotal]), [["p6", "CSV 데이터", 1, 1]]);
+  assert.deepEqual(a.stars.map((s) => [s.id, s.originalName, s.planetId]), [["c1", "workouts.csv", "p6"]]);
+  assert.deepEqual(Object.keys(a.tables), ["c1"]);
+  assert.equal(csvAddon(planets, [rec({ id: "t", kind: "text" })], now).stars.length, 0); // CSV 가 없으면 아무것도 더하지 않는다
 });

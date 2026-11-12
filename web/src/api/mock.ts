@@ -9,7 +9,7 @@ import universeEmpty from "../../../mocks/api/universe.empty.json";
 import rediscoveryToday from "../../../mocks/api/rediscovery/today.json";
 import { localDate } from "@spacelog/shared/period";
 import { registerCsvTables } from "../demo/csvSource.ts";
-import { buildSeed, universeIn, type SeedPlanet, type SeedRecord } from "../demo/seed.ts";
+import { buildSeed, csvAddon, universeIn, type SeedPlanet, type SeedRecord } from "../demo/seed.ts";
 import seedPlanets from "../../../docs/design/2.5d/design_handoff_spacelog_2_5d/mock-data/planets.json";
 import seedRecords from "../../../docs/design/2.5d/design_handoff_spacelog_2_5d/mock-data/records.json";
 import { RequestError } from "./client.ts";
@@ -19,10 +19,21 @@ const starFiles = Object.values(import.meta.glob("../../../mocks/api/stars/*.jso
 
 const params = new URLSearchParams(location.hash.split("?")[1]);
 const empty = params.get("mock") === "empty";
+/** 목업의 가상 "오늘" (mocks/api/README.md) */
+const MOCK_NOW = new Date("2026-11-11T12:00:00+09:00");
+
 /** `#/?token=dev&mock=seed`: 디자이너의 예시 데이터(행성 6 · 기록 41, CSV 6개 포함)로 연다. 기간별로 거르고, 7일 전 기록으로 재발견 혜성이 뜬다 */
 const seed = params.get("mock") === "seed" ? buildSeed(seedPlanets as unknown as SeedPlanet[], seedRecords as unknown as SeedRecord[]) : null;
 if (seed) registerCsvTables(seed.tables);
-let data = seed ? { stars: seed.stars, planets: seed.planets } : withStarCount((empty ? universeEmpty : universe) as unknown as UniverseResponse, Number(params.get("stars")) || 0);
+const base = withStarCount((empty ? universeEmpty : universe) as unknown as UniverseResponse, Number(params.get("stars")) || 0);
+/**
+ * 기본 목업 = 팀원의 데이터(mocks/api) + 디자이너의 CSV 기록 6개(대시보드 시연용). 팀원 데이터는 그대로 두고 덧붙인다.
+ * 빈 우주(`mock=empty`)와 성능 측정(`stars=N`)에는 더하지 않는다. `&tables=off` 는 CSV 내용을 등록하지 않아,
+ * 서버가 CSV 내용을 주지 않는 실제 서버와 같은 상태(내용을 읽지 못함)를 만든다.
+ */
+const addon = !seed && !empty && !params.get("stars") ? csvAddon(seedPlanets as unknown as SeedPlanet[], seedRecords as unknown as SeedRecord[], MOCK_NOW) : null;
+if (addon && params.get("tables") !== "off") registerCsvTables(addon.tables);
+let data = seed ? { stars: seed.stars, planets: seed.planets } : addon ? { stars: [...base.stars, ...addon.stars], planets: [...base.planets, ...addon.planets] } : base;
 
 /** 성능 측정용: `&stars=2000` 이면 별 N개를 만들어 행성에 나눠 준다 */
 function withStarCount(u: UniverseResponse, n: number): UniverseResponse {
@@ -42,8 +53,6 @@ function withStarCount(u: UniverseResponse, n: number): UniverseResponse {
 /** 목업에서 받은 재발견 이벤트 (개발 중 확인용) */
 export const mockRediscoveryEvents: unknown[] = [];
 
-/** 목업의 가상 "오늘" (mocks/api/README.md) */
-const MOCK_NOW = new Date("2026-11-11T12:00:00+09:00");
 
 /** 목업의 쓰기: 메모리에서만 바뀐다(새로고침하면 처음으로). 서버가 아직 안 만든 수정 API의 화면 확인용 */
 function recount() {
