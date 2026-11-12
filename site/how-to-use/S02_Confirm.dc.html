@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/radii.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/base.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/styles.css">
+  <script src="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="spacelog-data.js"></script>
+  <style>:root{--font-display:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-text:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}button,input{font-family:inherit}body{margin:0;background:#0b0b0c;color:#fff;font-family:var(--font-text);-webkit-font-smoothing:antialiased;word-break:keep-all}a{color:var(--color-primary-on-dark);text-decoration:none}a:hover{text-decoration:underline}</style>
+</helmet>
+<section data-screen-label="S-02 넣은 직후 확인" aria-label="넣은 직후 확인" style="display:flex;flex-direction:column;gap:10px;padding:16px;box-sizing:border-box;width:100%;border-radius:18px;background:rgb(30,30,32);border:1px solid rgba(255,255,255,0.12);color:#fff;--color-primary-on-dark:{{ accent }}">
+  <div style="display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;background:rgba(255,255,255,0.05)">
+    <span style="position:relative;overflow:hidden;width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,0.08);display:grid;place-items:center;flex:none"><sc-if value="{{ hasThumb }}"><img src="{{ thumb }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1"></sc-if><sc-if value="{{ kImage }}" hint-placeholder-val="{{ true }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/image.svg" alt="" style="width:18px;height:18px;filter:invert(1);opacity:0.85"></sc-if><sc-if value="{{ kFile }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/file-text.svg" alt="" style="width:18px;height:18px;filter:invert(1);opacity:0.85"></sc-if><sc-if value="{{ kLink }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/link.svg" alt="" style="width:18px;height:18px;filter:invert(1);opacity:0.85"></sc-if><sc-if value="{{ kText }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/type.svg" alt="" style="width:18px;height:18px;filter:invert(1);opacity:0.85"></sc-if><sc-if value="{{ kMulti }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/layers.svg" alt="" style="width:18px;height:18px;filter:invert(1);opacity:0.85"></sc-if></span>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+      <span class="cc-type-caption-strong" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ title }}</span>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sub }}</span>
+      <i style="display:block;height:3px;border-radius:9999px;background:var(--color-primary-on-dark)"></i>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:14px;border:1px solid rgba(255,255,255,0.1)">
+    <span class="cc-type-caption" style="color:var(--color-body-muted)">행성</span>
+    <span style="display:flex;align-items:center;gap:6px;height:28px;padding:0 10px 0 4px;border-radius:9999px;background:rgba(255,255,255,0.08);min-width:0">
+      <i style="width:20px;height:20px;border-radius:50%;background-color:#000;background-image:url('assets/planet-hero.png');background-size:230% auto;background-position:49% 62%;filter:{{ planetFilter }};display:block;flex:none"></i>
+      <span class="cc-type-caption-strong" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ planetName }}</span>
+    </span>
+    <span style="flex:1"></span>
+    <button onClick="{{ toggleMenu }}" disabled="{{ changed }}" class="cc-type-caption" style="height:32px;padding:0 12px;border-radius:9999px;border:1px solid rgba(255,255,255,0.16);background:transparent;color:{{ changeColor }};cursor:pointer;white-space:nowrap">{{ changeLabel }}</button>
+  </div>
+
+  <sc-if value="{{ menuOpen }}">
+    <div style="display:flex;flex-direction:column;padding:6px;border-radius:14px;background:rgba(255,255,255,0.05)">
+      <sc-for list="{{ options }}" as="o">
+        <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:10px;height:40px;padding:0 10px;border:0;border-radius:10px;background:{{ o.bg }};color:#fff;cursor:pointer;text-align:left">
+          <i style="width:20px;height:20px;border-radius:50%;background-color:#000;background-image:url('assets/planet-hero.png');background-size:230% auto;background-position:49% 62%;filter:{{ o.filter }};display:block;flex:none"></i>
+          <span class="cc-type-caption" style="flex:1">{{ o.name }}</span>
+          <span class="cc-type-fine-print" style="color:var(--color-body-muted)">{{ o.mark }}</span>
+        </button>
+      </sc-for>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted);padding:8px 10px 4px">새 행성은 웹에서 만들 수 있어요.</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{ hasNote }}"><span class="cc-type-fine-print" style="color:var(--color-body-muted);padding:0 4px">{{ note }}</span></sc-if>
+
+  <input value="{{ memo }}" onChange="{{ onMemo }}" onKeyDown="{{ onMemoKey }}" onFocus="{{ onFocus }}" onBlur="{{ onBlur }}" placeholder="한 줄 메모 (선택) · Enter로 저장" aria-label="한 줄 메모" class="cc-type-caption" style="height:44px;padding:0 14px;box-sizing:border-box;border-radius:14px;border:1.5px dashed rgba(255,255,255,0.24);background:transparent;color:#fff;outline:none" style-focus="border:1.5px solid var(--color-primary-on-dark)">
+
+  <footer style="display:flex;align-items:center;gap:12px">
+    <span class="cc-type-fine-print" style="flex:1;min-width:0;color:var(--color-body-muted)">{{ closeHint }}</span>
+    <button onClick="{{ cancel }}" class="cc-type-caption" style="height:36px;padding:0 6px;border:0;background:transparent;color:var(--color-primary-on-dark);cursor:pointer;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">넣기 취소</button>
+    <button onClick="{{ close }}" class="cc-type-caption" style="height:36px;padding:0 16px;white-space:nowrap;border-radius:9999px;border:1px solid rgba(255,255,255,0.16);background:transparent;color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">닫기</button>
+  </footer>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:340,&quot;height&quot;:300},&quot;autoCloseSec&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:0,&quot;max&quot;:20,&quot;default&quot;:6,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;동작&quot;},&quot;planetId&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;p1&quot;,&quot;p2&quot;,&quot;p3&quot;,&quot;p4&quot;,&quot;p5&quot;],&quot;default&quot;:&quot;p1&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;미리보기&quot;},&quot;items&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object[]&quot;},&quot;planets&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object[]&quot;},&quot;onChangePlanet&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onMemo&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onCancel&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onClose&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;}}">
+class Component extends DCLogic {
+  state = { planet: null, changed: false, menu: false, memo: '', memoSaved: false, focus: false, left: this.props.autoCloseSec ?? 6 };
+  componentDidMount() {
+    if (!(this.state.left > 0)) return;
+    this._i = setInterval(() => {
+      const s = this.state;
+      if (s.focus || s.menu || s.left <= 0) return;
+      if (s.left === 1) { clearInterval(this._i); this.setState({ left: 0 }); if (this.props.onClose) this.props.onClose(); }
+      else this.setState({ left: s.left - 1 });
+    }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this._i); }
+  renderVals() {
+    const S = window.SPACELOG, s = this.state;
+    const planets = this.props.planets ?? (S ? S.initial().planets : []);
+    const items = this.props.items && this.props.items.length ? this.props.items : [{ kind: 'image', title: '회의 캡처.png', meta: 'PNG · 1.8MB' }];
+    const pid = s.planet ?? this.props.planetId ?? 'p1';
+    const p = planets.find(x => x.id === pid) || planets[0] || { name: '', filter: 'none', accent: '#2997ff' };
+    const multi = items.length > 1;
+    const auto = (this.props.autoCloseSec ?? 6) > 0;
+    return {
+      accent: p.accent, hasThumb: !!items[0].thumb, thumb: items[0].thumb || '',
+      kMulti: multi, kImage: !multi && items[0].kind === 'image', kFile: !multi && items[0].kind === 'file', kLink: !multi && items[0].kind === 'link', kText: !multi && items[0].kind === 'text',
+      title: multi ? items.length + '개 저장했어요' : '저장했어요 · ' + items[0].title,
+      sub: multi ? items[0].title + ' 외 ' + (items.length - 1) + '개' : items[0].meta,
+      planetName: p.name, planetFilter: p.filter,
+      changed: s.changed, changeLabel: s.changed ? '바꿨어요' : '바꾸기', changeColor: s.changed ? 'var(--color-ink-muted-48)' : '#fff',
+      menuOpen: s.menu && !s.changed, toggleMenu: () => this.setState({ menu: !s.menu }),
+      options: planets.map(x => ({ key: x.id, name: x.name, filter: x.filter, mark: x.id === pid ? '자동 배정' : '', bg: x.id === pid ? 'rgba(255,255,255,0.08)' : 'transparent',
+        onClick: () => { if (x.id === pid) { this.setState({ menu: false }); return; } this.setState({ planet: x.id, changed: true, menu: false }); if (this.props.onChangePlanet) this.props.onChangePlanet(x.id); } })),
+      hasNote: s.changed || multi || s.memoSaved,
+      note: s.memoSaved ? '메모를 저장했어요.' : s.changed ? '한 번 바꿨어요. 이후 정리는 웹에서 해요.' : '행성 바꾸기는 묶음 전체에 적용돼요.',
+      memo: s.memo, onMemo: e => this.setState({ memo: e.target.value, memoSaved: false }),
+      onMemoKey: e => { if (e.key !== 'Enter' || e.nativeEvent.isComposing) return; if (this.props.onMemo) this.props.onMemo(s.memo.trim()); this.setState({ memoSaved: true }); e.target.blur(); },
+      onFocus: () => this.setState({ focus: true }), onBlur: () => this.setState({ focus: false }),
+      closeHint: !auto ? '잠시 뒤 자동으로 접혀요' : s.focus || s.menu ? '입력 중에는 기다려요' : s.left > 0 ? s.left + '초 뒤 자동으로 접혀요' : '접혔어요',
+      cancel: () => { clearInterval(this._i); if (this.props.onCancel) this.props.onCancel(); else if (this.props.onClose) this.props.onClose(); else this.setState({ left: 0 }); },
+      close: () => { clearInterval(this._i); if (this.props.onClose) this.props.onClose(); else this.setState({ left: 0 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

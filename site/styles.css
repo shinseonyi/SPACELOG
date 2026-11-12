@@ -371,3 +371,6 @@ a:focus-visible { outline: var(--line-thin) solid var(--sky); outline-offset: 2p
   .orbit { gap: 12px; }
   .btn { width: 100%; justify-content: center; }
 }
+
+/* 헤더 오른쪽 링크 묶음 */
+.bar-links { display: inline-flex; gap: 8px; align-items: center; }

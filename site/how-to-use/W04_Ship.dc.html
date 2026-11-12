@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/radii.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/base.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/styles.css">
+  <script src="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="spacelog-data.js"></script>
+  <style>:root{--font-display:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-text:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}button,input,textarea,select{font-family:inherit}button,kbd{white-space:nowrap;word-break:keep-all}body{word-break:keep-all}html,body{margin:0;height:100%;background:#000;color:#fff;font-family:var(--font-text);-webkit-font-smoothing:antialiased}a{color:var(--color-primary-on-dark);text-decoration:none}a:hover{text-decoration:underline}</style>
+</helmet>
+<section data-screen-label="W-04 탐사선" aria-label="탐사선" style="position:absolute;inset:0;display:flex;flex-direction:column;border-radius:18px;background:rgba(30,30,32,0.92);border:1px solid rgba(255,255,255,0.1);backdrop-filter:var(--blur-frosted);-webkit-backdrop-filter:var(--blur-frosted);overflow:hidden">
+  <header style="display:flex;align-items:center;gap:12px;padding:20px 20px 16px">
+    <span style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);display:grid;place-items:center;flex:none"><img src="https://unpkg.com/lucide-static@0.469.0/icons/rocket.svg" alt="" style="width:16px;height:16px;filter:invert(1)"></span>
+    <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+      <h2 class="cc-type-tagline" style="margin:0;color:#fff">탐사선</h2>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted)">고른 기록을 Claude가 읽기 좋은 형식으로 복사해요</span>
+    </div>
+    <button onClick="{{ close }}" aria-label="탐사선 닫기" title="닫기 (Esc)" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.14);background:transparent;display:grid;place-items:center;cursor:pointer;flex:none;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/x.svg" alt="" style="width:14px;height:14px;filter:invert(1)"></button>
+  </header>
+
+  <div style="flex:1;min-height:0;overflow-y:auto;padding:0 20px 16px;display:flex;flex-direction:column;gap:16px">
+    <div style="padding:16px;border-radius:18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span class="cc-type-body-strong" style="color:#fff;white-space:nowrap">{{ countLabel }}</span>
+        <button onClick="{{ loadAll }}" class="cc-type-caption" style="height:32px;padding:0 12px;border-radius:9999px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">{{ loadAllLabel }}</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="3">
+          <span style="display:flex;align-items:center;gap:6px;height:30px;padding:0 4px 0 10px;border-radius:9999px;background:{{ c.bg }};border:1px solid {{ c.border }};max-width:100%;box-sizing:border-box">
+            <i style="width:6px;height:6px;border-radius:50%;background:{{ c.accent }};display:block;flex:none"></i>
+            <span class="cc-type-fine-print" style="color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px">{{ c.label }}</span>
+            <button onClick="{{ c.onRemove }}" aria-label="{{ c.removeLabel }}" style="width:22px;height:22px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;flex:none;padding:0"><img src="https://unpkg.com/lucide-static@0.469.0/icons/x.svg" alt="" style="width:12px;height:12px;filter:invert(1);opacity:0.7"></button>
+          </span>
+        </sc-for>
+      </div>
+      <sc-if value="{{ isEmpty }}"><span class="cc-type-caption" style="color:var(--color-body-muted)">아직 실은 기록이 없어요. 행성 패널에서 기록을 골라 실어 보세요.</span></sc-if>
+    </div>
+
+    <div style="display:flex;gap:4px;padding:4px;border-radius:9999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);align-self:flex-start" role="tablist">
+      <sc-for list="{{ formats }}" as="f">
+        <button role="tab" aria-selected="{{ f.selected }}" onClick="{{ f.onClick }}" class="cc-type-button-utility" style="height:34px;padding:0 16px;border:0;border-radius:9999px;cursor:pointer;background:{{ f.bg }};color:{{ f.color }};font-weight:{{ f.weight }};transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">{{ f.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;flex:1;min-height:220px">
+      <span style="display:flex;justify-content:space-between"><span class="cc-type-caption-strong" style="color:#fff">미리보기</span><span class="cc-type-fine-print" style="color:var(--color-body-muted)">{{ charCount }}</span></span>
+      <pre style="margin:0;flex:1;min-height:220px;overflow:auto;padding:16px;border-radius:11px;background:#0c0c0d;border:1px solid rgba(255,255,255,0.08);font:400 12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#e6e6e6;white-space:pre-wrap;word-break:break-word">{{ preview }}</pre>
+    </div>
+  </div>
+
+  <footer style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid rgba(255,255,255,0.08)">
+    <img src="https://unpkg.com/lucide-static@0.469.0/icons/lock.svg" alt="" style="width:14px;height:14px;filter:invert(1);opacity:0.6;flex:none">
+    <span class="cc-type-caption" style="color:var(--color-body-muted);flex:1">고른 것만 복사돼요. 자동으로 보내지 않아요.</span>
+    <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.Button" variant="primary" disabled="{{ isEmpty }}" on-click="{{ copy }}" hint-size="104px,44px">{{ copyLabel }}</x-import>
+  </footer>
+
+  <div aria-live="polite" style="position:absolute;left:50%;bottom:80px;transform:translateX(-50%);z-index:9;pointer-events:none;opacity:{{ toastOpacity }};transition:opacity 200ms var(--ease-standard)">
+    <div class="cc-type-caption" style="background:#fff;color:var(--color-ink);border-radius:9999px;padding:10px 16px;white-space:nowrap">{{ toast }}</div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:820},&quot;db&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;cartIds&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string[]&quot;},&quot;period&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;today&quot;,&quot;week&quot;,&quot;month&quot;,&quot;all&quot;],&quot;default&quot;:&quot;week&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;미리보기&quot;},&quot;custom&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;onSetCart&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onClose&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onToast&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;}}">
+class Component extends DCLogic {
+  state = { db: window.SPACELOG ? window.SPACELOG.initial() : null, cart: ['s3', 's4', 's26', 's27', 's28', 's29', 's30', 's31', 's32', 's33', 's34'], format: 'claude', copied: false, toast: '', toastOn: false };
+
+  componentDidMount() {
+    const wait = () => window.SPACELOG ? this.setState({ db: this.state.db || window.SPACELOG.initial() }) : setTimeout(wait, 60);
+    wait();
+  }
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._c); }
+
+  db() { return this.props.db || this.state.db || { planets: [], stars: [] }; }
+  cart() { return (this.props.cartIds ?? this.state.cart).filter(id => this.db().stars.some(s => s.id === id)); }
+  setCart(ids) { this.props.onSetCart ? this.props.onSetCart(ids) : this.setState({ cart: ids }); }
+  flash(msg) {
+    if (this.props.onToast) return this.props.onToast(msg);
+    clearTimeout(this._t); this.setState({ toast: msg, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 2400);
+  }
+
+  renderVals() {
+    const S = window.SPACELOG, s = this.state, db = this.db();
+    if (!S) return { chips: [], formats: [], preview: '' };
+    const cart = this.cart();
+    const period = this.props.period || 'all', custom = this.props.custom;
+    const periodLabel = (S.PERIODS.find(x => x.key === period) || {}).label || '전체';
+    const chips = [];
+    db.planets.forEach(p => {
+      const all = db.stars.filter(x => x.planet === p.id), inCart = all.filter(x => cart.includes(x.id));
+      if (!inCart.length) return;
+      if (inCart.length === all.length && all.length > 1) chips.push({ key: p.id, label: p.name + ' 행성 · ' + all.length, accent: p.accent, removeLabel: p.name + ' 행성 빼기',
+        bg: 'color-mix(in srgb, ' + p.accent + ' 16%, transparent)', border: 'color-mix(in srgb, ' + p.accent + ' 40%, transparent)',
+        onRemove: () => this.setCart(cart.filter(id => !all.some(x => x.id === id))) });
+      else inCart.forEach(x => chips.push({ key: x.id, label: x.title, accent: p.accent, removeLabel: x.title + ' 빼기', bg: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.1)',
+        onRemove: () => this.setCart(cart.filter(id => id !== x.id)) }));
+    });
+    const text = cart.length ? S.buildExport(db, cart, s.format) : '';
+    const periodIds = db.stars.filter(x => S.inPeriod(x, period, custom)).map(x => x.id);
+
+    return {
+      close: () => this.props.onClose ? this.props.onClose() : (window.location.href = 'SPACELOG_Prototype.dc.html'),
+      countLabel: '실은 기록 ' + cart.length, chips, isEmpty: cart.length === 0,
+      loadAllLabel: '이 기간(' + periodLabel + ') 우주 전체 싣기',
+      loadAll: () => { this.setCart([...new Set([...cart, ...periodIds])]); this.flash(periodLabel + ' 기간의 기록 ' + periodIds.length + '개를 실었어요'); },
+      formats: [{ key: 'claude', label: 'Claude 프롬프트' }, { key: 'mcp', label: 'MCP 리소스' }].map(f => ({ ...f, selected: s.format === f.key,
+        bg: s.format === f.key ? 'rgba(255,255,255,0.14)' : 'transparent', color: s.format === f.key ? '#fff' : 'var(--color-body-muted)', weight: s.format === f.key ? 600 : 400,
+        onClick: () => this.setState({ format: f.key, copied: false }) })),
+      preview: text || '실은 기록이 생기면 복사될 내용이 여기에 그대로 보여요.',
+      charCount: text ? text.length.toLocaleString('ko-KR') + '자' : '',
+      copyLabel: s.copied ? '복사했어요' : '복사하기',
+      copy: () => {
+        const ok = () => { this.setState({ copied: true }); this.flash('복사했어요. Claude에 붙여넣으세요'); clearTimeout(this._c); this._c = setTimeout(() => this.setState({ copied: false }), 2400); };
+        const fail = () => this.flash('복사하지 못했어요. 미리보기를 직접 선택해 복사해 주세요');
+        try { navigator.clipboard.writeText(text).then(ok, fail); } catch (e) { fail(); }
+      },
+      toast: s.toast, toastOpacity: s.toastOn ? 1 : 0
+    };
+  }
+}
+</script>
+</body>
+</html>

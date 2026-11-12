@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/radii.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/base.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/styles.css">
+  <script src="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="spacelog-data.js"></script>
+  <style>:root{--font-display:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-text:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}button,input,textarea,select{font-family:inherit}button{white-space:nowrap}body{word-break:keep-all}html,body{margin:0;height:100%;background:#000;color:#fff;font-family:var(--font-text);-webkit-font-smoothing:antialiased}a{color:var(--color-primary-on-dark);text-decoration:none}a:hover{text-decoration:underline}</style>
+</helmet>
+<section data-screen-label="W-05 관측소" aria-label="관측소" style="position:absolute;inset:0;display:flex;flex-direction:column;border-radius:18px;background:rgb(24,24,26);border:1px solid rgba(255,255,255,0.1);overflow:hidden">
+  <header style="flex:none;display:flex;align-items:center;gap:12px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.08)">
+    <span style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);display:grid;place-items:center;flex:none"><img src="https://unpkg.com/lucide-static@0.469.0/icons/telescope.svg" alt="" style="width:18px;height:18px;filter:invert(1)"></span>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+      <h2 class="cc-type-tagline" style="margin:0;color:#fff">관측소</h2>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted)">CSV 데이터는 대시보드로, 사진은 모아서 봅니다</span>
+    </div>
+    <button onClick="{{ close }}" aria-label="관측소 닫기" title="닫기 (Esc)" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.14);background:transparent;display:grid;place-items:center;cursor:pointer;flex:none;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/x.svg" alt="" style="width:14px;height:14px;filter:invert(1)"></button>
+  </header>
+  <div role="tablist" aria-label="관측 모드" style="flex:none;display:flex;padding:14px 20px 0">
+    <div style="display:flex;gap:2px;padding:3px;border-radius:9999px;background:rgba(255,255,255,0.08)">
+      <sc-for list="{{ obsModes }}" as="om" hint-placeholder-count="2"><button role="tab" aria-selected="{{ om.selected }}" onClick="{{ om.onClick }}" class="cc-type-caption" style="height:36px;padding:0 18px;border-radius:9999px;border:0;background:{{ om.bg }};color:{{ om.color }};cursor:pointer;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">{{ om.label }}</button></sc-for>
+    </div>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px">
+      <sc-if value="{{ noComet }}">
+        <div style="border-radius:18px;border:1px dashed rgba(255,255,255,0.2);padding:20px;display:flex;flex-direction:column;gap:6px">
+          <span class="cc-type-caption-strong" style="color:#fff">아직 재발견할 기록이 없어요.</span>
+          <span class="cc-type-caption" style="color:var(--color-body-muted);text-wrap:pretty">넣은 지 7일이 지난 기록이 생기면 여기에 재발견 혜성으로 모입니다. 정확히 7일 전 기록은 오늘의 재발견으로 표시돼요.</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isComet }}">
+        <div data-screen-label="재발견 혜성" style="border-radius:18px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);padding:16px 12px 8px;display:flex;flex-direction:column;gap:4px;min-width:0">
+          <span class="cc-type-fine-print" style="color:var(--color-body-muted);padding:0 8px 6px">{{ cometNote }}</span>
+          <sc-for list="{{ comets }}" as="cm">
+            <button onClick="{{ cm.onOpen }}" title="기록 상세 열기" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 8px;border:0;border-radius:11px;background:transparent;cursor:pointer;text-align:left">
+              <span aria-hidden="true" style="position:relative;flex:none;width:36px;height:28px;display:block"><i style="position:absolute;left:10px;top:18px;width:26px;height:12px;transform-origin:0 50%;transform:translateY(-50%) rotate(-36deg);clip-path:polygon(0 0,100% 50%,0 100%);background:{{ cm.accent }};opacity:0.4;display:block"></i><i style="position:absolute;left:4px;top:12px;width:12px;height:12px;border-radius:50%;background:{{ cm.accent }};display:block"></i></span>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                <span class="cc-type-caption-strong" style="color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cm.title }}</span>
+                <span class="cc-type-fine-print" style="color:var(--color-body-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cm.sub }}</span>
+              </span>
+              <sc-if value="{{ cm.today }}"><span class="cc-type-fine-print" style="flex:none;height:24px;padding:0 10px;border-radius:9999px;background:#fff;color:var(--color-ink);display:flex;align-items:center;white-space:nowrap">오늘의 재발견</span></sc-if>
+              <span class="cc-type-caption" style="flex:none;color:{{ cm.accent }};font-variant-numeric:tabular-nums;white-space:nowrap">{{ cm.ago }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+    <sc-if value="{{ isEmpty }}">
+      <div style="margin:auto;max-width:440px;padding:48px 0;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center">
+        <span class="cc-type-tagline" style="color:#fff">아직 볼 기록이 없어요.</span>
+        <span class="cc-type-body" style="color:var(--color-body-muted);text-wrap:pretty">CSV 파일을 기록으로 넣고 체크한 뒤 "관측소에서 바로 보기"를 누르면 그 데이터가 대시보드로 보입니다. 별자리로 저장하면 언제든 다시 볼 수 있어요.</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hasData }}" hint-placeholder-val="{{ true }}">
+      <div role="tablist" aria-label="선택한 기록과 별자리" style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="2">
+          <button role="tab" aria-selected="{{ tb.selected }}" onClick="{{ tb.onClick }}" class="cc-type-caption" style="height:36px;padding:0 14px;box-sizing:border-box;border-radius:9999px;border:1px solid {{ tb.border }};background:{{ tb.bg }};color:{{ tb.color }};cursor:pointer;display:flex;align-items:center;gap:8px;max-width:100%"><span style="overflow:hidden;text-overflow:ellipsis">{{ tb.name }}</span><span style="opacity:0.6">{{ tb.count }}</span></button>
+        </sc-for>
+      </div>
+
+      <div style="border-radius:18px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);padding:20px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 16px">
+          <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:6px">
+            <span style="font:600 28px/1.2 var(--font-display);letter-spacing:-0.01em;color:#fff">{{ name }}</span>
+            <span class="cc-type-caption" style="color:var(--color-body-muted)">{{ meta }}</span>
+            <sc-if value="{{ hasMemo }}"><span class="cc-type-body" style="color:#fff;white-space:pre-wrap;text-wrap:pretty;max-width:640px">{{ memo }}</span></sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <sc-if value="{{ isSel }}"><button onClick="{{ saveSel }}" class="cc-type-caption" style="height:36px;padding:0 16px;border-radius:9999px;border:0;background:var(--color-primary);color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/bookmark.svg" alt="" style="width:14px;height:14px;filter:invert(1)">별자리로 저장</button></sc-if>
+            <button onClick="{{ removeLink }}" class="cc-type-caption" style="height:36px;padding:0 8px;border:0;background:none;color:var(--color-body-muted);cursor:pointer">{{ removeLabel }}</button>
+            <sc-if value="{{ canEditLink }}"><button onClick="{{ toggleLinkEdit }}" aria-expanded="{{ linkEditing }}" class="cc-type-caption" style="height:36px;padding:0 8px;border:0;background:none;color:var(--color-primary-on-dark);cursor:pointer">별자리 수정</button></sc-if>
+          </div>
+        </div>
+        <sc-if value="{{ linkEditing }}">
+          <div data-screen-label="별자리 수정" style="display:flex;flex-direction:column;gap:12px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);max-width:640px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span class="cc-type-fine-print" style="color:var(--color-body-muted);letter-spacing:0.04em">별자리 이름</span>
+              <input value="{{ leName }}" onChange="{{ onLeName }}" onKeyDown="{{ onLeKey }}" maxlength="24" aria-label="별자리 이름" class="cc-type-caption" style="height:40px;padding:0 14px;border-radius:9999px;box-sizing:border-box;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:#fff;outline:none"></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span class="cc-type-fine-print" style="color:var(--color-body-muted);letter-spacing:0.04em">관측 목적</span>
+              <textarea value="{{ leMemo }}" onChange="{{ onLeMemo }}" onKeyDown="{{ stopKey }}" rows="3" placeholder="이 기록들로 무엇을 보고 싶나요?" aria-label="관측 목적" class="cc-type-caption" style="resize:vertical;min-height:76px;padding:10px 14px;border-radius:14px;line-height:1.5;box-sizing:border-box;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:#fff;outline:none"></textarea></label>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ saveLe }}" disabled="{{ leEmpty }}" class="cc-type-caption" style="height:36px;padding:0 18px;border-radius:9999px;border:0;background:var(--color-primary);color:#fff;opacity:{{ leBtnOpacity }};cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">저장</button>
+              <button onClick="{{ toggleLinkEdit }}" class="cc-type-caption" style="height:36px;padding:0 18px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);background:transparent;color:#fff;cursor:pointer">취소</button>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ hasSettings }}" hint-placeholder-val="{{ true }}">
+          <div data-screen-label="보기 설정" style="display:flex;flex-direction:column;gap:14px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
+            <sc-for list="{{ settings }}" as="sg" hint-placeholder-count="3">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">
+                <span class="cc-type-fine-print" style="width:72px;flex:none;color:var(--color-body-muted);letter-spacing:0.04em">{{ sg.label }}</span>
+                <div role="radiogroup" aria-label="{{ sg.label }}" style="flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ sg.opts }}" as="op">
+                    <button role="radio" aria-checked="{{ op.selected }}" onClick="{{ op.onClick }}" class="cc-type-caption" style="height:32px;padding:0 14px;box-sizing:border-box;border-radius:9999px;border:1px solid {{ op.border }};background:{{ op.bg }};color:{{ op.color }};cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis">{{ op.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ hasColNote }}"><span class="cc-type-fine-print" style="color:var(--color-body-muted);line-height:1.5;text-wrap:pretty">{{ colNote }}</span></sc-if>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ noCsv }}">
+        <div style="border-radius:18px;border:1px dashed rgba(255,255,255,0.2);padding:20px;display:flex;flex-direction:column;gap:6px">
+          <span class="cc-type-caption-strong" style="color:#fff">이 묶음에는 대시보드로 볼 CSV 데이터나 모아 볼 사진이 없어요.</span>
+          <span class="cc-type-caption" style="color:var(--color-body-muted);text-wrap:pretty">{{ noCsvText }}</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+        <div data-screen-label="CSV 대시보드" style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+            <sc-for list="{{ stats }}" as="st" hint-placeholder-count="4">
+              <div style="border-radius:18px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);padding:16px 20px;display:flex;flex-direction:column;gap:6px;min-width:0">
+                <span class="cc-type-fine-print" style="color:var(--color-body-muted);letter-spacing:0.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ st.label }}</span>
+                <span style="font:600 28px/1.2 var(--font-display);color:#fff;letter-spacing:-0.01em">{{ st.value }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="border-radius:18px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0">
+            <span class="cc-type-caption-strong" style="color:#fff">{{ chartTitle }}</span>
+            <sc-if value="{{ isBar }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ segs }}" as="b" hint-placeholder-count="4">
+                  <div style="display:grid;grid-template-columns:minmax(72px,160px) minmax(0,1fr) 64px;align-items:center;gap:12px">
+                    <span class="cc-type-caption" style="color:#fff;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.label }}</span>
+                    <div style="height:12px;border-radius:6px;background:rgba(255,255,255,0.08);overflow:hidden"><i style="display:block;height:100%;width:{{ b.pct }};border-radius:6px;background:var(--color-primary-on-dark)"></i></div>
+                    <span class="cc-type-caption" style="color:#fff;text-align:right">{{ b.value }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isDonut }}">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:24px">
+                <div role="img" aria-label="{{ chartTitle }}" style="position:relative;width:168px;height:168px;border-radius:50%;background:{{ donutBg }};flex:none">
+                  <div style="position:absolute;inset:36px;border-radius:50%;background:#232325;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font:600 24px/1.1 var(--font-display);color:#fff">{{ total }}</span><span class="cc-type-fine-print" style="color:var(--color-body-muted)">{{ totalLabel }}</span></div>
+                </div>
+                <div style="flex:1;min-width:160px;display:flex;flex-direction:column;gap:10px">
+                  <sc-for list="{{ segs }}" as="b">
+                    <div style="display:flex;align-items:center;gap:10px"><i style="width:10px;height:10px;border-radius:50%;background:{{ b.color }};display:block;flex:none"></i><span class="cc-type-caption" style="flex:1;min-width:0;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.label }}</span><span class="cc-type-caption" style="color:var(--color-body-muted);flex:none">{{ b.value }} · {{ b.share }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasChartNote }}"><span class="cc-type-fine-print" style="color:var(--color-body-muted)">{{ chartNote }}</span></sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isTable }}">
+        <div data-screen-label="CSV 데이터" style="border-radius:18px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);display:flex;flex-direction:column;min-width:0">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:14px 16px 14px 20px;border-bottom:1px solid rgba(255,255,255,0.08)">
+            <span class="cc-type-caption-strong" style="flex:1;min-width:0;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tableTitle }}</span>
+            <button onClick="{{ toggleRaw }}" aria-pressed="{{ isRaw }}" class="cc-type-caption" style="height:32px;padding:0 14px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);background:transparent;color:#fff;cursor:pointer">{{ rawLabel }}</button>
+          </div>
+          <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ true }}">
+            <div style="overflow:auto;max-height:440px">
+              <div role="table" style="min-width:{{ tableMin }}">
+                <div role="row" style="position:sticky;top:0;display:grid;grid-template-columns:{{ gridCols }};gap:12px;padding:10px 20px;background:#232325;border-bottom:1px solid rgba(255,255,255,0.08)">
+                  <sc-for list="{{ tcols }}" as="tc"><span role="columnheader" class="cc-type-fine-print" style="color:var(--color-body-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tc.name }}</span></sc-for>
+                </div>
+                <sc-for list="{{ trows }}" as="tr" hint-placeholder-count="5">
+                  <div role="row" style="display:grid;grid-template-columns:{{ gridCols }};gap:12px;align-items:center;min-height:40px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.05)">
+                    <sc-for list="{{ tr.cells }}" as="c"><span role="cell" class="cc-type-caption" style="color:#fff;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.v }}</span></sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isRaw }}">
+            <pre style="margin:12px;padding:16px;border-radius:11px;background:#000;color:#fff;font:400 12px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre;overflow:auto;max-height:420px;user-select:text">{{ csv }}</pre>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ noTexts }}">
+        <div style="border-radius:18px;border:1px dashed rgba(255,255,255,0.2);padding:20px;display:flex;flex-direction:column;gap:6px">
+          <span class="cc-type-caption-strong" style="color:#fff">이 묶음에는 텍스트 기록이 없어요.</span>
+          <span class="cc-type-caption" style="color:var(--color-body-muted);text-wrap:pretty">메모나 붙여 넣은 글을 기록으로 넣고 이 묶음에 포함하면 여기에 내용이 모여 보입니다.</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isTexts }}">
+        <div data-screen-label="텍스트 모아보기" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">
+          <sc-for list="{{ texts }}" as="tx">
+            <button onClick="{{ tx.onOpen }}" title="기록 상세 열기" style="display:flex;flex-direction:column;gap:8px;padding:18px 20px;border-radius:18px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);cursor:pointer;text-align:left;min-width:0">
+              <span style="display:flex;align-items:center;gap:8px;min-width:0"><i style="width:8px;height:8px;border-radius:50%;background:{{ tx.accent }};display:block;flex:none"></i><span class="cc-type-caption-strong" style="flex:1;min-width:0;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tx.title }}</span></span>
+              <span class="cc-type-caption" style="color:#fff;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:8;-webkit-box-orient:vertical;overflow:hidden">{{ tx.body }}</span>
+              <span class="cc-type-fine-print" style="color:var(--color-body-muted)">{{ tx.sub }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noPhotos }}">
+        <div style="border-radius:18px;border:1px dashed rgba(255,255,255,0.2);padding:20px;display:flex;flex-direction:column;gap:6px">
+          <span class="cc-type-caption-strong" style="color:#fff">이 묶음에는 이미지 기록이 없어요.</span>
+          <span class="cc-type-caption" style="color:var(--color-body-muted);text-wrap:pretty">이미지 파일(PNG, JPG 등)을 기록으로 넣고 이 묶음에 포함하면 여기에 사진이 모여 보입니다.</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isPhotos }}">
+        <div data-screen-label="사진 모아보기" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+          <sc-for list="{{ photos }}" as="ph">
+            <button onClick="{{ ph.onOpen }}" title="기록 상세 열기" style="position:relative;aspect-ratio:4/3;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);background:{{ ph.bg }};padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+              <img src="https://unpkg.com/lucide-static@0.469.0/icons/image.svg" alt="" style="width:28px;height:28px;filter:invert(1);opacity:0.7;margin-bottom:28px">
+              <sc-if value="{{ ph.hasThumb }}"><img src="{{ ph.thumb }}" alt="{{ ph.title }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+              <span style="position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:rgba(0,0,0,0.64);text-align:left;display:flex;flex-direction:column;gap:2px">
+                <span class="cc-type-caption-strong" style="color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ph.title }}</span>
+                <span class="cc-type-fine-print" style="color:#d2d2d7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ph.sub }}</span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <div style="border-radius:18px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);padding:16px 12px 8px;display:flex;flex-direction:column;gap:4px;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;padding:0 4px 4px 8px">
+          <span class="cc-type-caption-strong" style="flex:1;color:#fff">이 묶음의 기록</span>
+          <button onClick="{{ toggleEdit }}" aria-pressed="{{ editing }}" class="cc-type-caption" style="height:32px;padding:0 14px;box-sizing:border-box;border-radius:9999px;border:1px solid {{ editBorder }};background:{{ editBg }};color:{{ editColor }};cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">{{ editLabel }}</button>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:4px">
+          <button onClick="{{ r.onOpen }}" title="기록 상세 열기" style="flex:1;min-width:0;display:flex;align-items:center;gap:12px;min-height:44px;padding:4px 8px;border:0;border-radius:11px;background:transparent;cursor:pointer;text-align:left">
+            <i style="width:8px;height:8px;border-radius:50%;background:{{ r.accent }};display:block;flex:none"></i>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <span class="cc-type-caption-strong" style="color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</span>
+              <span class="cc-type-fine-print" style="color:var(--color-body-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.sub }}</span>
+            </span>
+            <sc-if value="{{ r.isData }}"><span class="cc-type-micro-legal" style="flex:none;height:20px;padding:0 8px;border-radius:9999px;border:1px solid rgba(255,255,255,0.3);color:#fff;display:flex;align-items:center">CSV</span></sc-if>
+          </button>
+          <sc-if value="{{ r.editing }}"><button onClick="{{ r.onRemove }}" aria-label="{{ r.removeLabel }}" title="이 묶음에서 빼기" style="flex:none;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,0.08);display:grid;place-items:center;cursor:pointer"><img src="https://unpkg.com/lucide-static@0.469.0/icons/x.svg" alt="" style="width:14px;height:14px;filter:invert(1)"></button></sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ editing }}">
+          <div data-screen-label="기록 더하기" style="display:flex;flex-direction:column;gap:4px;margin-top:8px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">
+            <span class="cc-type-fine-print" style="color:var(--color-body-muted);padding:0 8px 4px;letter-spacing:0.04em">{{ addTitle }}</span>
+            <div style="max-height:264px;overflow-y:auto;display:flex;flex-direction:column">
+              <sc-for list="{{ addRows }}" as="ar">
+                <button onClick="{{ ar.onAdd }}" title="이 묶음에 더하기" style="flex:none;display:flex;align-items:center;gap:12px;min-height:44px;padding:4px 8px;border:0;border-radius:11px;background:transparent;cursor:pointer;text-align:left">
+                  <span style="flex:none;width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);display:grid;place-items:center"><img src="https://unpkg.com/lucide-static@0.469.0/icons/plus.svg" alt="" style="width:12px;height:12px;filter:invert(1)"></span>
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <span class="cc-type-caption" style="color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ar.title }}</span>
+                    <span class="cc-type-fine-print" style="color:var(--color-body-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ar.sub }}</span>
+                  </span>
+                  <sc-if value="{{ ar.isData }}"><span class="cc-type-micro-legal" style="flex:none;height:20px;padding:0 8px;border-radius:9999px;border:1px solid rgba(255,255,255,0.3);color:#fff;display:flex;align-items:center">CSV</span></sc-if>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">
+        <span class="cc-type-fine-print" style="flex:1;min-width:200px;color:var(--color-body-muted);line-height:1.5">{{ footNote }}</span>
+        <button onClick="{{ copyAi }}" class="cc-type-caption" style="height:36px;padding:0 14px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);background:transparent;color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">AI용 텍스트 복사</button>
+        <sc-if value="{{ hasCsv }}" hint-placeholder-val="{{ true }}"><button onClick="{{ copyCsv }}" class="cc-type-caption" style="height:36px;padding:0 14px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);background:transparent;color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">CSV 복사</button></sc-if>
+        <sc-if value="{{ hasCsv }}" hint-placeholder-val="{{ true }}"><button onClick="{{ download }}" class="cc-type-caption" style="height:36px;padding:0 16px;border-radius:9999px;border:0;background:var(--color-primary);color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">CSV 내려받기</button></sc-if>
+      </div>
+    </sc-if>
+  </div>
+
+  <div aria-live="polite" style="position:absolute;left:16px;right:16px;bottom:24px;z-index:9;display:flex;justify-content:center;pointer-events:none;opacity:{{ toastOpacity }};transition:opacity 200ms var(--ease-standard)">
+    <div class="cc-type-caption" style="background:#fff;color:var(--color-ink);border-radius:9999px;padding:10px 16px">{{ toast }}</div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;db&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;cartIds&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string[]&quot;},&quot;linkId&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;onSetCart&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onAction&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onClose&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onOpenStar&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onToast&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;}}">
+const TONES = ['#2997ff', '#f5f5f7', '#a1a1a6', '#6e6e73', '#d2d2d7', '#8e8e93', '#48484a'];
+const SEL = '__sel';
+const toNum = v => { const t = String(v == null ? '' : v).trim().replace(/,/g, ''); return t !== '' && isFinite(+t) ? +t : null; };
+const fmt = v => (Math.round(v * 10) / 10).toLocaleString();
+class Component extends DCLogic {
+  state = { db: null, cart: null, sel: null, raw: false, edit: false, selViz: null, toast: '', toastOn: false };
+  componentDidMount() {
+    const wait = () => {
+      if (!window.SPACELOG) { this._w = setTimeout(wait, 60); return; }
+      if (this.props.db || this.state.db) return;
+      const db = window.SPACELOG.initial();
+      // 단독 미리보기용 예시 별자리 (저장하지 않습니다)
+      if (!db.links.length) db.links = [{ id: 'demo', name: '몸과 여가 돌아보기', memo: '운동과 여가 기록을 같이 보고 균형을 확인한다.', ids: db.stars.filter(x => x.csv).slice(0, 2).map(x => x.id).concat(['s2']) }];
+      this.setState({ db });
+    };
+    wait();
+  }
+  componentDidUpdate(prev) { if (prev.linkId !== this.props.linkId && this.state.sel) this.setState({ sel: null }); }
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._w); }
+  db() { return this.props.db || this.state.db || { planets: [], stars: [], links: [] }; }
+  cart() { const db = this.db(); return (this.props.cartIds ?? this.state.cart ?? []).filter(id => db.stars.some(s => s.id === id)); }
+  setCart(ids) { this.props.onSetCart ? this.props.onSetCart(ids) : this.setState({ cart: ids }); }
+  act(a) {
+    if (this.props.onAction) return this.props.onAction(a);
+    const db = this.db();
+    if (a.type === 'linkViz') this.setState({ db: { ...db, links: db.links.map(l => l.id === a.id ? { ...l, viz: a.viz } : l) } });
+    else if (a.type === 'link') this.setState({ db: { ...db, links: db.links.concat([{ id: a.id, name: a.name, memo: a.memo || '', viz: a.viz, ids: a.ids }]) } });
+    else if (a.type === 'linkEdit') this.setState({ db: { ...db, links: db.links.map(l => l.id === a.id ? { ...l, name: a.name, memo: a.memo } : l) } });
+    else if (a.type === 'linkSet') this.setState({ db: { ...db, links: db.links.map(l => l.id === a.id ? { ...l, ids: a.ids } : l) } });
+    else if (a.type === 'unlink') this.setState({ db: { ...db, links: db.links.filter(l => l.id !== a.id) } });
+  }
+  flash(msg) {
+    if (this.props.onToast) return this.props.onToast(msg);
+    clearTimeout(this._t); this.setState({ toast: msg, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 2400);
+  }
+  copy(text, ok) {
+    const fail = () => this.flash('복사하지 못했어요. 표 · CSV 보기에서 원문을 직접 선택해 주세요');
+    try { navigator.clipboard.writeText(text).then(() => this.flash(ok), fail); } catch (e) { fail(); }
+  }
+  renderVals() {
+    const S = window.SPACELOG, s = this.state;
+    const close = () => this.props.onClose ? this.props.onClose() : (window.location.href = 'SPACELOG_Prototype.dc.html');
+    const om = (s.obsMode || this.props.startMode) === 'comet' ? 'comet' : 'link';
+    const blank = { close, obsModes: [['comet', '재발견 혜성 관측'], ['link', '별자리 관측']].map(([k, label]) => ({ key: k, label, selected: om === k, bg: om === k ? '#fff' : 'transparent', color: om === k ? 'var(--color-ink)' : '#fff', onClick: () => this.setState({ obsMode: k }) })), comets: [], texts: [], photos: [], tabs: [], settings: [], segs: [], rows: [], stats: [], tcols: [], trows: [], toast: s.toast, toastOpacity: s.toastOn ? 1 : 0 };
+    if (!S) return { ...blank, hasData: true, hasCsv: true, isDash: true, isBar: true };
+    const db = this.db(), cart = this.cart(), pm = {}; db.planets.forEach(p => { pm[p.id] = p; });
+    const star = id => db.stars.find(x => x.id === id);
+    if (om === 'comet') { // 재발견 혜성 관측: 모든 행성에서 넣은 지 7일이 넘은 기록. 정확히 7일 전 기록은 '오늘의 재발견'.
+      const d0 = new Date(); d0.setHours(0, 0, 0, 0); const ago = x => { const d = new Date(x.addedAt); d.setHours(0, 0, 0, 0); return Math.round((d0 - d) / 864e5); };
+      const old = db.stars.filter(x => ago(x) >= 7).sort((a, b) => ago(a) - ago(b) || (a.addedAt < b.addedAt ? 1 : -1));
+      return { ...blank, isEmpty: false, hasData: false, isComet: old.length > 0, noComet: !old.length, cometNote: '넣은 지 7일이 넘은 기록 ' + old.length + '개' + (old.length > 60 ? ' 중 최근 60개' : '') + ' · 가까운 날짜부터',
+        comets: old.slice(0, 60).map(x => ({ key: x.id, title: x.title, accent: (pm[x.planet] || {}).accent || '#fff', sub: ((pm[x.planet] || {}).name || '') + ' · ' + S.fmtDate(x.addedAt) + ' · ' + S.descOf(x), ago: ago(x) + '일 전', today: ago(x) === 7,
+          onOpen: () => this.props.onOpenStar ? this.props.onOpenStar(x.planet, x.id) : (window.location.href = 'SPACELOG_Prototype.dc.html#planet=' + x.planet + '&star=' + x.id) })) };
+    }
+    // 맨 앞은 지금 고른 기록(저장 전), 그 뒤는 저장된 모든 별자리입니다.
+    const dupLink = (db.links || []).some(l => l.ids.length === cart.length && l.ids.every(i => cart.includes(i)));
+    const sent = (cart.length && !dupLink ? [{ l: { id: SEL, name: '선택한 기록', memo: '', ids: cart, viz: s.selViz }, ms: cart.map(star).filter(Boolean) }] : []).concat((db.links || []).map(l => ({ l, ms: l.ids.map(star).filter(Boolean) })).filter(o => o.ms.length > 0));
+    const has = id => !!id && sent.some(o => o.l.id === id);
+    const selId = has(s.sel) ? s.sel : has(this.props.linkId) ? this.props.linkId : (sent[0] ? sent[0].l.id : null);
+    const cur = sent.find(o => o.l.id === selId);
+    if (!cur) return { ...blank, isEmpty: true, hasData: false };
+
+    const isSel = cur.l.id === SEL, viz = { mode: 'dash', chart: 'bar', agg: 'avg', ...(cur.l.viz || {}) };
+    const setViz = patch => isSel ? this.setState({ selViz: { ...viz, ...patch } }) : this.act({ type: 'linkViz', id: cur.l.id, viz: { ...viz, ...patch } });
+    const list = [...cur.ms].sort((a, b) => a.addedAt < b.addedAt ? 1 : -1);
+    const datas = list.filter(x => x.csv && x.csv.cols && x.csv.cols.length && x.csv.rows && x.csv.rows.length);
+    const pick = datas.find(x => x.id === viz.csvId) || datas[0], hasCsv = !!pick, imgs = list.filter(x => x.kind === 'image');
+    // 볼 수 있는 방식: CSV가 있으면 대시보드·표, 사진이 있으면 사진 모아보기
+    const avail = (pick ? [['dash', '시각화 대시보드'], ['table', '표 · CSV']] : []).concat([['photos', '사진 모아보기'], ['texts', '텍스트 모아보기']]);
+    viz.mode = avail.some(a => a[0] === viz.mode) ? viz.mode : (avail[0] ? avail[0][0] : 'dash');
+    const opt = (key, cur0, opts) => opts.map(([v, l]) => ({ key: String(v), label: l, selected: cur0 === v, bg: cur0 === v ? '#fff' : 'transparent', color: cur0 === v ? 'var(--color-ink)' : '#fff', border: key === 'mode' && v === this.props.hintMode && cur0 !== v ? '#2997ff' : cur0 === v ? '#fff' : 'rgba(255,255,255,0.24)', onClick: () => setViz({ [key]: v }) }));
+    const esc = v => { v = String(v ?? ''); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+
+    const modeGroup = avail.length > 1 ? [{ key: 'mode', label: '보기 방식', opts: opt('mode', viz.mode, avail) }] : [];
+    let dash = { stats: [], segs: [], settings: modeGroup, tcols: [], trows: [], csv: '' };
+    if (pick) {
+      const cols = pick.csv.cols, rws = pick.csv.rows;
+      const info = cols.map((name, i) => { const vals = rws.map(r => r[i]).filter(v => v !== '' && v != null), nums = vals.map(toNum).filter(n => n !== null); return { i, name, isNum: vals.length > 0 && nums.length >= vals.length * 0.8, distinct: new Set(vals.map(String)).size, nums }; });
+      // 행을 구분하는 번호 열(id, no, 번호 등 또는 값이 전부 다른 정수)은 계산과 차트에서 뺍니다. 표와 CSV에는 그대로 둡니다.
+      info.forEach(c => { c.isId = /^(id|_id|no|no\.|num|index|idx|번호|순번|연번)$/i.test(c.name.trim()) || /(_id|Id|ID)$/.test(c.name.trim()) || (c.isNum && rws.length > 2 && c.distinct === rws.length && c.nums.every(n => Number.isInteger(n)) && Math.max(...c.nums) - Math.min(...c.nums) === rws.length - 1); });
+      const ov = (viz.cols && viz.cols[pick.id]) || {}; info.forEach(c => { c.off = c.name in ov ? !ov[c.name] : c.isId; });
+      const numCols = info.filter(c => c.isNum && !c.off);
+      let catCols = info.filter(c => !c.isNum && !c.off && c.distinct >= 2 && c.distinct <= 12);
+      const rowLabel = !catCols.length; if (rowLabel) catCols = [info.find(c => !c.isNum && !c.off) || info.find(c => !c.off) || info[0]];
+      const cat = catCols.find(c => c.name === viz.cat) || catCols[0];
+      const valKey = viz.val === '__count' || numCols.some(c => c.name === viz.val) ? viz.val : ((numCols.find(c => !c.isId) || numCols[0]) ? (numCols.find(c => !c.isId) || numCols[0]).name : '__count');
+      const valCol = numCols.find(c => c.name === valKey) || null, agg = viz.agg === 'sum' ? 'sum' : 'avg';
+      const g = {}; rws.forEach(r => { const k = String(r[cat.i] ?? ''); if (k === '') return; const o = g[k] = g[k] || { k, sum: 0, n: 0, rows: 0 }; o.rows++; if (valCol) { const n = toNum(r[valCol.i]); if (n !== null) { o.sum += n; o.n++; } } });
+      const all = Object.values(g).map(o => ({ k: o.k, v: valCol ? (agg === 'sum' ? o.sum : (o.n ? o.sum / o.n : 0)) : o.rows })).sort((a, b) => b.v - a.v), top = all.slice(0, 12);
+      const max = Math.max(1e-9, ...top.map(x => x.v)), tot = top.reduce((a, x) => a + Math.max(0, x.v), 0) || 1;
+      let acc = 0;
+      dash.segs = top.map((x, i) => { const from = acc / tot * 100; acc += Math.max(0, x.v); return { key: x.k, label: x.k, value: fmt(x.v), pct: Math.max(0, x.v / max * 100).toFixed(1) + '%', share: Math.round(Math.max(0, x.v) / tot * 100) + '%', color: TONES[i % TONES.length], stop: TONES[i % TONES.length] + ' ' + from.toFixed(2) + '% ' + (acc / tot * 100).toFixed(2) + '%' }; });
+      dash.stats = [{ key: 'r', label: '행', value: rws.length.toLocaleString() }, { key: 'c', label: '열', value: cols.length }].concat(numCols.filter(c => !c.isId).concat(numCols.filter(c => c.isId)).slice(0, 2).map(c => ({ key: c.name, label: c.name + ' 평균', value: fmt(c.nums.reduce((a, b) => a + b, 0) / c.nums.length) })));
+      dash.chartTitle = cat.name + '별 ' + (valCol ? valCol.name + (agg === 'sum' ? ' 합계' : ' 평균') : '행 수');
+      dash.chartNote = all.length > top.length ? '값이 큰 순서로 ' + top.length + '개만 그렸어요. 전체 ' + all.length + '개는 표에서 볼 수 있어요.' : '';
+      dash.total = valCol && agg === 'avg' ? top.length : fmt(tot); dash.totalLabel = valCol && agg === 'avg' ? '항목' : (valCol ? valCol.name + ' 합계' : '행');
+      dash.settings = [].concat(
+        datas.length > 1 && viz.mode !== 'photos' ? [{ key: 'csvId', label: '데이터', opts: opt('csvId', pick.id, datas.map(x => [x.id, x.title])) }] : [],
+        modeGroup,
+        viz.mode !== 'dash' ? [] : [].concat(
+          catCols.length > 1 ? [{ key: 'cat', label: '묶는 기준', opts: opt('cat', cat.name, catCols.map(c => [c.name, c.name])) }] : [],
+          [{ key: 'val', label: '값', opts: opt('val', valKey, numCols.map(c => [c.name, c.name]).concat([['__count', '행 수']])) }],
+          valCol ? [{ key: 'agg', label: '계산', opts: opt('agg', agg, [['avg', '평균'], ['sum', '합계']]) }] : [],
+          [{ key: 'chart', label: '차트 모양', opts: opt('chart', viz.chart, [['bar', '막대'], ['donut', '도넛']]) }],
+          [{ key: 'cols', label: '쓸 열', opts: info.map(c => ({ key: 'col' + c.i, label: c.name, selected: !c.off, bg: c.off ? 'transparent' : 'rgba(255,255,255,0.16)', color: c.off ? 'var(--color-body-muted)' : '#fff', border: c.off ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.5)',
+            onClick: () => setViz({ cols: { ...(viz.cols || {}), [pick.id]: { ...ov, [c.name]: c.off } } }) })) }]));
+      const autoOff = info.filter(c => c.off && c.isId && !(c.name in ov)), offAll = info.filter(c => c.off);
+      dash.colNote = viz.mode !== 'dash' ? '' : autoOff.length ? '‘' + autoOff.map(c => c.name).join('’, ‘') + '’ 열은 행 번호로 보여 계산에서 기본으로 뺐어요. ‘쓸 열’에서 눌러 다시 넣거나 다른 열을 뺄 수 있어요.' : offAll.length ? '‘' + offAll.map(c => c.name).join('’, ‘') + '’ 열을 계산에서 뺀 상태예요. ‘쓸 열’에서 눌러 다시 넣을 수 있어요.' : '';
+      dash.tcols = cols.map((name, i) => ({ key: i, name }));
+      dash.trows = rws.slice(0, 100).map((r, i) => ({ key: i, cells: cols.map((_, j) => ({ key: j, v: String(r[j] ?? '') })) }));
+      dash.gridCols = 'repeat(' + cols.length + ', minmax(96px, 1fr))'; dash.tableMin = (cols.length * 116 + 40) + 'px';
+      dash.tableTitle = pick.title + ' · ' + rws.length.toLocaleString() + '행' + (rws.length > 100 ? ' (처음 100행만 표시)' : '');
+      dash.csv = [cols].concat(rws).map(r => r.map(esc).join(',')).join('\n');
+    }
+    const saveLe = () => { if (!s.le || !s.le.name.trim()) return; this.act({ type: 'linkEdit', id: cur.l.id, name: s.le.name.trim(), memo: s.le.memo.trim() }); this.setState({ le: null }); this.flash('별자리를 수정했어요'); };
+    const planets = new Set(list.map(x => x.planet)).size, ids = list.map(x => x.id), isCsvStar = x => !!(x.csv && x.csv.cols && x.csv.rows && x.csv.rows.length);
+    // 묶음 수정: 선택한 기록은 선택 목록을, 별자리는 별자리의 기록을 바꿉니다.
+    const setIds = next => { if (isSel) { this.setCart(next); if (!next.length) this.setState({ edit: false, sel: null }); } else if (!next.length) this.flash('별자리에는 기록이 하나는 있어야 해요. 없애려면 ‘별자리 풀기’를 누르세요'); else this.act({ type: 'linkSet', id: cur.l.id, ids: next }); };
+    const others = db.stars.filter(x => !ids.includes(x.id)).sort((a, b) => (isCsvStar(b) - isCsvStar(a)) || (a.addedAt < b.addedAt ? 1 : -1));
+    return { ...blank, ...dash, isEmpty: false, hasData: true, hasCsv, noCsv: !hasCsv && !imgs.length, hasSettings: dash.settings.length > 0, isPhotos: viz.mode === 'photos', noPhotos: viz.mode === 'photos' && !imgs.length,
+      isTexts: viz.mode === 'texts', noTexts: viz.mode === 'texts' && !list.some(x => x.kind === 'text' || x.csv),
+      texts: list.filter(x => x.kind === 'text' || x.csv).map(x => ({ key: x.id, title: x.title, body: x.kind === 'text' ? (x.body || x.memo || '(내용이 저장돼 있지 않아요)') : (x.memo ? '메모 · ' + x.memo : '메모가 아직 없어요. 기록 상세에서 메모를 남기면 여기에 보입니다.'), accent: (pm[x.planet] || {}).accent || '#fff', sub: ((pm[x.planet] || {}).name || '') + ' · ' + S.fmtDate(x.addedAt),
+        onOpen: () => this.props.onOpenStar ? this.props.onOpenStar(x.planet, x.id) : (window.location.href = 'SPACELOG_Prototype.dc.html#planet=' + x.planet + '&star=' + x.id) })),
+      photos: imgs.map(x => ({ key: x.id, title: x.title, hasThumb: !!x.thumb, thumb: x.thumb || '', bg: 'color-mix(in srgb, ' + ((pm[x.planet] || {}).accent || '#fff') + ' 22%, #161618)', sub: ((pm[x.planet] || {}).name || '') + ' · ' + S.fmtDate(x.addedAt) + (x.memo ? ' · ' + x.memo : ''),
+        onOpen: () => this.props.onOpenStar ? this.props.onOpenStar(x.planet, x.id) : (window.location.href = 'SPACELOG_Prototype.dc.html#planet=' + x.planet + '&star=' + x.id) })),
+      noCsvText: list.some(x => /\.csv$/i.test(x.title)) ? 'CSV 파일이 있지만 내용이 저장돼 있지 않아요. 그 파일을 다시 끌어다 넣으면 내용까지 저장돼 대시보드로 볼 수 있습니다.' : 'CSV 파일을 기록으로 넣고 이 묶음에 포함하면, 그 데이터의 열을 기준으로 대시보드가 만들어집니다.',
+      tabs: sent.map(o => { const on = o.l.id === selId; return { key: o.l.id, name: o.l.name, count: o.ms.length, selected: on, bg: on ? '#fff' : 'transparent', color: on ? 'var(--color-ink)' : '#fff', border: on ? '#fff' : 'rgba(255,255,255,0.24)', onClick: () => this.setState({ sel: o.l.id, le: null }) }; }),
+      name: cur.l.name, memo: cur.l.memo ? '관측 목적 · ' + cur.l.memo : '', hasMemo: !!cur.l.memo,
+      meta: '기록 ' + list.length + ' · CSV 데이터 ' + datas.length + ' · 사진 ' + imgs.length + ' · 행성 ' + planets,
+      isSel, removeLabel: isSel ? '선택 비우기' : '별자리 풀기',
+      canEditLink: !isSel, linkEditing: !isSel && !!s.le, leName: s.le ? s.le.name : '', leMemo: s.le ? s.le.memo : '', leEmpty: !(s.le && s.le.name.trim()), leBtnOpacity: s.le && s.le.name.trim() ? 1 : 0.4,
+      toggleLinkEdit: () => this.setState({ le: s.le ? null : { name: cur.l.name, memo: cur.l.memo || '' } }),
+      onLeName: e => this.setState({ le: { ...s.le, name: e.target.value } }), onLeMemo: e => this.setState({ le: { ...s.le, memo: e.target.value } }),
+      stopKey: e => e.stopPropagation(),
+      onLeKey: e => { e.stopPropagation(); if (e.key === 'Enter' && !e.nativeEvent.isComposing && s.le && s.le.name.trim()) saveLe(); },
+      saveLe,
+      removeLink: () => { if (isSel) { this.setCart([]); this.flash('선택을 비웠어요'); } else { this.act({ type: 'unlink', id: cur.l.id }); this.flash('‘' + cur.l.name + '’ 별자리를 풀었어요. 기록은 그대로 있어요'); } this.setState({ sel: null }); },
+      saveSel: () => { const id = 'l' + Date.now(), name = '별자리 ' + ((db.links || []).length + 1); this.act({ type: 'link', id, name, memo: '', viz, ids: cart }); this.setCart([]); this.setState({ sel: id }); this.flash('‘' + name + '’ 별자리로 저장했어요'); },
+      isDash: hasCsv && viz.mode === 'dash', isTable: hasCsv && viz.mode === 'table', isBar: viz.chart !== 'donut', isDonut: viz.chart === 'donut',
+      hasColNote: !!dash.colNote, hasChartNote: !!dash.chartNote, donutBg: 'conic-gradient(' + dash.segs.map(x => x.stop).join(', ') + ')',
+      editing: s.edit, toggleEdit: () => this.setState({ edit: !s.edit }), editLabel: s.edit ? '수정 완료' : '기록 수정하기', editBg: s.edit ? '#fff' : 'transparent', editColor: s.edit ? 'var(--color-ink)' : '#fff', editBorder: s.edit ? '#fff' : 'rgba(255,255,255,0.24)',
+      addTitle: others.length ? '더할 수 있는 기록 ' + others.length + (others.length > 60 ? ' (최근 60개만 표시)' : '') : '더할 수 있는 기록이 없어요',
+      addRows: others.slice(0, 60).map(x => ({ key: x.id, title: x.title, isData: isCsvStar(x), sub: ((pm[x.planet] || {}).name || '') + ' · ' + S.fmtDate(x.addedAt) + ' · ' + S.descOf(x), onAdd: () => setIds(ids.concat([x.id])) })),
+      rows: list.map(x => ({ key: x.id, title: x.title, accent: (pm[x.planet] || {}).accent || '#fff', isData: datas.includes(x), editing: s.edit, removeLabel: x.title + ' 빼기', onRemove: () => setIds(ids.filter(i => i !== x.id)),
+        sub: ((pm[x.planet] || {}).name || '') + ' · ' + S.fmtDate(x.addedAt) + ' · ' + S.descOf(x),
+        onOpen: () => this.props.onOpenStar ? this.props.onOpenStar(x.planet, x.id) : (window.location.href = 'SPACELOG_Prototype.dc.html#planet=' + x.planet + '&star=' + x.id) })),
+      isRaw: s.raw, isGrid: !s.raw, rawLabel: s.raw ? '표로 보기' : 'CSV 원문 보기', toggleRaw: () => this.setState({ raw: !s.raw }),
+      footNote: viz.mode === 'photos' ? '사진은 미리보기용 축소본입니다. 원본은 내 PC 보관함에 그대로 있어요.' : hasCsv ? '대시보드와 CSV는 ‘' + pick.title + '’의 데이터입니다. 원본 파일은 내 PC 보관함에 그대로 있어요.' : 'AI용 텍스트에는 이 묶음의 기록 목록이 담깁니다.',
+      download: () => {
+        if (!pick) return;
+        const a = document.createElement('a'), url = URL.createObjectURL(new Blob(['\ufeff' + dash.csv], { type: 'text/csv;charset=utf-8' }));
+        a.href = url; a.download = /\.csv$/i.test(pick.title) ? pick.title : pick.title + '.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+        this.flash('CSV를 내려받았어요');
+      },
+      copyCsv: () => this.copy(dash.csv, 'CSV를 복사했어요'),
+      copyAi: () => this.copy(S.buildExport(db, list.map(x => x.id), 'claude') + datas.map(x => '\n\n### 데이터: ' + x.title + '\n' + [x.csv.cols].concat(x.csv.rows).map(r => r.map(esc).join(',')).join('\n')).join(''), 'AI용 텍스트를 복사했어요')
+    };
+  }
+}
+</script>
+</body>
+</html>

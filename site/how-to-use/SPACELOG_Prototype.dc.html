@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/radii.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/base.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/styles.css">
+  <script src="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="spacelog-data.js"></script>
+  <script src="spacelog-tour.js"></script>
+  <style>:root{--font-display:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-text:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}button,input,textarea,select{font-family:inherit}button,kbd{white-space:nowrap;word-break:keep-all}body{word-break:keep-all}html,body{margin:0;height:100%;overflow:hidden;background:#000;color:#fff;font-family:var(--font-text);-webkit-font-smoothing:antialiased}a{color:var(--color-primary-on-dark);text-decoration:none}a:hover{text-decoration:underline}@keyframes sl-spin{to{transform:rotate(360deg)}}</style>
+</helmet>
+<div style="position:fixed;inset:0;background:#000;min-width:320px;min-height:480px">
+  <nav style="position:absolute;left:0;right:0;top:0;height:36px;background:#000;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:6px;padding:0 16px;box-sizing:border-box;z-index:40;overflow-x:auto;white-space:nowrap;scrollbar-width:none">
+    <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}"><span class="cc-type-fine-print" style="color:var(--color-body-muted);margin-right:4px">How to Use</span></sc-if>
+    <a onClick="{{ navGuard }}" href="SPACELOG_Collector.dc.html" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:transparent;color:var(--color-body-muted);font-weight:400">1 수집 앱</a>
+    <img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg" alt="" style="width:12px;height:12px;filter:invert(1);opacity:0.5;flex:none">
+    <a onClick="{{ navWeb }}" href="SPACELOG_Prototype.dc.html" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:{{ nav2.bg }};color:{{ nav2.color }};font-weight:{{ nav2.weight }}">2 웹 우주</a>
+    <img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg" alt="" style="width:12px;height:12px;filter:invert(1);opacity:0.5;flex:none">
+    <a onClick="{{ navObs }}" href="SPACELOG_Prototype.dc.html#ship" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:{{ nav3.bg }};color:{{ nav3.color }};font-weight:{{ nav3.weight }}">3 관측소</a>
+    <span style="flex:1;min-width:8px"></span>
+    <button role="switch" aria-checked="{{ tourIsOn }}" onClick="{{ tourToggle }}" title="체험 가이드 켜기 · 끄기" class="cc-type-fine-print" style="height:24px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap">체험 가이드<span aria-hidden="true" style="position:relative;width:36px;height:20px;border-radius:9999px;background:{{ tourSwBg }};display:block;flex:none;transition:background 200ms var(--ease-standard)"><i style="position:absolute;top:2px;left:{{ tourSwLeft }};width:16px;height:16px;border-radius:50%;background:#fff;display:block;transition:left 200ms var(--ease-standard)"></i></span><span style="min-width:22px;text-align:left;color:{{ tourSwColor }}">{{ tourSwText }}</span></button>
+    </nav>
+  <div onDragEnter="{{ onDragEnter }}" onDragOver="{{ onDragOver }}" onDragLeave="{{ onDragLeave }}" onDrop="{{ onDrop }}" style="position:absolute;left:0;right:0;top:36px;bottom:{{ tourH }}px">
+  <dc-import name="W01_Home" probe-count="{{ probeCount }}" on-probe="{{ probeAdd }}" on-open-probe="{{ openProbe }}" chat-url="{{ chatUrl }}" on-bg-click="{{ bgClick }}" on-action="{{ act }}" on-load-ship="{{ homeSend }}" style="position:absolute;inset:0" db="{{ db }}" period="{{ period }}" custom="{{ custom }}" on-period="{{ setPeriod }}" on-custom="{{ setCustom }}" focus="{{ focus }}" on-land="{{ land }}" on-open-ship="{{ openShip }}" panel-open="{{ overlayOpen }}" paused="{{ overlayOpen }}" cart-count="{{ cartCount }}" demo-state="{{ demoState }}" hint-size="100%,100%"></dc-import>
+
+  <sc-if value="{{ hasTourMade }}">
+    <div data-screen-label="체험 별자리 요약" role="status" style="position:absolute;left:24px;top:84px;z-index:30;width:360px;max-width:calc(100% - 48px);max-height:calc(100% - 96px);overflow-y:auto;box-sizing:border-box;padding:18px;border-radius:18px;background:rgb(30,30,32);border:1px solid rgba(255,255,255,0.14);box-shadow:var(--shadow-product);display:flex;flex-direction:column;gap:12px">
+      <span class="cc-type-caption-strong" style="color:#fff">별자리를 이렇게 만들었어요</span>
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="cc-type-fine-print" style="color:var(--color-body-muted);letter-spacing:0.04em">고른 기록 {{ tm.count }}개</span>
+        <sc-for list="{{ tm.titles }}" as="tt"><span class="cc-type-caption" style="display:flex;align-items:center;gap:8px;color:#fff;min-width:0"><img src="https://unpkg.com/lucide-static@0.469.0/icons/check.svg" alt="" style="width:14px;height:14px;filter:invert(1);flex:none"><span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tt.title }}</span></span></sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px 12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">
+        <span class="cc-type-fine-print" style="color:var(--color-body-muted)">이름</span><span class="cc-type-caption" style="color:#fff">{{ tm.name }}</span>
+        <span class="cc-type-fine-print" style="color:var(--color-body-muted)">관측 목적</span><span class="cc-type-caption" style="color:#fff;text-wrap:pretty">{{ tm.memo }}</span>
+        <span class="cc-type-fine-print" style="color:var(--color-body-muted)">보기 방식</span><span class="cc-type-caption" style="color:#fff">{{ tm.mode }}</span>
+        <span class="cc-type-fine-print" style="color:var(--color-body-muted)">차트 모양</span><span class="cc-type-caption" style="color:#fff">{{ tm.chart }}</span>
+      </div>
+      <button onClick="{{ closeTourMade }}" class="cc-type-caption" style="align-self:flex-end;flex:none;height:36px;padding:0 18px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);background:transparent;color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">확인</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ panelOpen }}">
+    <dc-import name="W02_PlanetPanel" on-probe="{{ probeAdd }}" open-link-id="{{ tourLinkOpen }}" on-add="{{ openAdd }}" back-text="{{ backText }}" highlight-id="{{ demoPick }}" demo-checks="{{ demoChecks }}" demo-count="{{ demoCount }}" demo-ship="{{ demoShip }}" demo-press="{{ demoPress }}" style="position:absolute;top:{{ panelTop }};right:{{ inset }};bottom:{{ inset }};left:{{ panelLeft }};width:{{ panelW }};z-index:10" db="{{ db }}" planet-id="{{ panelId }}" cart-ids="{{ cart }}" detail-id="{{ detailId }}" on-open-star="{{ openStar }}" on-close="{{ closePanel }}" on-action="{{ act }}" on-load-ship="{{ loadShip }}" on-switch="{{ switchPlanet }}" on-toast="{{ flash }}" hint-size="440px,100%"></dc-import>
+  </sc-if>
+
+  <sc-if value="{{ probeOpen }}">
+    <dc-import name="W04_Ship" style="position:absolute;top:{{ inset }};right:{{ inset }};bottom:{{ inset }};width:480px;max-width:calc(100% - 32px);z-index:13" db="{{ db }}" cart-ids="{{ probe }}" on-set-cart="{{ setProbe }}" on-close="{{ closeProbe }}" on-toast="{{ flash }}" period="{{ period }}" hint-size="480px,100%"></dc-import>
+  </sc-if>
+
+  <sc-if value="{{ drawerOpen }}">
+    <dc-import name="W05_Observatory" start-mode="{{ obsStart }}" hint-mode="{{ obsHint }}" link-id="{{ obsLink }}" on-action="{{ act }}" style="position:absolute;top:{{ inset }};right:{{ inset }};bottom:{{ inset }};left:{{ inset }};z-index:11" db="{{ db }}" cart-ids="{{ cart }}" on-set-cart="{{ setCart }}" on-close="{{ closeShip }}" on-open-star="{{ obsOpen }}" on-toast="{{ flash }}" hint-size="100%,100%"></dc-import>
+  </sc-if>
+
+  <sc-if value="{{ showAdd }}" hint-placeholder-val="{{ true }}">
+    <button onClick="{{ openAdd }}" data-screen-label="웹에서 기록 넣기" class="cc-type-caption" style="position:absolute;left:50%;bottom:76px;transform:translateX(-50%);z-index:8;height:44px;padding:0 18px;border-radius:9999px;border:1px solid rgba(255,255,255,0.16);background:rgba(30,30,32,0.88);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform 200ms var(--ease-standard)" style-active="transform:translateX(-50%) scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/plus.svg" alt="" style="width:16px;height:16px;filter:invert(1)"><span>기록 넣기</span><sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}"><span class="cc-type-fine-print" style="color:var(--color-body-muted)">끌어다 놓기 · 붙여넣기</span></sc-if></button>
+  </sc-if>
+  <sc-if value="{{ addOpen }}">
+    <div style="position:absolute;left:16px;right:16px;bottom:76px;z-index:26;display:flex;justify-content:center;pointer-events:none">
+      <div data-screen-label="웹에서 기록 넣기 · 메모" role="dialog" aria-label="기록 넣기" style="pointer-events:auto;width:420px;max-width:100%;box-sizing:border-box;padding:16px;border-radius:18px;background:rgb(30,30,32);border:1px solid rgba(255,255,255,0.12);box-shadow:var(--shadow-product);display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cc-type-caption-strong" style="flex:1;color:#fff">기록 넣기</span>
+          <button onClick="{{ closeAdd }}" aria-label="닫기" style="width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,0.08);display:grid;place-items:center;cursor:pointer"><img src="https://unpkg.com/lucide-static@0.469.0/icons/x.svg" alt="" style="width:14px;height:14px;filter:invert(1)"></button>
+        </div>
+        <textarea ref="{{ noteRef }}" value="{{ note }}" onChange="{{ onNote }}" onKeyDown="{{ onNoteKey }}" rows="3" placeholder="메모를 적어 보세요. 링크를 붙여 넣어도 돼요" aria-label="메모" class="cc-type-caption" style="resize:none;min-height:84px;padding:12px 14px;box-sizing:border-box;border-radius:14px;border:1.5px dashed rgba(255,255,255,0.24);background:transparent;color:#fff;outline:none;line-height:1.5" style-focus="border:1.5px solid var(--color-primary-on-dark)"></textarea>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ pickFiles }}" class="cc-type-caption" style="height:40px;padding:0 14px;border-radius:9999px;border:1px solid rgba(255,255,255,0.16);background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/paperclip.svg" alt="" style="width:14px;height:14px;filter:invert(1)">파일 고르기</button>
+          <span class="cc-type-fine-print" style="flex:1;min-width:0;color:var(--color-body-muted)">{{ noteHint }}</span>
+          <button onClick="{{ saveNote }}" disabled="{{ noteEmpty }}" class="cc-type-caption" style="height:40px;padding:0 18px;border-radius:9999px;border:0;background:var(--color-primary);color:#fff;opacity:{{ noteBtnOpacity }};cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">넣기</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <input ref="{{ fileRef }}" onChange="{{ onFiles }}" type="file" multiple="{{ true }}" aria-label="기록으로 넣을 파일" style="display:none">
+
+  <sc-if value="{{ dragging }}">
+    <div style="position:absolute;inset:16px;z-index:25;border-radius:18px;border:2px dashed var(--color-primary-on-dark);background:rgba(0,0,0,0.72);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:none">
+      <img src="https://unpkg.com/lucide-static@0.469.0/icons/sparkle.svg" alt="" style="width:28px;height:28px;filter:invert(1)">
+      <span style="font:600 28px/1.2 var(--font-display)">놓으면 기록이 됩니다</span>
+      <span class="cc-type-caption" style="color:var(--color-body-muted)">{{ dropHint }}</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasAdded }}">
+    <div style="position:absolute;left:16px;right:16px;bottom:136px;z-index:31;display:flex;justify-content:center;pointer-events:none"><div role="status" style="pointer-events:auto;display:flex;align-items:center;gap:14px;padding:8px 8px 8px 20px;border-radius:9999px;background:#fff;color:var(--color-ink);box-shadow:var(--shadow-product);max-width:100%;box-sizing:border-box;min-width:0">
+      <span class="cc-type-caption" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ addedText }}</span>
+      <button onClick="{{ undoAdd }}" class="cc-type-caption" style="flex:none;height:32px;padding:0 14px;border-radius:9999px;border:0;background:var(--color-primary);color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">넣기 취소</button>
+    </div></div>
+  </sc-if>
+
+  <sc-if value="{{ showNotice }}">
+    <button onClick="{{ openNotice }}" style="position:absolute;top:88px;right:24px;z-index:20;width:340px;max-width:calc(100% - 48px);box-sizing:border-box;padding:14px 16px;border-radius:18px;background:rgba(245,245,247,0.92);border:1px solid rgba(0,0,0,0.08);backdrop-filter:var(--blur-frosted);-webkit-backdrop-filter:var(--blur-frosted);box-shadow:var(--shadow-product);display:flex;gap:12px;text-align:left;cursor:pointer;color:var(--color-ink)">
+      <span style="width:36px;height:36px;border-radius:9px;background:#000;display:grid;place-items:center;flex:none"><img src="https://unpkg.com/lucide-static@0.469.0/icons/orbit.svg" alt="" style="width:18px;height:18px;filter:invert(1)"></span>
+      <span style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1">
+        <span style="display:flex;justify-content:space-between"><span class="cc-type-fine-print" style="color:var(--text-tertiary)">SPACELOG · S-03 재발견 알림</span><span class="cc-type-fine-print" style="color:var(--text-tertiary)">지금</span></span>
+        <span class="cc-type-caption-strong">7일 전 오늘의 기록</span>
+        <span class="cc-type-caption" style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">“{{ noticeTitle }}” · {{ noticePlanet }} 행성</span>
+      </span>
+    </button>
+  </sc-if>
+
+  <div aria-live="polite" style="position:absolute;left:16px;right:16px;bottom:84px;z-index:30;display:flex;justify-content:center;pointer-events:none;opacity:{{ toastOpacity }};transition:opacity 200ms var(--ease-standard)">
+    <div class="cc-type-caption" style="background:#fff;color:var(--color-ink);border-radius:22px;padding:12px 20px;text-align:center;text-wrap:pretty;box-shadow:var(--shadow-product)">{{ toast }}</div>
+  </div>
+</div>
+<sc-if value="{{ tourOn }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="체험 가이드" style="position:fixed;left:0;right:0;bottom:0;height:76px;z-index:60;background:#000;border-top:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;gap:20px;padding:0 20px;box-sizing:border-box;color:#fff">
+    <i style="position:absolute;left:0;top:-1px;height:2px;width:{{ tourPct }};background:var(--color-primary-on-dark);display:block;transition:width 200ms var(--ease-standard)"></i>
+    <div style="flex:none;display:{{ tourLabelDisplay }};flex-direction:column;gap:6px">
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted)">체험 가이드</span>
+      <span class="cc-type-caption-strong" style="white-space:nowrap">{{ tourNo }}</span>
+    </div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+      <span class="cc-type-body-strong" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tourTitle }}</span>
+      <span class="cc-type-caption" style="color:var(--color-body-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-wrap:pretty">{{ tourDesc }}</span>
+    </div>
+    <button onClick="{{ tourSkip }}" class="cc-type-caption" style="flex:none;height:44px;padding:0 12px;border:0;background:transparent;color:var(--color-body-muted);cursor:pointer">{{ tourSkipLabel }}</button>
+    <sc-if value="{{ tourCanBack }}"><button onClick="{{ tourBack }}" class="cc-type-caption" style="flex:none;height:44px;padding:0 16px 0 10px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-left.svg" alt="" style="width:16px;height:16px;filter:invert(1)">전 단계로 돌아가기</button></sc-if>
+    <button onClick="{{ tourNext }}" class="cc-type-caption" style="flex:none;height:44px;padding:0 20px;border:0;border-radius:9999px;background:var(--color-primary);color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">{{ tourCta }}</button>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;entry&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;notice&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;진입&quot;},&quot;startPeriod&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;today&quot;,&quot;week&quot;,&quot;month&quot;,&quot;all&quot;],&quot;default&quot;:&quot;today&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;진입&quot;},&quot;demoState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;normal&quot;,&quot;todayEmpty&quot;,&quot;empty&quot;,&quot;loading&quot;,&quot;offline&quot;,&quot;seed&quot;,&quot;overCap&quot;],&quot;default&quot;:&quot;normal&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;W-01 상태&quot;},&quot;chatbotUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;챗봇&quot;}}">
+class Component extends DCLogic {
+  state = { db: window.SPACELOG ? window.SPACELOG.initial() : null, period: 'today', custom: { from: '', to: '' }, focus: null, panel: null, detail: null, cart: [], drawer: false, notice: false, toast: '', toastOn: false, tour: 0, dragging: false, added: null, addOpen: false, note: '', narrow: window.innerWidth < 760 };
+  fileRef = React.createRef();
+  noteRef = React.createRef();
+  saveNote() {
+    const S = window.SPACELOG, txt = this.state.note.trim(); if (!S || !txt) return;
+    const it = S.fromText(txt); if (it[0] && it[0].kind === 'text') it[0].memo = txt;
+    this.setState({ addOpen: false, note: '' }); this.addItems(it);
+  }
+  // 체험 8단계: 관측소에서 눌러 볼 보기 방식과 지금까지 눌러 본 것
+  obs8() { const s = this.state, db = s.db; if (s.tour !== 8 || !db) return null;
+    const L = db.links || [], lk = L.find(l => l.id === s.obsLink) || L.find(l => window.SPACELOG.isTourLink(l)) || L[L.length - 1]; if (!lk) return null;
+    const ms = lk.ids.map(id => db.stars.find(x => x.id === id)).filter(Boolean);
+    const modes = (ms.some(x => x.csv && x.csv.rows && x.csv.rows.length) ? [['dash', '시각화 대시보드'], ['table', '표 · CSV']] : []).concat([['photos', '사진 모아보기'], ['texts', '텍스트 모아보기']]);
+    const m0 = (lk.viz || {}).mode, cur = modes.some(m => m[0] === m0) ? m0 : modes[0][0], seen = modes.map(m => m[0]).filter(k => k === cur || (s.tourModes || []).includes(k));
+    return { lk, modes, cur, seen, next: modes.find(m => !seen.includes(m[0])) || null }; }
+  setTour(n) { if (window.SPACELOG_TOUR) window.SPACELOG_TOUR.set(n);
+    if (!n) { const S = window.SPACELOG, db = this.state.db, ids = db ? (db.links || []).filter(l => S && S.isTourLink(l)).map(l => l.id) : [];
+      if (S) S.clearTourLink();
+      if (ids.length) { clearTimeout(this._demo); this._demo = null; this.setState({ tour: 0, tourMade: null, demoChecks: null, demoPress: false, obsLink: ids.includes(this.state.obsLink) ? null : this.state.obsLink, db: { ...db, links: db.links.filter(l => !ids.includes(l.id)) } }); return; } }
+    this.setState({ tour: n }); }
+  go(n, url) { const T = window.SPACELOG_TOUR; if (T) { T.set(n); url = T.url(url); } window.location.href = url; }
+  ok(...steps) { const t = this.state.tour; if (!t || steps.includes(t)) return true; this.flash('체험 중에는 안내된 단계만 할 수 있어요'); return false; }
+  waitTour(def) { if (this.props.frozen) return; if (!window.SPACELOG_TOUR) { this._w = setTimeout(() => this.waitTour(def), 60); return; } const v = window.SPACELOG_TOUR.boot(), st = { tour: v }, S = window.SPACELOG, db = this.state.db || (S && S.initial()), f = db && db.stars[0];
+    if (f && v >= 4 && v <= 7) { st.panel = f.planet; st.focus = { planet: f.planet, nonce: Date.now() }; if (v === 5) st.detail = f.id; }
+    if (f && v === 8) { st.drawer = true; st.obsLink = (((db.links || []).slice(-1)[0]) || {}).id || null; }
+        if (f && v === 12) st.drawer = true;
+    this.setState(st); }
+
+  componentDidMount() {
+    const wait = () => {
+      if (!window.SPACELOG) return setTimeout(wait, 60);
+      const ds = this.props.demoState, S0 = window.SPACELOG;
+      this.setState({ db: ds === 'seed' ? S0.seeded(S0.SEED_N) : ds === 'overCap' ? S0.seeded(S0.OVER_N) : (this.state.db || S0.initial()), period: this.props.startPeriod || 'today' });
+      if (!this._cartLoaded) { this._cartLoaded = true; let saved = []; try { saved = JSON.parse(localStorage.getItem('spacelog_obs_v1') || '[]'); } catch (e) {} const d0 = this.state.db || S0.initial(); saved = saved.filter(id => d0.stars.some(x => x.id === id)); if (saved.length && !this.state.cart.length) this.setState({ cart: saved }); }
+      if (!this._probeLoaded) { this._probeLoaded = true; try { const pv = JSON.parse(localStorage.getItem('spacelog_probe_v1') || '[]'); if (pv.length) this.setState({ probe: pv }); } catch (e) {} }
+      const h = location.hash.slice(1);
+      // 재발견 알림: 다른 곳에서 바로 들어온 경우(#…)와 체험 가이드 중에는 띄우지 않습니다.
+      if (!h && (this.props.entry || 'home') === 'notice') this._n = setTimeout(() => { const s = this.state; if (s.tour || s.panel || s.drawer || s.focus) return; this.setState({ notice: true }); this._nh = setTimeout(() => this.setState({ notice: false }), 12000); }, (this.props.entry || 'home') === 'notice' ? 900 : 1600);
+      if (h) {
+        const q = Object.fromEntries(h.split('&').map(x => x.split('='))), S = window.SPACELOG, db = this.state.db || S.initial();
+        if ('redisc' in q) { const r = S.rediscovery(db); if (r) this._n = setTimeout(() => this.land(r.planet, r.id), 700); }
+        else if (q.planet && db.planets.some(p => p.id === q.planet)) this._n = setTimeout(() => this.land(q.planet, q.star || null), 500);
+        else if ('ship' in q) this.setState({ drawer: true, ...(q.ship ? { cart: q.ship.split(',').filter(id => db.stars.some(s => s.id === id)) } : {}) });
+      }
+    };
+    wait();
+    this.waitTour(3);
+    this._key = e => {
+      if (e.key !== 'Escape') return;
+      if (this.state.probeOpen) { this.setState({ probeOpen: false }); return; }
+      if (this.state.addOpen) { this.setState({ addOpen: false }); return; }
+      if (this.state.notice) { this.setState({ notice: false }); return; }
+      if (/INPUT|TEXTAREA/.test(e.target.tagName)) { e.target.blur(); return; }
+      const s = this.state;
+      if (s.tour && !(s.tour === 5 && s.detail)) return;
+      if (s.detail && s.fromList) this.closePanel();
+      else if (s.detail) this.setState({ detail: null });
+      else if (s.panel) this.closePanel();
+      else if (s.drawer) this.setState({ drawer: false });
+    };
+    window.addEventListener('keydown', this._key);
+    this._paste = e => {
+      if (/INPUT|TEXTAREA/.test(e.target.tagName) || !window.SPACELOG) return;
+      const S = window.SPACELOG, cd = e.clipboardData, it = cd && cd.files && cd.files.length ? S.fromTransfer(cd) : S.fromText(cd ? cd.getData('text/plain') : '');
+      if (it.length) { e.preventDefault(); this.addItems(it); }
+    };
+    window.addEventListener('paste', this._paste);
+    this._rs = () => { const n = window.innerWidth < 760; if (n !== this.state.narrow) this.setState({ narrow: n }); };
+    window.addEventListener('resize', this._rs);
+  }
+  addItems(items) {
+    const S = window.SPACELOG, s = this.state; if (!S || !s.db || !items.length || !this.ok()) return;
+    if (items.some(i => i._file)) { S.thumbs(items).then(it => this.addItems(it)); return; }
+    const planet = s.panel || S.assign(items[0].kind), p = s.db.planets.find(x => x.id === planet) || s.db.planets[0]; if (!p) return;
+    const ids = S.addInbox(items, p.id), now = new Date().toISOString();
+    const db = S.clone(s.db); items.forEach((it, n) => db.stars.push({ id: ids[n], planet: p.id, kind: it.kind, title: it.title, meta: it.meta, memo: it.memo || '', addedAt: now, ...(it.thumb ? { thumb: it.thumb } : {}), ...(it.csv ? { csv: it.csv } : {}), ...(it.body ? { body: it.body } : {}) }));
+    clearTimeout(this._u);
+    this.setState({ db, dragging: false, toastOn: false, added: { ids, text: (items.length > 1 ? items.length + '개 넣었어요' : '넣었어요 · ' + items[0].title) + ' · ' + p.name + ' 행성' } });
+    this._u = setTimeout(() => this.setState({ added: null }), 7000);
+  }
+  undoAdd() {
+    const S = window.SPACELOG, a = this.state.added; if (!a) return;
+    clearTimeout(this._u); S.removeInbox(a.ids);
+    const db = S.clone(this.state.db); db.stars = db.stars.filter(x => !a.ids.includes(x.id));
+    this.setState({ db, added: null, cart: this.state.cart.filter(id => !a.ids.includes(id)), detail: a.ids.includes(this.state.detail) ? null : this.state.detail });
+    this.flash('넣기를 취소했어요');
+  }
+  componentDidUpdate(pp, ps) {
+    const s = this.state, t = s.tour;
+    if (t === 3 && s.panel) this.setTour(4);
+    else if (t === 4 && s.detail) this.setTour(5);
+    else if (t === 5 && s.panel && !s.detail && this._hadDetail) this.setTour(6);
+    else if (t === 6 && ((s.db && s.db.links) || []).length > ((ps.db && ps.db.links) || []).length) this.setTour(7);
+    else if (t === 7 && s.drawer) this.setTour(8);
+    this._hadDetail = !!s.detail;
+  }
+  componentWillUnmount() { clearTimeout(this._demo); clearTimeout(this._w); clearTimeout(this._n); clearTimeout(this._nh); clearTimeout(this._u); window.removeEventListener('paste', this._paste); window.removeEventListener('resize', this._rs); window.removeEventListener('keydown', this._key); clearTimeout(this._t); clearTimeout(this._l); clearTimeout(this._n); }
+
+  flash(msg) { clearTimeout(this._t); this.setState({ toast: msg, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 2400); }
+  land(pid, starId, from) {
+    clearTimeout(this._l);
+    this.setState({ fromList: from === 'list' && !!starId, focus: { planet: pid, nonce: Date.now() }, drawer: false, notice: false, panel: null, detail: null });
+    this._l = setTimeout(() => this.setState({ panel: pid, detail: starId || null }), 850);
+  }
+  closePanel() { clearTimeout(this._l); this.setState({ panel: null, detail: null, focus: null, fromList: false }); }
+
+  renderVals() {
+    const S = window.SPACELOG, s = this.state;
+    const redisc = S && s.db ? S.rediscovery(s.db) : null;
+    const rp = redisc && s.db.planets.find(p => p.id === redisc.planet);
+    return {
+      db: s.db, period: s.period, custom: s.custom,
+      setPeriod: p => this.ok() && this.setState({ period: p }), setCustom: c => this.ok() && this.setState({ custom: c }),
+      focus: s.focus, land: (pid, sid, from) => this.ok(3) && this.land(pid, s.tour === 3 ? null : sid, s.tour ? null : from),
+      backText: s.fromList ? '기록 목록' : null,
+      overlayOpen: !!s.panel || s.drawer || (!!s.focus && !s.panel),
+      cartCount: ((s.db && s.db.links) || []).length, cart: s.cart, demoState: this.props.demoState || 'normal',
+      openShip: () => this.ok() && this.setState({ drawer: true, cart: [], panel: null, detail: null, focus: null }),
+      panelOpen: !!s.panel, panelId: s.panel, detailId: s.detail,
+      openStar: (id, keep) => { if (!this.ok(id ? 4 : 5)) return; if (!id && s.fromList) this.closePanel(); else this.setState({ detail: id, fromList: keep ? s.fromList : false }); },
+      closePanel: () => this.ok() && this.closePanel(),
+      bgClick: () => { if ((s.panel || s.focus) && !s.tour) this.closePanel(); },
+      act: this._act = a => {
+        if (!this.ok(...(/^link/.test(a.type) ? [6, 8] : []))) return;
+        if (s.tour === 8 && a.type === 'linkViz') { const o = this.obs8(); if (o && a.id === o.lk.id) { const seen = [...new Set(o.seen.concat([a.viz.mode]))]; this.setState({ tourModes: seen });
+          if (o.modes.every(m => seen.includes(m[0]))) { clearTimeout(this._t8); this._t8 = setTimeout(() => { this.setState({ tourModes: [] }); if (this.state.tour === 8) this.setTour(9); }, 1100); } } }
+        const db = S.reduce(s.db, a), patch = { db };
+        if (a.type === 'destroyPlanet') { patch.cart = s.cart.filter(id => db.stars.some(x => x.id === id)); patch.panel = null; patch.detail = null; patch.focus = null; }
+        if (a.type === 'deleteStar') { patch.cart = s.cart.filter(id => id !== a.id); if (s.detail === a.id) patch.detail = null; }
+        this.setState(patch);
+      },
+      loadShip: (ids, linkId) => { if (!this.ok(7)) return; this.setState(linkId ? { obsLink: linkId, cart: [], drawer: true, panel: null, detail: null, focus: null } : { obsLink: null, cart: [...new Set(ids)], drawer: true, panel: null, detail: null, focus: null }); if (!linkId) this.flash('선택한 기록 ' + ids.length + '개를 관측소에서 봅니다'); },
+      switchPlanet: to => this.ok() && this.setState({ panel: to, detail: null, focus: { planet: to, nonce: Date.now() } }),
+      flash: m => this.flash(m),
+      obsStart: s.tour === 12 ? 'comet' : null,
+      // 탐사선: 기록을 실어 하나의 텍스트로 묶어 복사합니다 (AI에게 보내기). 관측소와는 따로 담습니다.
+      ...(() => { const probe = (s.probe || []).filter(id => !s.db || s.db.stars.some(x => x.id === id));
+        if (this._probeLoaded && this._probeSaved !== s.probe) { this._probeSaved = s.probe; try { localStorage.setItem('spacelog_probe_v1', JSON.stringify(probe)); } catch (e) {} }
+        return { probe, probeCount: probe.length, probeOpen: !!s.probeOpen,
+          probeAdd: ids => { if (!this.ok()) return; const next = [...new Set(probe.concat(ids))], added = next.length - probe.length; this.setState({ probe: next }); this.flash(added ? '탐사선에 ' + added + '개 실었어요' : '이미 실은 기록이에요'); },
+          setProbe: ids => this.ok() && this.setState({ probe: ids }),
+          openProbe: () => this.ok() && this.setState({ probeOpen: true, drawer: false }), closeProbe: () => this.setState({ probeOpen: false }) }; })(),
+      chatUrl: this.props.chatbotUrl || '',
+      tourLinkOpen: s.tour ? s.tourLinkOpen || null : null, obsLink: s.obsLink || null,
+      demoPick: s.demoPick || null, demoChecks: s.demoChecks || null, demoCount: s.demoCount || null, demoShip: s.demoShip || null, demoPress: !!s.demoPress,
+      homeSend: (ids, linkId) => { if (!this.ok()) return; this.setState(linkId ? { obsLink: linkId, cart: [], drawer: true, panel: null, detail: null, focus: null } : { obsLink: null, cart: [...new Set(ids)], drawer: true, panel: null, detail: null, focus: null }); this.flash(linkId ? '별자리로 저장했어요' : '선택한 기록 ' + ids.length + '개를 관측소에서 봅니다'); },
+      obsOpen: (pid, id) => this.ok() && this.land(pid, id),
+      ...(() => { const on = { bg: 'rgba(255,255,255,0.16)', color: '#fff', weight: 600 }, off = { bg: 'transparent', color: 'var(--color-body-muted)', weight: 400 }, guard = e => { e.preventDefault(); this.flash('체험 중에는 안내된 단계만 할 수 있어요'); };
+        if (this._cartLoaded && this._savedCart !== s.cart) { this._savedCart = s.cart; try { localStorage.setItem('spacelog_obs_v1', JSON.stringify(s.cart)); } catch (e) {} }
+        return { nav2: s.drawer ? off : on, nav3: s.drawer ? on : off,
+          navWeb: e => { if (s.tour) return guard(e); if (s.drawer) { e.preventDefault(); this.setState({ drawer: false }); } },
+          navObs: e => { if (s.tour) return guard(e); e.preventDefault(); this.setState({ drawer: true, cart: [], panel: null, detail: null, focus: null, notice: false, addOpen: false }); } }; })(),
+      drawerOpen: s.drawer, setCart: ids => this.ok() && this.setState({ cart: ids }), closeShip: () => this.ok() && this.setState({ drawer: false }),
+      showNotice: s.notice && !!redisc && !!rp, noticeTitle: redisc ? redisc.title : '', noticePlanet: rp ? rp.name : '',
+      openNotice: () => redisc && this.ok() && this.land(redisc.planet, redisc.id),
+      ...(() => { const T = window.SPACELOG_TOUR, v = T ? T.view(s.tour, 'w') : { on: false, h: 0 }; return { tourOn: v.on, tourH: v.h, tourNo: v.no, tourPct: v.pct, tourTitle: v.title, tourDesc: v.desc, tourCta: v.cta, tourSkipLabel: v.skip, tourHere: v.here }; })(),
+      ...(() => { const o = this.obs8(); return o ? { obsHint: o.next ? o.next[0] : null, tourTitle: o.next ? '보기 방식을 차례로 눌러 보세요 (' + o.seen.length + '/' + o.modes.length + ') · 다음: ' + o.next[1] : '보기 방식을 모두 눌러 봤어요' } : { obsHint: null }; })(),
+      navGuard: e => { if (s.tour) { e.preventDefault(); this.flash('체험 중에는 안내된 단계만 할 수 있어요'); } },
+      hasTourMade: !!s.tourMade && !!s.tour && !s.drawer, tm: s.tourMade || { titles: [] }, closeTourMade: () => this.setState({ tourMade: null }),
+      tourSkip: () => this.setTour(0),
+      ...(() => { const on = !!s.tour; return { tourIsOn: on, tourSwBg: on ? 'var(--color-primary)' : 'rgba(255,255,255,0.24)', tourSwLeft: on ? '18px' : '2px', tourSwText: on ? 'On' : 'Off', tourSwColor: on ? '#fff' : 'var(--color-body-muted)' }; })(),
+      tourCanBack: s.tour > 1,
+      tourBack: () => { const T = window.SPACELOG_TOUR, n = s.tour - 1; if (!T || n < 1) return; const pg = T.steps[n - 1].page; T.set(n);
+        if (pg === 'w') { if (location.hash === '#tour') location.reload(); else { location.hash = 'tour'; location.reload(); } }
+        else window.location.href = T.url(pg === 'w' ? 'SPACELOG_Prototype.dc.html' : 'SPACELOG_Collector.dc.html'); },
+      tourToggle: () => { if (s.tour) this.setTour(0); else this._tourStart && this._tourStart(); },
+      tourStart: this._tourStart = () => this.go(1, 'SPACELOG_Collector.dc.html'),
+      tourNext: () => {
+        const t = s.tour, stars = (s.db && s.db.stars) || [], inP = stars.filter(x => x.planet === s.panel);
+        if (t === 3) { if (stars[0]) this.land(stars[0].planet, null); else this.setTour(4); }
+        else if (t === 4) {
+          // 시연: 목록에서 어떤 기록을 고르는지 먼저 강조해 보여 준 뒤 엽니다.
+          if (this._demo) return;
+          const pid = s.panel || (stars[0] && stars[0].planet), pick = stars.filter(x => x.planet === pid).sort((a, b) => a.addedAt < b.addedAt ? 1 : -1)[0];
+          if (!pick) { this.setTour(5); return; }
+          const show = () => { this.setState({ demoPick: pick.id }); this.flash('‘' + pick.title + '’ 기록을 열어 볼게요'); this._demo = setTimeout(() => { this._demo = null; this.setState({ detail: pick.id, demoPick: null }); }, 1800); };
+          if (s.panel) show(); else { this.land(pid, null); this._demo = setTimeout(show, 1300); }
+        }
+        else if (t === 5) { if (s.detail) this.setState({ detail: null }); else this.setTour(6); }
+        else if (t === 6) {
+          // 시연: 목록에서 기록을 하나씩 체크하고 → "별자리 만들기"를 누르고 → 만든 내용을 요약해 보여 줍니다.
+          const db0 = s.db, lk0 = (db0.links || []).find(l => window.SPACELOG.isTourLink(l));
+          const finish = (db, lk) => { const vz = lk.viz || {}, titles = lk.ids.map(id => (db.stars.find(x => x.id === id) || {}).title).filter(Boolean);
+            this.setState({ db, demoChecks: null, demoCount: null, demoPress: false, tourLinkOpen: lk.id, tourMade: { name: lk.name, memo: lk.memo || '(없음)', count: titles.length, titles: titles.map((title, i) => ({ key: i, title })), mode: { table: '표 · CSV', photos: '사진 모아보기', texts: '텍스트 모아보기' }[vz.mode] || '시각화 대시보드', chart: vz.chart === 'donut' ? '도넛' : '막대' } }); this.setTour(7); };
+          if (this._demo) return;
+          const first0 = lk0 && db0.stars.find(x => x.id === lk0.ids[0]), pid = first0 ? first0.planet : (stars.find(x => x.title === 'workouts.csv') || {}).planet || s.panel || (stars.find(x => x.csv) || stars[0] || {}).planet, mine = stars.filter(x => x.planet === pid).sort((a, b) => a.addedAt < b.addedAt ? 1 : -1), csv = mine.find(x => x.title === 'workouts.csv') || mine.find(x => x.csv);
+          const seedIds = S.TOUR_SEED.titles.map(t => (stars.find(x => x.title === t) || {}).id).filter(Boolean), all = lk0 ? lk0.ids : seedIds.length ? seedIds : [...new Set([csv && csv.id].concat(mine.slice(0, 2).map(x => x.id)).filter(Boolean))].slice(0, 2), ids = all.filter(i => mine.some(x => x.id === i)).slice(0, 2), others = all.length - ids.length;
+          if (!ids.length) { this.setTour(7); return; }
+          const make = () => { if (lk0) { finish(this.state.db, lk0); return; } const db = S.reduce(this.state.db, { type: 'link', id: 'l' + Date.now(), name: 'cvs 활용 데이터 대시보드', memo: '운동 기록을 활용한 cvs 활용 데이터 대시보드 만들기 프로젝트', viz: { mode: 'dash', chart: 'bar' }, ids: all }); finish(db, db.links.slice(-1)[0]); };
+          const plOf = i => (stars.find(x => x.id === i) || {}).planet, seq = [...new Set(all.map(plOf).filter(Boolean))].sort((a, b) => (a === pid) - (b === pid));
+          const press = () => { this.setState({ demoPress: true }); this.flash('“별자리 만들기”를 누릅니다'); this._demo = setTimeout(() => { this._demo = null; make(); }, 900); };
+          const visit = (k, acc) => { if (k >= seq.length) { this._demo = setTimeout(press, 600); return; }
+            const here = all.filter(i => plOf(i) === seq[k]);
+            const tick = (j, got) => { if (j >= here.length) { this._demo = setTimeout(() => visit(k + 1, got), 900); return; } const nx = got.concat([here[j]]); this.setState({ demoChecks: nx, demoCount: nx.length }); this._demo = setTimeout(() => tick(j + 1, nx), 800); };
+            const go = () => { this.flash(k === 0 ? '기록을 체크해 볼게요' : '다른 행성의 기록도 함께 고를 수 있어요'); this._demo = setTimeout(() => tick(0, acc), 500); };
+            if (this.state.panel === seq[k]) go(); else { this.land(seq[k], null); this._demo = setTimeout(go, 1300); } };
+          visit(0, []);
+        }
+        else if (t === 7) { let db = s.db, lk = (db.links || []).find(l => window.SPACELOG.isTourLink(l)) || (db.links || []).slice(-1)[0]; if (!lk) { const ids = (inP.length ? inP : stars).slice(0, 2).map(x => x.id); if (!ids.length) { this.setTour(8); return; } db = S.reduce(db, { type: 'link', id: 'l' + Date.now(), name: 'cvs 활용 데이터 대시보드', memo: '운동 기록을 활용한 cvs 활용 데이터 대시보드 만들기 프로젝트', ids }); lk = db.links.slice(-1)[0]; }
+          // 시연: 별자리가 있는 행성 패널에서 "관측소에서 보기" 버튼이 눌리는 모습을 보여 준 뒤 관측소를 엽니다.
+          if (this._demo) return;
+          const pls = lk.ids.map(i => (db.stars.find(x => x.id === i) || {}).planet).filter(Boolean), pid7 = pls.includes(s.panel) ? s.panel : pls[pls.length - 1];
+          const open = () => { this._demo = null; this.setState({ demoShip: null, obsLink: lk.id, drawer: true, panel: null, detail: null, focus: null }); };
+          const press = () => { this.setState({ demoShip: lk.id }); this.flash('“관측소에서 보기”를 누릅니다'); this._demo = setTimeout(open, 1100); };
+          this.setState({ db, tourLinkOpen: lk.id, tourMade: null });
+          if (!pid7) open(); else if (s.panel === pid7 && !s.detail) this._demo = setTimeout(press, 500); else { this.land(pid7, null); this._demo = setTimeout(press, 1400); } }
+        else if (t === 8) { const o = this.obs8();
+          if (!o || !o.next) { this.setState({ tourModes: [] }); this.setTour(9); }
+          else if (!this._d8) { const rest = o.modes.map(m => m[0]).filter(k => !o.seen.includes(k));
+            const step = i => { const lk = ((this.state.db || {}).links || []).find(l => l.id === o.lk.id); if (i >= rest.length || !lk || this.state.tour !== 8) { this._d8 = null; return; }
+              this._act({ type: 'linkViz', id: lk.id, viz: { ...(lk.viz || {}), mode: rest[i] } }); this._d8 = setTimeout(() => step(i + 1), 1200); };
+            step(0); } }
+        else if (t === 9) this.go(10, 'SPACELOG_Collector.dc.html');
+        else if (t === 11) { this.setState({ drawer: true, cart: [], panel: null, detail: null, focus: null, notice: false }); this.setTour(12); }
+        else if (t === 12) this.go(1, 'SPACELOG_Collector.dc.html');
+        else this.go(t, 'SPACELOG_Collector.dc.html');
+      },
+      wide: !s.narrow, inset: s.narrow ? '8px' : '16px', panelLeft: s.narrow ? '8px' : 'auto', panelTop: s.narrow ? '40%' : '92px', shipTop: s.narrow ? '14%' : '16px', panelW: s.narrow ? 'auto' : '440px', shipW: s.narrow ? 'auto' : '460px', tourLabelDisplay: s.narrow ? 'none' : 'flex',
+      showAdd: !s.panel && !s.drawer && !s.focus && !s.added && !s.dragging && !s.toastOn && !s.addOpen, fileRef: this.fileRef, noteRef: this.noteRef,
+      addOpen: s.addOpen && !s.dragging, note: s.note, noteEmpty: !s.note.trim(), noteBtnOpacity: s.note.trim() ? 1 : 0.4,
+      noteHint: s.panel && s.db && s.db.planets.find(x => x.id === s.panel) ? s.db.planets.find(x => x.id === s.panel).name + ' 행성에 넣어요' : 'Enter로 넣기 · Shift+Enter 줄바꿈',
+      openAdd: () => { if (!this.ok()) return; this.setState({ addOpen: true }, () => this.noteRef.current && this.noteRef.current.focus()); },
+      closeAdd: () => this.setState({ addOpen: false }),
+      onNote: e => this.setState({ note: e.target.value }),
+      onNoteKey: e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); this.saveNote(); } },
+      saveNote: () => this.saveNote(),
+      pickFiles: () => this.ok() && this.fileRef.current && this.fileRef.current.click(),
+      onFiles: e => { const it = S.fromTransfer({ getData: () => '', files: e.target.files }); e.target.value = ''; this.setState({ addOpen: false }); this.addItems(it); },
+      dragging: s.dragging, dropHint: s.panel && s.db && s.db.planets.find(x => x.id === s.panel) ? s.db.planets.find(x => x.id === s.panel).name + ' 행성에 넣어요' : '종류에 맞는 행성에 자동으로 넣어요',
+      onDragEnter: e => { if (s.tour) return; e.preventDefault(); this._dc = (this._dc || 0) + 1; if (!s.dragging) this.setState({ dragging: true }); },
+      onDragOver: e => { if (!s.tour) e.preventDefault(); },
+      onDragLeave: () => { this._dc = Math.max(0, (this._dc || 0) - 1); if (!this._dc && s.dragging) this.setState({ dragging: false }); },
+      onDrop: e => { e.preventDefault(); this._dc = 0; const it = S.fromTransfer(e.dataTransfer); this.setState({ dragging: false }); if (it.length) this.addItems(it); else this.flash('넣을 수 있는 내용이 없어요'); },
+      hasAdded: !!s.added, addedText: s.added ? s.added.text : '', undoAdd: () => this.undoAdd(),
+      toast: s.toast, toastOpacity: s.toastOn ? 1 : 0
+    };
+  }
+}
+</script>
+</body>
+</html>

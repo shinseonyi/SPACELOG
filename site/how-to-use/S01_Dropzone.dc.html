@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/radii.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/base.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/styles.css">
+  <script src="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="spacelog-data.js"></script>
+  <style>:root{--font-display:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-text:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}button,input{font-family:inherit}body{margin:0;background:#0b0b0c;color:#fff;font-family:var(--font-text);-webkit-font-smoothing:antialiased;word-break:keep-all}a{color:var(--color-primary-on-dark);text-decoration:none}a:hover{text-decoration:underline}@keyframes sl-spin{to{transform:rotate(360deg)}}</style>
+</helmet>
+<section data-screen-label="S-01 드롭존" aria-label="드롭존" tabIndex="0" onPaste="{{ onPaste }}" style="display:flex;flex-direction:column;gap:12px;padding:16px;box-sizing:border-box;width:100%;border-radius:18px;background:rgb(30,30,32);border:1px solid rgba(255,255,255,0.12);color:#fff;outline:none">
+  <header style="display:flex;align-items:center;gap:8px">
+    <span style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:grid;place-items:center;flex:none"><img src="https://unpkg.com/lucide-static@0.469.0/icons/orbit.svg" alt="" style="width:14px;height:14px;filter:invert(1)"></span>
+    <span class="cc-type-caption-strong" style="flex:1;letter-spacing:0.12em">SPACELOG</span>
+    <button onClick="{{ collapse }}" title="접기" aria-label="접기" style="width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,0.08);display:grid;place-items:center;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/chevrons-right.svg" alt="" style="width:16px;height:16px;filter:invert(1);opacity:0.8"></button>
+  </header>
+
+  <div onDragOver="{{ onDragOver }}" onDragLeave="{{ onDragLeave }}" onDrop="{{ onDrop }}" style="height:148px;border-radius:14px;border:{{ dropBorder }};background:{{ dropBg }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:12px;box-sizing:border-box;transition:background 200ms var(--ease-standard)">
+    <sc-if value="{{ isIdle }}" hint-placeholder-val="{{ true }}">
+      <img src="https://unpkg.com/lucide-static@0.469.0/icons/download.svg" alt="" style="width:22px;height:22px;filter:invert(1);opacity:0.7;pointer-events:none">
+      <span class="cc-type-caption-strong" style="pointer-events:none">여기에 끌어다 놓기</span>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted);pointer-events:none">이미지 · 파일 · 텍스트 · 링크</span>
+    </sc-if>
+    <sc-if value="{{ isDragging }}">
+      <img src="https://unpkg.com/lucide-static@0.469.0/icons/sparkle.svg" alt="" style="width:22px;height:22px;filter:invert(1);pointer-events:none">
+      <span class="cc-type-caption-strong" style="pointer-events:none">놓으면 기록이 됩니다</span>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted);pointer-events:none">여러 개를 놓으면 각각 기록돼요</span>
+    </sc-if>
+    <sc-if value="{{ isSaving }}">
+      {{ spinner }}
+      <span class="cc-type-caption" style="color:var(--color-body-muted)">저장하는 중</span>
+    </sc-if>
+    <sc-if value="{{ isDone }}">
+      <img src="https://unpkg.com/lucide-static@0.469.0/icons/check.svg" alt="" style="width:22px;height:22px;filter:invert(1)">
+      <span class="cc-type-caption-strong">저장했어요</span>
+    </sc-if>
+    <sc-if value="{{ isFail }}">
+      <span class="cc-type-caption-strong">로컬 서버가 꺼져 있어요.</span>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted)">앱을 다시 켜 주세요. 기록은 저장되지 않았어요.</span>
+      <button onClick="{{ retry }}" class="cc-type-caption" style="height:32px;padding:0 14px;border-radius:9999px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;cursor:pointer;margin-top:4px">다시 시도</button>
+    </sc-if>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 12px;border-radius:11px;background:rgba(255,255,255,0.05)">
+    <span class="cc-type-fine-print" style="color:var(--color-body-muted)">붙여넣기</span>
+    <kbd class="cc-type-fine-print" style="padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.1);color:#fff;font-family:inherit;white-space:nowrap">Ctrl/⌘ V</kbd>
+    <span class="cc-type-fine-print" style="color:var(--color-body-muted)">· 클립보드 바로 기록</span>
+    <kbd class="cc-type-fine-print" style="padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.1);color:#fff;font-family:inherit;white-space:nowrap">{{ shortcut }}</kbd>
+  </div>
+
+  <footer style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0">
+      <button onClick="{{ openWeb }}" class="cc-type-caption" style="border:1px solid var(--color-primary);background:var(--color-primary);color:#fff;flex:1 1 0;min-width:0;height:40px;padding:0 8px;box-sizing:border-box;border-radius:9999px;cursor:pointer;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">우주 보기</button>
+      <button onClick="{{ openNotice }}" class="cc-type-caption" style="border:1px solid rgba(255,255,255,0.24);background:transparent;color:#fff;flex:1 1 0;min-width:0;height:40px;padding:0 8px;box-sizing:border-box;border-radius:9999px;cursor:pointer;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">재발견 알림 보기</button>
+    </div>
+    <button onClick="{{ openSettings }}" title="설정" aria-label="설정" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,0.14);background:transparent;display:grid;place-items:center;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/settings.svg" alt="" style="width:16px;height:16px;filter:invert(1);opacity:0.8"></button>
+  </footer>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:340,&quot;height&quot;:330},&quot;onNotice&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;status&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;idle&quot;,&quot;dragging&quot;,&quot;saving&quot;,&quot;done&quot;,&quot;fail&quot;],&quot;default&quot;:&quot;idle&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;상태&quot;},&quot;shortcut&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Ctrl+Shift+S&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;상태&quot;},&quot;onItems&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onStatus&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onOpenWeb&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onOpenSettings&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onCollapse&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;}}">
+class Component extends DCLogic {
+  state = { status: 'idle', over: false };
+  componentWillUnmount() { clearTimeout(this._a); clearTimeout(this._b); }
+  submit(items) {
+    if (!items.length) return;
+    if (this.props.onItems) { this.props.onItems(items); return; }
+    this.setState({ status: 'saving' });
+    this._a = setTimeout(() => { this.setState({ status: 'done' }); this._b = setTimeout(() => this.setState({ status: 'idle' }), 1600); }, 900);
+  }
+  renderVals() {
+    const S = window.SPACELOG;
+    const status = this.props.status ?? this.state.status;
+    const drag = this.state.over || status === 'dragging';
+    return {
+      isIdle: !drag && status === 'idle', isDragging: drag, isSaving: !drag && status === 'saving', isDone: !drag && status === 'done', isFail: !drag && status === 'fail',
+      dropBorder: drag ? '2px solid var(--color-primary-on-dark)' : '1.5px dashed rgba(255,255,255,0.24)',
+      dropBg: drag ? 'color-mix(in srgb, var(--color-primary-on-dark) 16%, transparent)' : 'transparent',
+      spinner: React.createElement('i', { style: { width: 20, height: 20, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', display: 'block', boxSizing: 'border-box', animation: 'sl-spin 800ms linear infinite' } }),
+      shortcut: this.props.shortcut ?? 'Ctrl+Shift+S',
+      onDragOver: e => { e.preventDefault(); if (!this.state.over) this.setState({ over: true }); },
+      onDragLeave: e => { if (!e.currentTarget.contains(e.relatedTarget)) this.setState({ over: false }); },
+      onDrop: e => { e.preventDefault(); this.setState({ over: false }); if (S) this.submit(S.fromTransfer(e.dataTransfer)); },
+      onPaste: e => { if (!S) return; const items = S.fromTransfer(e.clipboardData); if (items.length) { e.preventDefault(); this.submit(items); } },
+      retry: () => this.props.onStatus ? this.props.onStatus('idle') : this.setState({ status: 'idle' }),
+      openNotice: () => this.props.onNotice ? this.props.onNotice() : (window.location.href = 'SPACELOG_Prototype.dc.html#redisc'),
+      openWeb: () => this.props.onOpenWeb ? this.props.onOpenWeb() : (window.location.href = 'SPACELOG_Prototype.dc.html'),
+      openSettings: () => this.props.onOpenSettings ? this.props.onOpenSettings() : (window.location.href = 'S04_Settings.dc.html'),
+      collapse: () => this.props.onCollapse && this.props.onCollapse()
+    };
+  }
+}
+</script>
+</body>
+</html>

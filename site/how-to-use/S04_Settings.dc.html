@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/radii.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/base.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/styles.css">
+  <script src="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="spacelog-data.js"></script>
+  <style>:root{--font-display:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-text:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}button,input{font-family:inherit}body{margin:0;background:#0b0b0c;color:#fff;font-family:var(--font-text);-webkit-font-smoothing:antialiased;word-break:keep-all}a{color:var(--color-primary-on-dark);text-decoration:none}a:hover{text-decoration:underline}</style>
+</helmet>
+<section data-screen-label="S-04 설정" aria-label="설정" style="display:flex;flex-direction:column;gap:10px;padding:16px;box-sizing:border-box;width:100%;border-radius:18px;background:rgb(30,30,32);border:1px solid rgba(255,255,255,0.12);color:#fff">
+  <header style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+    <button onClick="{{ back }}" title="드롭존으로 돌아가기" aria-label="드롭존으로 돌아가기" style="width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,0.08);display:grid;place-items:center;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-left.svg" alt="" style="width:16px;height:16px;filter:invert(1);opacity:0.8"></button>
+    <span class="cc-type-body-strong" style="flex:1">설정</span>
+  </header>
+
+  <div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.05)">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="cc-type-caption" style="flex:1">클립보드 기록 단축키</span>
+      <button onClick="{{ startRec }}" onKeyDown="{{ onRecKey }}" onBlur="{{ stopRec }}" class="cc-type-fine-print" style="height:32px;padding:0 12px;border-radius:8px;border:{{ recBorder }};background:rgba(255,255,255,0.08);color:#fff;cursor:pointer;white-space:nowrap">{{ shortcutLabel }}</button>
+    </div>
+    <sc-if value="{{ hasWarn }}"><span class="cc-type-fine-print" style="color:var(--color-body-muted)">{{ warn }}</span></sc-if>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.05)">
+    <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+      <span class="cc-type-caption">재발견 알림</span>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted)">하루 1회 · 7일 전 오늘의 기록</span>
+    </div>
+    <span class="cc-type-fine-print" style="color:var(--color-body-muted)">{{ rediscText }}</span>
+    <button onClick="{{ toggleRedisc }}" role="switch" aria-checked="{{ redisc }}" aria-label="재발견 알림" style="position:relative;width:44px;height:26px;border-radius:9999px;border:0;padding:0;background:{{ rediscBg }};cursor:pointer;flex:none;transition:background 200ms var(--ease-standard)"><i style="position:absolute;top:3px;left:{{ rediscLeft }};width:20px;height:20px;border-radius:50%;background:#fff;display:block;transition:left 200ms var(--ease-standard)"></i></button>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.05)">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+      <span class="cc-type-caption">보관함 위치</span>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted)">~/SpaceLog/보관함 · 사용량 2.4GB</span>
+    </div>
+    <button onClick="{{ openFolder }}" class="cc-type-caption" style="height:32px;padding:0 12px;border-radius:9999px;border:1px solid rgba(255,255,255,0.16);background:transparent;color:#fff;cursor:pointer;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">폴더 열기</button>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.05)">
+    <span class="cc-type-caption" style="flex:1">로그인 시 자동 실행</span>
+    <span class="cc-type-fine-print" style="color:var(--color-body-muted)">{{ autoText }}</span>
+    <button onClick="{{ toggleAuto }}" role="switch" aria-checked="{{ autostart }}" aria-label="로그인 시 자동 실행" style="position:relative;width:44px;height:26px;border-radius:9999px;border:0;padding:0;background:{{ autoBg }};cursor:pointer;flex:none;transition:background 200ms var(--ease-standard)"><i style="position:absolute;top:3px;left:{{ autoLeft }};width:20px;height:20px;border-radius:50%;background:#fff;display:block;transition:left 200ms var(--ease-standard)"></i></button>
+  </div>
+
+  <sc-if value="{{ hasNote }}"><span class="cc-type-fine-print" style="color:var(--color-body-muted);padding:2px 4px 0">{{ note }}</span></sc-if>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:340,&quot;height&quot;:330},&quot;settings&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;onChange&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onBack&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onToast&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;}}">
+const CONFLICTS = { 'Ctrl+C': '복사', 'Ctrl+V': '붙여넣기', 'Ctrl+X': '잘라내기', 'Ctrl+Z': '실행 취소', 'Ctrl+S': '저장', 'Ctrl+W': '탭 닫기', 'Ctrl+T': '새 탭', '⌘+C': '복사', '⌘+V': '붙여넣기', '⌘+X': '잘라내기', '⌘+Z': '실행 취소', '⌘+S': '저장', '⌘+W': '창 닫기', '⌘+T': '새 탭', '⌘+Shift+4': '화면 캡처', '⌘+Shift+3': '화면 캡처' };
+class Component extends DCLogic {
+  state = { local: {}, rec: false, warn: '', note: '' };
+  renderVals() {
+    const S = window.SPACELOG, s = this.state;
+    const v = { shortcut: 'Ctrl+Shift+S', redisc: true, autostart: true, ...(this.props.settings || {}), ...s.local };
+    const change = patch => this.props.onChange ? this.props.onChange(patch) : this.setState(st => ({ local: { ...st.local, ...patch } }));
+    const sw = on => ({ bg: on ? 'var(--color-primary-focus)' : 'rgba(255,255,255,0.18)', left: on ? '21px' : '3px', text: on ? '켜짐' : '꺼짐' });
+    const r = sw(v.redisc), a = sw(v.autostart);
+    return {
+      back: () => this.props.onBack ? this.props.onBack() : (window.location.href = 'S01_Dropzone.dc.html'),
+      shortcutLabel: s.rec ? '새 단축키를 누르세요' : v.shortcut,
+      recBorder: s.rec ? '2px solid var(--color-primary-focus)' : '1px solid rgba(255,255,255,0.16)',
+      startRec: () => this.setState({ rec: true, warn: '' }), stopRec: () => this.setState({ rec: false }),
+      onRecKey: e => {
+        if (!s.rec) return;
+        e.preventDefault(); e.stopPropagation();
+        if (e.key === 'Escape') { this.setState({ rec: false }); return; }
+        const c = S ? S.combo(e) : ''; if (!c) return;
+        if (!e.ctrlKey && !e.metaKey && !e.altKey) { this.setState({ warn: 'Ctrl, Alt, ⌘ 중 하나를 함께 눌러 주세요.' }); return; }
+        change({ shortcut: c });
+        this.setState({ rec: false, warn: CONFLICTS[c] ? '다른 앱의 ‘' + CONFLICTS[c] + '’ 단축키와 겹쳐요. 다른 조합을 권해요.' : '단축키를 ' + c + '(으)로 바꿨어요.' });
+      },
+      hasWarn: !!s.warn, warn: s.warn,
+      redisc: v.redisc, rediscText: r.text, rediscBg: r.bg, rediscLeft: r.left, toggleRedisc: () => change({ redisc: !v.redisc }),
+      autostart: v.autostart, autoText: a.text, autoBg: a.bg, autoLeft: a.left, toggleAuto: () => change({ autostart: !v.autostart }),
+      openFolder: () => this.props.onToast ? this.props.onToast('보관함 폴더를 열었어요') : this.setState({ note: '보관함 폴더를 열었어요.' }),
+      hasNote: !!s.note, note: s.note
+    };
+  }
+}
+</script>
+</body>
+</html>

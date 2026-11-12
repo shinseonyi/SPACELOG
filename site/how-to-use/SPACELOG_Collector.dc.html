@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/radii.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/base.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/styles.css">
+  <script src="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="spacelog-data.js"></script>
+  <script src="spacelog-tour.js"></script>
+  <style>:root{--font-display:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-text:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}button,input{font-family:inherit}html,body{height:100%}body{margin:0;background:#0b0b0c;color:#fff;font-family:var(--font-text);-webkit-font-smoothing:antialiased;word-break:keep-all}a{color:var(--color-primary-on-dark);text-decoration:none}a:hover{text-decoration:underline}@keyframes sl-spin{to{transform:rotate(360deg)}}</style>
+</helmet>
+<div data-screen-label="수집 앱 프로토타입" onDragEnter="{{ onRootDragEnter }}" style="position:absolute;inset:0;bottom:{{ tourH }}px;background:#1c1c1e;overflow-x:hidden;overflow-y:auto;color:#fff">
+  <div style="position:absolute;left:0;right:0;top:0;height:36px;background:rgba(0,0,0,0.5);display:flex;align-items:center;gap:12px;padding:0 16px;box-sizing:border-box;z-index:6">
+    <span class="cc-type-fine-print" style="color:var(--color-body-muted);margin-right:4px">How to Use</span>
+    <a onClick="{{ navGuard }}" href="SPACELOG_Collector.dc.html" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:rgba(255,255,255,0.16);color:#fff;font-weight:600">1 수집 앱</a>
+    <img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg" alt="" style="width:12px;height:12px;filter:invert(1);opacity:0.5">
+    <a onClick="{{ navGuard }}" href="SPACELOG_Prototype.dc.html" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:transparent;color:var(--color-body-muted);font-weight:400">2 웹 우주</a>
+    <img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg" alt="" style="width:12px;height:12px;filter:invert(1);opacity:0.5;flex:none">
+    <a onClick="{{ navGuard }}" href="SPACELOG_Prototype.dc.html#ship" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:transparent;color:var(--color-body-muted);font-weight:400">3 관측소</a>
+    <span style="flex:1"></span>
+    <button role="switch" aria-checked="{{ tourIsOn }}" onClick="{{ tourToggle }}" title="체험 가이드 켜기 · 끄기" class="cc-type-fine-print" style="height:24px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap">체험 가이드<span aria-hidden="true" style="position:relative;width:36px;height:20px;border-radius:9999px;background:{{ tourSwBg }};display:block;flex:none;transition:background 200ms var(--ease-standard)"><i style="position:absolute;top:2px;left:{{ tourSwLeft }};width:16px;height:16px;border-radius:50%;background:#fff;display:block;transition:left 200ms var(--ease-standard)"></i></span><span style="min-width:22px;text-align:left;color:{{ tourSwColor }}">{{ tourSwText }}</span></button>
+    <button onClick="{{ toggleTray }}" title="SPACELOG 수집 앱 열기·접기" aria-label="SPACELOG 수집 앱 열기·접기" style="width:28px;height:28px;border-radius:6px;border:0;background:{{ trayBg }};display:grid;place-items:center;cursor:pointer"><img src="https://unpkg.com/lucide-static@0.469.0/icons/orbit.svg" alt="" style="width:15px;height:15px;filter:invert(1)"></button>
+  </div>
+
+  <div style="position:absolute;left:56px;top:96px;width:min(560px,calc(100% - 480px));min-width:280px;display:flex;flex-direction:column;gap:20px;padding-bottom:48px">
+    <span class="cc-type-caption-strong" style="color:var(--color-body-muted);letter-spacing:0.08em">SPACELOG 수집 앱</span>
+    <h1 style="margin:0;font:600 44px/1.12 var(--font-display);letter-spacing:-0.02em">끌어다 놓으면<br>기록이 됩니다.</h1>
+    <p class="cc-type-body" style="margin:0;color:var(--color-body-muted);text-wrap:pretty">아래 예시를 오른쪽 수집 앱으로 끌어 보세요. 내 PC의 파일이나 브라우저의 링크를 끌어와도 됩니다.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px">
+      <button onClick="{{ dlApp }}" class="cc-type-caption" style="height:44px;padding:0 20px 0 16px;box-sizing:border-box;border-radius:9999px;border:0;background:var(--color-primary);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/download.svg" alt="" style="width:16px;height:16px;filter:invert(1)">PC앱 다운로드 받기</button>
+      <a onClick="{{ navGuard }}" href="SPACELOG_Prototype.dc.html" class="cc-type-caption" style="height:44px;padding:0 16px 0 20px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);color:#fff;text-decoration:none;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">웹 바로가기<img src="https://unpkg.com/lucide-static@0.469.0/icons/arrow-right.svg" alt="" style="width:16px;height:16px;filter:invert(1)"></a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+      <button draggable="{{ true }}" onDragStart="{{ s0.onDragStart }}" onClick="{{ s0.onClick }}" title="끌어서 수집 앱에 놓기" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;cursor:grab;text-align:left">
+          <span style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,0.08);display:grid;place-items:center;flex:none"><img src="https://unpkg.com/lucide-static@0.469.0/icons/image.svg" alt="" draggable="false" style="width:16px;height:16px;filter:invert(1);opacity:0.85"></span>
+          <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <span class="cc-type-caption-strong" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">회의 캡처.png</span>
+            <span class="cc-type-fine-print" style="color:var(--color-body-muted)">PNG · 1.8MB</span>
+          </span>
+        </button>
+      <button draggable="{{ true }}" onDragStart="{{ s1.onDragStart }}" onClick="{{ s1.onClick }}" title="끌어서 수집 앱에 놓기" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;cursor:grab;text-align:left">
+          <span style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,0.08);display:grid;place-items:center;flex:none"><img src="https://unpkg.com/lucide-static@0.469.0/icons/file-text.svg" alt="" draggable="false" style="width:16px;height:16px;filter:invert(1);opacity:0.85"></span>
+          <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <span class="cc-type-caption-strong" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">요구사항 초안 v2.pdf</span>
+            <span class="cc-type-fine-print" style="color:var(--color-body-muted)">PDF · 640KB</span>
+          </span>
+        </button>
+      <button draggable="{{ true }}" onDragStart="{{ s2.onDragStart }}" onClick="{{ s2.onClick }}" title="끌어서 수집 앱에 놓기" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;cursor:grab;text-align:left">
+          <span style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,0.08);display:grid;place-items:center;flex:none"><img src="https://unpkg.com/lucide-static@0.469.0/icons/link.svg" alt="" draggable="false" style="width:16px;height:16px;filter:invert(1);opacity:0.85"></span>
+          <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <span class="cc-type-caption-strong" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">로컬 퍼스트 소프트웨어 글</span>
+            <span class="cc-type-fine-print" style="color:var(--color-body-muted)">inkandswitch.com</span>
+          </span>
+        </button>
+      <button draggable="{{ true }}" onDragStart="{{ s3.onDragStart }}" onClick="{{ s3.onClick }}" title="끌어서 수집 앱에 놓기" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;cursor:grab;text-align:left">
+          <span style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,0.08);display:grid;place-items:center;flex:none"><img src="https://unpkg.com/lucide-static@0.469.0/icons/type.svg" alt="" draggable="false" style="width:16px;height:16px;filter:invert(1);opacity:0.85"></span>
+          <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <span class="cc-type-caption-strong" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">탐사선 이름 아이디어</span>
+            <span class="cc-type-fine-print" style="color:var(--color-body-muted)">텍스트 · 64자</span>
+          </span>
+        </button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted)">클립보드에서 바로 붙여넣을 수도 있어요.</span>
+      <kbd class="cc-type-fine-print" style="padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.1);color:#fff;font-family:inherit;white-space:nowrap">{{ shortcut }}</kbd>
+    </div>
+    <div data-screen-label="도구 연결" style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:18px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05)">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span class="cc-type-caption-strong" style="color:#fff">다른 도구에서도 가져오기</span>
+        <span class="cc-type-fine-print" style="color:var(--color-body-muted);line-height:1.5">자주 쓰는 도구를 연결하면 그곳의 파일과 글도 기록으로 모을 수 있어요.</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button onClick="{{ toolDrive }}" class="cc-type-caption" style="height:40px;padding:0 14px 0 12px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/hard-drive.svg" alt="" style="width:14px;height:14px;filter:invert(1);opacity:0.85">Google Drive<span class="cc-type-fine-print" style="color:var(--color-body-muted)">연결</span></button>
+        <button onClick="{{ toolNotion }}" class="cc-type-caption" style="height:40px;padding:0 14px 0 12px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/notebook-text.svg" alt="" style="width:14px;height:14px;filter:invert(1);opacity:0.85">Notion<span class="cc-type-fine-print" style="color:var(--color-body-muted)">연결</span></button>
+        <button onClick="{{ toolSlack }}" class="cc-type-caption" style="height:40px;padding:0 14px 0 12px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/message-square.svg" alt="" style="width:14px;height:14px;filter:invert(1);opacity:0.85">Slack<span class="cc-type-fine-print" style="color:var(--color-body-muted)">연결</span></button>
+        <button onClick="{{ toolGmail }}" class="cc-type-caption" style="height:40px;padding:0 14px 0 12px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/mail.svg" alt="" style="width:14px;height:14px;filter:invert(1);opacity:0.85">Gmail<span class="cc-type-fine-print" style="color:var(--color-body-muted)">연결</span></button>
+        <button onClick="{{ toolFigma }}" class="cc-type-caption" style="height:40px;padding:0 14px 0 12px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/pen-tool.svg" alt="" style="width:14px;height:14px;filter:invert(1);opacity:0.85">Figma<span class="cc-type-fine-print" style="color:var(--color-body-muted)">연결</span></button>
+        <button onClick="{{ addTool }}" class="cc-type-caption" style="height:40px;padding:0 14px 0 12px;box-sizing:border-box;border-radius:9999px;border:1px dashed rgba(255,255,255,0.3);background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/plus.svg" alt="" style="width:14px;height:14px;filter:invert(1)">도구 추가</button>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ expanded }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:340px;z-index:5;border-radius:18px;box-shadow:var(--shadow-product)">
+      <sc-if value="{{ isDrop }}" hint-placeholder-val="{{ true }}">
+        <dc-import name="S01_Dropzone" status="{{ status }}" shortcut="{{ shortcut }}" on-items="{{ onItems }}" on-status="{{ onStatus }}" on-open-web="{{ openWeb }}" on-notice="{{ previewNotice }}" on-open-settings="{{ openSettings }}" on-collapse="{{ collapse }}" hint-size="340px,330px"></dc-import>
+      </sc-if>
+      <sc-if value="{{ isConfirm }}">
+        <dc-import name="S02_Confirm" items="{{ items }}" planet-id="{{ planet }}" auto-close-sec="{{ autoClose }}" on-change-planet="{{ changePlanet }}" on-memo="{{ saveMemo }}" on-cancel="{{ cancelSave }}" on-close="{{ closeConfirm }}" hint-size="340px,300px"></dc-import>
+        <sc-if value="{{ showNewDrop }}"><button onClick="{{ newDrop }}" class="cc-type-caption" style="position:absolute;left:0;right:0;top:100%;margin-top:8px;height:40px;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);background:rgb(30,30,32);color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">새 기록 넣기</button></sc-if>
+      </sc-if>
+      <sc-if value="{{ isSettings }}">
+        <dc-import name="S04_Settings" settings="{{ settings }}" on-change="{{ changeSettings }}" on-back="{{ backFromSettings }}" on-toast="{{ flash }}" hint-size="340px,330px"></dc-import>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ collapsed }}">
+    <button onClick="{{ expand }}" title="수집 앱 펼치기" aria-label="수집 앱 펼치기" style="position:absolute;right:0;top:50%;transform:translateY(-50%);width:36px;height:128px;border-radius:14px 0 0 14px;border:1px solid rgba(255,255,255,0.14);border-right:0;background:rgb(30,30,32);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;z-index:5;box-shadow:var(--shadow-product)">
+      <img src="https://unpkg.com/lucide-static@0.469.0/icons/orbit.svg" alt="" style="width:16px;height:16px;filter:invert(1)">
+      <i style="width:4px;height:32px;border-radius:9999px;background:rgba(255,255,255,0.3);display:block"></i>
+    </button>
+  </sc-if>
+
+  <sc-if value="{{ showNotice }}">
+    <button onClick="{{ openNotice }}" style="position:absolute;top:52px;right:16px;z-index:8;width:340px;padding:14px 16px;box-sizing:border-box;border-radius:18px;background:rgba(245,245,247,0.94);border:1px solid rgba(0,0,0,0.08);box-shadow:var(--shadow-product);display:flex;gap:12px;text-align:left;cursor:pointer;color:var(--color-ink)">
+      <span style="width:36px;height:36px;border-radius:9px;background:#000;display:grid;place-items:center;flex:none"><img src="https://unpkg.com/lucide-static@0.469.0/icons/orbit.svg" alt="" style="width:18px;height:18px;filter:invert(1)"></span>
+      <span style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1">
+        <span style="display:flex;justify-content:space-between"><span class="cc-type-fine-print" style="color:var(--text-tertiary)">SPACELOG</span><span class="cc-type-fine-print" style="color:var(--text-tertiary)">지금</span></span>
+        <span class="cc-type-caption-strong">7일 전 오늘의 기록</span>
+        <span class="cc-type-caption" style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">“{{ noticeTitle }}” · {{ noticePlanet }} 행성</span>
+      </span>
+    </button>
+  </sc-if>
+
+  <div aria-live="polite" style="position:absolute;left:50%;bottom:32px;transform:translateX(-50%);z-index:9;pointer-events:none;opacity:{{ toastOpacity }};transition:opacity 200ms var(--ease-standard)">
+    <div class="cc-type-caption" style="background:#fff;color:var(--color-ink);border-radius:9999px;padding:12px 20px;white-space:nowrap;box-shadow:var(--shadow-product)">{{ toast }}</div>
+  </div>
+</div>
+<sc-if value="{{ tourOn }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="체험 가이드" style="position:fixed;left:0;right:0;bottom:0;height:76px;z-index:60;background:#000;border-top:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;gap:20px;padding:0 20px;box-sizing:border-box;color:#fff">
+    <i style="position:absolute;left:0;top:-1px;height:2px;width:{{ tourPct }};background:var(--color-primary-on-dark);display:block;transition:width 200ms var(--ease-standard)"></i>
+    <div style="flex:none;display:flex;flex-direction:column;gap:6px">
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted)">체험 가이드</span>
+      <span class="cc-type-caption-strong" style="white-space:nowrap">{{ tourNo }}</span>
+    </div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+      <span class="cc-type-body-strong" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tourTitle }}</span>
+      <span class="cc-type-caption" style="color:var(--color-body-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-wrap:pretty">{{ tourDesc }}</span>
+    </div>
+    <button onClick="{{ tourSkip }}" class="cc-type-caption" style="flex:none;height:44px;padding:0 12px;border:0;background:transparent;color:var(--color-body-muted);cursor:pointer">{{ tourSkipLabel }}</button>
+    <sc-if value="{{ tourCanBack }}"><button onClick="{{ tourBack }}" class="cc-type-caption" style="flex:none;height:44px;padding:0 16px 0 10px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-left.svg" alt="" style="width:16px;height:16px;filter:invert(1)">전 단계로 돌아가기</button></sc-if>
+    <button onClick="{{ tourNext }}" class="cc-type-caption" style="flex:none;height:44px;padding:0 20px;border:0;border-radius:9999px;background:var(--color-primary);color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">{{ tourCta }}</button>
+  </div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;open&quot;,&quot;collapsed&quot;,&quot;dragging&quot;,&quot;saving&quot;,&quot;confirm&quot;,&quot;settings&quot;,&quot;fail&quot;,&quot;notice&quot;],&quot;default&quot;:&quot;open&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;시작 화면&quot;},&quot;serverDown&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;상태&quot;},&quot;frozen&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const SAMPLES = [
+  { kind: 'image', title: '회의 캡처.png', meta: 'PNG · 1.8MB' },
+  { kind: 'file', title: '요구사항 초안 v2.pdf', meta: 'PDF · 640KB' },
+  { kind: 'link', title: '로컬 퍼스트 소프트웨어 글', meta: 'inkandswitch.com' },
+  { kind: 'text', title: '탐사선 이름 아이디어', meta: '텍스트 · 64자' }
+];
+class Component extends DCLogic {
+  state = { ...this.sceneState(this.props.scene || 'open'), tour: 0 };
+  setTour(n) { if (window.SPACELOG_TOUR) window.SPACELOG_TOUR.set(n); if (!n && window.SPACELOG) window.SPACELOG.clearTourLink(); this.setState({ tour: n }); }
+  go(n, url) { const T = window.SPACELOG_TOUR; if (T) { T.set(n); url = T.url(url); } window.location.href = url; }
+  ok(...steps) { const t = this.state.tour; if (!t || steps.includes(t)) return true; this.flash('체험 중에는 안내된 단계만 할 수 있어요'); return false; }
+  waitTour(def) { if (this.props.frozen) return; if (!window.SPACELOG_TOUR) { this._w = setTimeout(() => this.waitTour(def), 60); return; } const v = window.SPACELOG_TOUR.boot(); this.setState(v === 2 ? { tour: v, view: 'confirm', items: [SAMPLES[2]], collapsed: false } : { tour: v }); }
+  sceneState(sc) {
+    const b = { collapsed: false, view: 'drop', status: 'idle', items: [], ids: [], planet: 'p1', notice: false, seen: false, settings: (this.state && this.state.settings) || { shortcut: 'Ctrl+Shift+S', redisc: true, autostart: true }, toast: '', toastOn: false };
+    if (sc === 'collapsed') b.collapsed = true;
+    else if (sc === 'dragging' || sc === 'saving' || sc === 'fail') b.status = sc;
+    else if (sc === 'confirm') { b.view = 'confirm'; b.items = [SAMPLES[0]]; }
+    else if (sc === 'settings') b.view = 'settings';
+    else if (sc === 'notice') { b.collapsed = true; b.notice = true; }
+    return b;
+  }
+  componentDidMount() {
+    this.waitTour(1);
+    // 지난번에 넣은 기록을 다시 열었을 때도 보여 줍니다 (체험 중이 아닐 때만).
+    this._k = setTimeout(() => { const s = this.state; if (this.props.frozen || (this.props.scene && this.props.scene !== 'open') || s.tour || s.view !== 'drop' || s.status !== 'idle' || s.items.length) return;
+      try { const k = JSON.parse(localStorage.getItem('spacelog_collector_last_v1') || 'null'); if (k && k.items && k.items.length) this.setState({ view: 'confirm', items: k.items, ids: k.ids || [], planet: k.planet || 'p1', seen: true }); } catch (e) {} }, 500);
+    this._key = e => {
+      if (this.props.frozen || /INPUT|TEXTAREA/.test(e.target.tagName) || this.state.view === 'settings' || this.state.tour > 1) return;
+      const S = window.SPACELOG; if (!S || S.combo(e) !== this.state.settings.shortcut) return;
+      e.preventDefault();
+      const fail = () => this.flash('클립보드를 읽을 수 없어요. 창을 누르고 붙여넣기를 써 주세요');
+      try { navigator.clipboard.readText().then(t => { const it = S.fromText(t); it.length ? this.save(it) : this.flash('클립보드가 비어 있어요'); }).catch(fail); } catch (err) { fail(); }
+    };
+    window.addEventListener('keydown', this._key);
+  }
+  componentDidUpdate(prev) {
+    if (prev.scene !== this.props.scene) this.setState(this.sceneState(this.props.scene || 'open'));
+    if (this.state.tour === 1 && this.state.view === 'confirm') this.setTour(2);
+  }
+  componentWillUnmount() { clearTimeout(this._k); clearTimeout(this._r); window.removeEventListener('keydown', this._key); clearTimeout(this._a); clearTimeout(this._b); clearTimeout(this._t); clearTimeout(this._w); }
+  keep(items, ids, planet) { try { if (items && items.length) localStorage.setItem('spacelog_collector_last_v1', JSON.stringify({ items, ids, planet })); else localStorage.removeItem('spacelog_collector_last_v1'); } catch (e) {} }
+  flash(msg) { clearTimeout(this._t); this.setState({ toast: msg, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 2600); }
+  save(items) {
+    const S = window.SPACELOG; if (!S || !items.length) return;
+    if (items.some(i => i._file)) { S.thumbs(items).then(it => this.save(it)); return; }
+    clearTimeout(this._a); clearTimeout(this._b);
+    this.setState({ collapsed: false, view: 'drop', status: 'saving', seen: false });
+    this._a = setTimeout(() => {
+      if (this.props.serverDown) { this.setState({ status: 'fail' }); return; }
+      const planet = S.assign(items[0].kind), ids = S.addInbox(items, planet);
+      this.setState({ status: 'done', items, ids, planet }); this.keep(items, ids, planet);
+      this._b = setTimeout(() => this.setState({ view: 'confirm', status: 'idle' }), 700);
+    }, 900);
+  }
+  renderVals() {
+    const S = window.SPACELOG, s = this.state;
+    const db = S ? S.initial() : null;
+    const re = db ? S.rediscovery(db) : null, rp = re ? db.planets.find(p => p.id === re.planet) : null;
+    return {
+      expanded: !s.collapsed, collapsed: s.collapsed,
+      isDrop: s.view === 'drop', isConfirm: s.view === 'confirm', isSettings: s.view === 'settings',
+      status: s.status, shortcut: s.settings.shortcut,
+      trayBg: s.collapsed ? 'transparent' : 'rgba(255,255,255,0.16)',
+      toggleTray: () => this.ok() && this.setState({ collapsed: !s.collapsed }),
+      expand: () => this.setState({ collapsed: false }),
+      collapse: () => this.ok() && this.setState({ collapsed: true }),
+      onRootDragEnter: () => { if (s.collapsed || (s.view === 'confirm' && s.seen)) this.setState({ collapsed: false, view: 'drop', status: 'idle' }); },
+      onItems: items => this.ok(1) && this.save(items),
+      onStatus: st => this.setState({ status: st }),
+      openWeb: () => this.ok(2) && (s.tour === 2 ? this.go(3, 'SPACELOG_Prototype.dc.html') : (window.location.href = 'SPACELOG_Prototype.dc.html')),
+      openSettings: () => this.ok() && this.setState({ view: 'settings' }),
+      backFromSettings: () => this.setState({ view: 'drop' }),
+      settings: s.settings, changeSettings: patch => this.setState(st => ({ settings: { ...st.settings, ...patch }, notice: patch.redisc === false ? false : st.notice })),
+      items: s.items, planet: s.planet, autoClose: this.props.frozen || s.seen ? 0 : 6,
+      changePlanet: id => { if (!this.ok(2)) return; S.patchInbox(s.ids, { planet: id }); this.setState({ planet: id }); this.keep(s.items, s.ids, id); },
+      saveMemo: m => S.patchInbox(s.ids, { memo: m }),
+      cancelSave: () => { if (!this.ok()) return; const n = s.ids.length; S.removeInbox(s.ids); this.keep(null); this.setState({ view: 'drop', status: 'idle', items: [], ids: [] }); this.flash(n > 1 ? n + '개 넣기를 취소했어요' : '넣기를 취소했어요. 저장하지 않았어요'); },
+      // 닫아도 넣은 기록은 그대로 두고 창만 접습니다. 다시 펼치면 같은 확인 화면이 보입니다.
+      closeConfirm: () => this.setState({ collapsed: true, seen: true }),
+      showNewDrop: s.view === 'confirm' && !!s.seen && !s.tour, newDrop: () => { this.keep(null); this.setState({ view: 'drop', status: 'idle', items: [], ids: [], seen: false }); },
+      ...Object.fromEntries(SAMPLES.map((it, n) => ['s' + n, {
+        onDragStart: e => { if (!this.ok(1)) { e.preventDefault(); return; } e.dataTransfer.setData('application/x-spacelog', JSON.stringify(it)); e.dataTransfer.effectAllowed = 'copy'; },
+        onClick: () => this.flash('끌어서 오른쪽 수집 앱에 놓아 보세요') }])),
+      previewNotice: () => !this.ok(10) ? null : s.settings.redisc ? (re ? this.setState({ notice: true }) : this.flash('7일 전에 넣은 기록이 없어요')) : this.flash('설정에서 재발견 알림이 꺼져 있어요'),
+      showNotice: s.notice && !!re && !!rp, noticeTitle: re ? re.title : '', noticePlanet: rp ? rp.name : '',
+      openNotice: () => !this.ok(10) ? null : s.tour === 10 ? this.go(11, 'SPACELOG_Prototype.dc.html#redisc') : (window.location.href = 'SPACELOG_Prototype.dc.html#redisc'),
+      ...(() => { const T = window.SPACELOG_TOUR, v = T ? T.view(s.tour, 'c') : { on: false, h: 0 }; return { tourOn: v.on, tourH: v.h, tourNo: v.no, tourPct: v.pct, tourTitle: v.title, tourDesc: v.desc, tourCta: v.cta, tourSkipLabel: v.skip, tourHere: v.here }; })(),
+      navGuard: e => { if (s.tour) { e.preventDefault(); this.flash('체험 중에는 안내된 단계만 할 수 있어요'); } },
+      dlApp: () => this.flash('프로토타입이라 실제 설치 파일은 아직 없어요'),
+      tourSkip: () => this.setTour(0),
+      ...(() => { const on = !!s.tour; return { tourIsOn: on, tourSwBg: on ? 'var(--color-primary)' : 'rgba(255,255,255,0.24)', tourSwLeft: on ? '18px' : '2px', tourSwText: on ? 'On' : 'Off', tourSwColor: on ? '#fff' : 'var(--color-body-muted)' }; })(),
+      tourCanBack: s.tour > 1,
+      tourBack: () => { const T = window.SPACELOG_TOUR, n = s.tour - 1; if (!T || n < 1) return; const pg = T.steps[n - 1].page; T.set(n);
+        if (pg === 'c') { if (location.hash === '#tour') location.reload(); else { location.hash = 'tour'; location.reload(); } }
+        else window.location.href = T.url(pg === 'w' ? 'SPACELOG_Prototype.dc.html' : 'SPACELOG_Collector.dc.html'); },
+      tourToggle: () => { if (s.tour) this.setTour(0); else this._tourStart && this._tourStart(); },
+      tourStart: this._tourStart = () => { clearTimeout(this._a); clearTimeout(this._b); this.setState(this.sceneState('open')); this.setTour(1); },
+      tourNext: () => {
+        const t = s.tour;
+        if (t === 1) this.save([SAMPLES[2]]);
+        else if (t === 2) this.go(3, 'SPACELOG_Prototype.dc.html');
+        else if (t === 10) this.go(11, 'SPACELOG_Prototype.dc.html#redisc');
+        else this.go(t, t === 11 ? 'SPACELOG_Prototype.dc.html#redisc' : 'SPACELOG_Prototype.dc.html');
+      },
+      ...Object.fromEntries([['toolDrive', 'Google Drive'], ['toolNotion', 'Notion'], ['toolSlack', 'Slack'], ['toolGmail', 'Gmail'], ['toolFigma', 'Figma']].map(([k, name]) => [k, () => this.ok() && this.flash(name + ' 연결은 준비 중이에요')])),
+      addTool: () => this.ok() && this.flash('연결할 수 있는 도구를 더 준비하고 있어요'),
+      flash: m => this.flash(m),
+      toast: s.toast, toastOpacity: s.toastOn ? 1 : 0
+    };
+  }
+}
+</script>
+</body>
+</html>
