@@ -23,6 +23,7 @@ export function SideWindow() {
   return (
     <aside className="side" aria-label={tab === "planet" ? "행성 목록" : tab === "rec" ? "기록 목록" : "별자리 목록"}>
       {tab === "planet" && <PlanetCard />}
+      {tab === "planet" && <LinkQuickCard />}
       {tab === "rec" && <RecordCard />}
       {tab === "link" && <LinkCard />}
     </aside>
@@ -120,6 +121,39 @@ function RecordCard() {
   );
 }
 
+const QUICK_MAX = 5;
+
+/**
+ * 행성 목록 아래 "별자리 바로 보기" (시안 W01 별자리 카드). 별자리가 있을 때만.
+ * 체크 = 그 별자리를 우주에 선으로 잇기(행성끼리). 이름을 누르면 그 별자리의 기록 창. 5개까지, 나머지는 위의 별자리 태그에서
+ */
+function LinkQuickCard() {
+  const links = useDemo((s) => s.links);
+  const hidden = useDemo((s) => s.hiddenLinkIds);
+  if (links.length === 0) return null;
+  return (
+    <section className="card side__card lquick" aria-label="별자리 바로 보기">
+      <h2 className="side__title lquick__title">별자리 바로 보기</h2>
+      <p className="side__note">체크한 별자리만 우주에 선으로 보여요</p>
+      <ul className="rows lquick__rows">
+        {links.slice(0, QUICK_MAX).map((l) => {
+          const shown = !hidden.includes(l.id);
+          return (
+            <li key={l.id} className="lquick__row">
+              <button type="button" role="checkbox" aria-checked={shown} aria-label={`${l.name} 우주에 선으로 ${shown ? "숨기기" : "보이기"}`} title="우주에 선으로 보이기 · 숨기기" className={`check${shown ? " is-on" : ""}`} onClick={() => demo.getState().toggleLinkShown(l.id)} />
+              <button type="button" className="lquick__open" title="별자리의 기록 보기" onClick={() => store.getState().openLinkView(l.id)}>
+                <span className="lquick__name">{l.name}</span>
+                <span className="lquick__n">기록 {l.starIds.length}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      {links.length > QUICK_MAX && <p className="side__note lquick__more">외 {links.length - QUICK_MAX}개는 위의 별자리 태그에서 볼 수 있어요</p>}
+    </section>
+  );
+}
+
 /**
  * 별자리 목록 (시안 W01 "별자리 목록"). 줄 = 별자리 아이콘 · 이름 · "기록 N · 관측 목적" · ＞(눌러서 그 별자리의 기록 창).
  * 오른쪽 연필을 누르면 그 줄 아래에서 바로 고친다: 이름 · 관측 목적 · 우주에 선 보이기 · [별자리 풀기] [취소] [저장].
@@ -134,7 +168,7 @@ function LinkCard() {
   return (
     <section className="card side__card">
       <div className="side__head">
-        <h2 className="side__title">별자리 {links.length}</h2>
+        <h2 className="side__title">별자리 목록({links.length})</h2>
         <button type="button" className="btn btn--icon" aria-label="별자리 목록 닫기" onClick={() => store.getState().toggleSideTab("link")}>
           <X size={14} aria-hidden />
         </button>

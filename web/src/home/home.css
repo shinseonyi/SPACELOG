@@ -34,6 +34,17 @@ kbd { font: var(--type-fine-print); background: var(--color-chip); color: var(--
 .side__note { margin: 0; padding: 0 8px 8px; color: var(--color-body-muted); font: var(--type-fine-print); line-height: 1.4; }
 .side__empty { margin: 0; padding: 12px 8px; color: var(--color-body-muted); font: var(--type-caption); }
 
+/* 행성 목록 아래 "별자리 바로 보기" (시안 W01 별자리 카드): 체크 = 우주에 선, 이름 = 기록 창 */
+.lquick { flex: none; padding: 12px 8px 8px; gap: 0; }
+.lquick__title { padding: 6px 8px 4px; }
+.lquick__rows { gap: 2px; }
+.lquick__row { display: flex; align-items: center; gap: 6px; padding-left: 8px; }
+.lquick__open { flex: 1; min-width: 0; min-height: 40px; display: flex; align-items: center; gap: 12px; padding: 2px 8px 2px 4px; border: 0; border-radius: var(--r-item); background: transparent; color: var(--color-body); text-align: left; cursor: pointer; }
+.lquick__open:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.lquick__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption); }
+.lquick__n { flex: none; font: var(--type-fine-print); color: var(--color-body-muted); }
+.lquick__more { padding: 8px 8px 4px; }
+
 /* 별자리 목록 (시안 W01): 줄 = 아이콘 · 이름/아랫줄 · ＞, 오른쪽 연필 → 줄 아래에서 바로 고치기 */
 .lmenu { gap: 2px; }
 .lmenu__item { border-radius: var(--r-field); }
