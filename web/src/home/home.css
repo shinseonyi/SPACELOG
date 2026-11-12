@@ -140,7 +140,15 @@ li.row--rec:active { transform: none; }
 .near { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); /* 가운데 아래 "기록 넣기" 위 */ z-index: 10; font-size: 16px; }
 .near:active:not(:disabled) { transform: translateX(-50%) scale(var(--press-scale)); }
 
-.home-banner { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); width: min(560px, calc(100vw - 2 * var(--gutter))); z-index: 15; overflow: hidden; padding: 0; }
+/* 배너: 상단 바(위 20 · 높이 56) 바로 아래 가운데. 오른쪽 창보다 위에 덮는다 */
+.home-banner { position: fixed; left: 50%; transform: translateX(-50%); top: 88px; width: min(560px, calc(100vw - 32px)); z-index: 15; overflow: hidden; padding: 0; }
+/* 기간 자동 확장 안내: 흰 카드 + [확인] (빈 우주 안내 .empty · 넣기 알림 .addrec-done 과 같은 흰 면) */
+.home-banner--light { width: max-content; max-width: calc(100vw - 32px); box-sizing: border-box; display: flex; align-items: center; gap: 14px; padding: 8px 8px 8px 20px; border-radius: var(--r-pill); background: #fff; color: var(--color-ink-on-light); box-shadow: var(--shadow-float); font: var(--type-caption); animation: fade-in 0.2s ease-out; }
+.home-banner__text { min-width: 0; }
+.home-banner__ok { flex: none; height: 32px; padding: 0 16px; border: 0; border-radius: var(--r-pill); background: var(--color-primary); color: #fff; font: var(--type-caption); cursor: pointer; transition: transform var(--press-time); }
+.home-banner__ok:active { transform: scale(var(--press-scale)); }
+.home-banner__ok:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .home-banner--light { animation: none; } }
 
 /* 빈 우주 안내: 흰 카드 (넣기 알림 .addrec-done 과 같은 흰 면) + [확인]으로 닫기 */
 .empty { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 12; box-sizing: border-box; width: max-content; max-width: min(420px, calc(100vw - 32px)); padding: 24px 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; border-radius: var(--r-panel); background: #fff; color: var(--color-ink-on-light); box-shadow: var(--shadow-float); animation: fade-in 0.2s ease-out; }
@@ -169,7 +177,7 @@ li.row--rec:active { transform: none; }
   .side { left: 16px; right: 16px; width: auto; top: 84px; }
   .stack { left: 16px; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
   .near { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); font-size: 14px; }
-  .home-banner { bottom: calc(200px + env(safe-area-inset-bottom, 0px)); }
+  .home-banner { top: 76px; } /* 상단 바가 위 12 */
 }
 
 .perf { position: fixed; left: 50%; top: var(--gutter); transform: translateX(-50%); z-index: 40; padding: 4px 12px; font: 600 13px var(--font-mono); }
@@ -292,7 +300,6 @@ li.row--rec:active { transform: none; }
   .actionbar { flex-direction: column; flex-wrap: nowrap; align-items: flex-end; max-width: none; }
   .newplanet { bottom: calc(100% + 8px); } /* 세로 묶음 위로 */
   .near { bottom: calc(240px + env(safe-area-inset-bottom, 0px)); }
-  .home-banner { bottom: calc(240px + env(safe-area-inset-bottom, 0px)); }
 }
 /* 휴대폰 폭: 왼쪽 아래 카드(혜성 · 거리)가 오른쪽 세로 버튼과 겹치지 않게 그 앞에서 멈춘다 */
 @media (max-width: 480px) { .rediscovery, .dist { max-width: calc(100vw - 172px); } }
