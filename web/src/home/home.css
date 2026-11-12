@@ -31,9 +31,9 @@ kbd { font: var(--type-fine-print); background: var(--color-chip); color: var(--
 .side__head .side__title { flex: 1; }
 .side__title { margin: 0; padding: 6px 8px 10px; font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); }
 .side__card--list .side__title { padding: 0 16px; }
-.side__note { margin: 0; padding: 0 8px 6px; color: var(--color-body-muted); font: var(--type-fine-print); }
+.side__note { margin: 0; padding: 0 8px 8px; color: var(--color-body-muted); font: var(--type-fine-print); line-height: 1.4; }
 .side__empty { margin: 0; padding: 12px 8px; color: var(--color-body-muted); font: var(--type-caption); }
-.rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .rows--scroll { overflow-y: auto; min-height: 0; padding: 0 0 4px; }
 .row { width: 100%; height: 36px; padding: 0 8px; display: flex; align-items: center; gap: 12px; border: 0; border-radius: var(--r-item); background: transparent; color: var(--color-body); font: var(--type-caption-strong); text-align: left; cursor: pointer; transition: transform var(--press-time); }
 .row:active { transform: scale(var(--press-scale)); }
@@ -43,13 +43,13 @@ kbd { font: var(--type-fine-print); background: var(--color-chip); color: var(--
 .row__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .row__n { font: var(--type-caption); font-variant-numeric: tabular-nums; }
 .row__go { opacity: 0.5; }
-li.row--rec { height: auto; min-height: 44px; padding: 4px 8px 4px 10px; cursor: default; gap: 10px; }
+li.row--rec { height: auto; min-height: 52px; padding: 7px 8px 7px 10px; cursor: default; gap: 10px; }
 li.row--rec.is-picked { background: var(--color-inset); }
 li.row--rec:active { transform: none; }
 .row__main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; border-radius: var(--r-item); }
-.row__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.row__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; } /* 제목과 아랫줄 사이 (기록 목록 · 행성 패널 · 별자리) */
 .row__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption-strong); }
-.row__sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-fine-print); color: var(--color-body-muted); }
+.row__sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-fine-print); line-height: 1.35; color: var(--color-body-muted); }
 .check { width: 22px; height: 22px; flex: none; padding: 0; box-sizing: border-box; border-radius: 6px; border: 1.5px solid rgba(255, 255, 255, 0.5); background: transparent; cursor: pointer; position: relative; }
 .check.is-on { background: #fff; border-color: #fff; }
 .check.is-on::after { content: ""; position: absolute; left: 6px; top: 2px; width: 6px; height: 11px; border: solid var(--color-ink-on-light); border-width: 0 2px 2px 0; transform: rotate(45deg); }
@@ -107,7 +107,7 @@ li.row--rec:active { transform: none; }
 .rediscovery { display: flex; align-items: center; gap: 12px; width: 260px; max-width: calc(100vw - 48px); box-sizing: border-box; padding: 12px 14px 12px 10px; border-radius: var(--r-panel); border: 1px solid var(--color-line-card); background: var(--color-card-solid); color: var(--color-body); text-align: left; overflow: hidden; cursor: pointer; transition: transform var(--press-time); }
 .rediscovery:active { transform: scale(var(--press-scale)); }
 .rediscovery:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-.rediscovery__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.rediscovery__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .rediscovery__eyebrow { font: var(--type-fine-print); letter-spacing: 0.04em; }
 .rediscovery__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); }
 .rediscovery__sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-fine-print); color: var(--color-body-muted); }
@@ -130,29 +130,29 @@ li.row--rec:active { transform: none; }
 .side__barrow { display: flex; align-items: center; gap: 8px; }
 .side__barrow .btn { flex: 1; height: 40px; padding: 0 12px; }
 .side__barrow .btn--icon { flex: none; width: 40px; padding: 0; }
-.lsheet { display: flex; flex-direction: column; gap: 10px; padding: 4px 8px 8px; }
+.lsheet { display: flex; flex-direction: column; gap: 14px; padding: 4px 8px 8px; }
 .lsheet__title { margin: 0; font: var(--type-caption-strong); }
 .lsheet input, .lview__form input { box-sizing: border-box; height: 38px; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: var(--color-chip); color: var(--color-body); font: var(--type-caption); }
 .lsheet textarea, .lview__form textarea { box-sizing: border-box; padding: 10px 14px; border-radius: var(--r-field); border: 1px solid var(--color-line-btn); background: var(--color-chip); color: var(--color-body); font: var(--type-caption); font-family: inherit; line-height: 1.5; resize: vertical; }
 .lsheet input:focus-visible, .lsheet textarea:focus-visible, .lview__form input:focus-visible, .lview__form textarea:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
-.lsheet__q { display: flex; flex-direction: column; gap: 6px; }
+.lsheet__q { display: flex; flex-direction: column; gap: 10px; } /* 라벨과 고르기 버튼 사이 */
 .lsheet__q > span { font: var(--type-fine-print); color: var(--color-body-muted); }
-.lsheet__q > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.lsheet__q > div { display: flex; flex-wrap: wrap; gap: 8px; }
 .lsheet__q button { height: 30px; padding: 0 12px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: transparent; color: var(--color-body); font: var(--type-fine-print); cursor: pointer; white-space: nowrap; }
 .lsheet__q button.is-on { background: #fff; color: var(--color-ink-on-light); border-color: #fff; }
 .lsheet__q button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .lsheet__actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
 .lsheet__actions .btn { height: 36px; padding: 0 14px; flex: none; }
 .lview { padding-bottom: 8px; }
-.lview__head { display: flex; align-items: center; gap: 6px; padding: 0 8px 0 4px; }
+.lview__head { display: flex; align-items: center; gap: 8px; padding: 0 8px 4px 4px; }
 .lview__back { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--color-body); cursor: pointer; }
 .lview__back:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-.lview__titles { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lview__titles { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .lview__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption-strong); }
-.lview__sub { font: var(--type-fine-print); color: var(--color-body-muted); }
-.lview__memo { margin: 0; padding: 0 16px; font: var(--type-fine-print); color: var(--color-body); line-height: 1.5; }
-.lview__form { display: flex; flex-direction: column; gap: 8px; padding: 0 8px; }
-.lview__more { padding: 10px 8px 4px; font: var(--type-fine-print); color: var(--color-body-muted); border-top: 1px solid var(--color-line-inset); margin-top: 6px; list-style: none; }
+.lview__sub { font: var(--type-fine-print); line-height: 1.35; color: var(--color-body-muted); }
+.lview__memo { margin: 0; padding: 2px 16px 8px; font: var(--type-fine-print); color: var(--color-body); line-height: 1.55; }
+.lview__form { display: flex; flex-direction: column; gap: 10px; padding: 0 8px 4px; }
+.lview__more { padding: 14px 8px 6px; font: var(--type-fine-print); color: var(--color-body-muted); border-top: 1px solid var(--color-line-inset); margin-top: 6px; list-style: none; }
 .row__main:disabled { cursor: default; }
 
 /* 체크한 기록 도구: 세 버튼은 같은 크기의 전체 폭 */
