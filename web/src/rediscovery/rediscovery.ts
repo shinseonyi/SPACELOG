@@ -71,7 +71,7 @@ export function useRediscoveryCard(): RediscoveryCardState {
       .rediscoveryToday()
       .then((res) => {
         if (!alive || !res) return;
-        if (isDismissedToday(res.star.id)) return;
+        // 닫기 버튼이 없는 카드라(handoff 7-3) 예전에 닫아 둔 기록은 보지 않는다 — 남아 있으면 그날 내내 카드가 안 보였다
         setToday(res);
         if (markShownOnce(toLocalDateString(new Date()), res.star.id)) record({ starId: res.star.id, channel: "card", type: "shown" });
       })
@@ -98,13 +98,6 @@ export function useRediscoveryCard(): RediscoveryCardState {
 }
 
 const dismissedKey = (starId: string) => `${cardShownKey(toLocalDateString(new Date()), starId)}.dismissed`;
-function isDismissedToday(starId: string): boolean {
-  try {
-    return localStorage.getItem(dismissedKey(starId)) === "1";
-  } catch {
-    return false;
-  }
-}
 function rememberDismissed(starId: string): void {
   try {
     localStorage.setItem(dismissedKey(starId), "1");

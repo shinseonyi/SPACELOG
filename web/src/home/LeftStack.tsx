@@ -2,17 +2,21 @@ import { Minus, Plus } from "lucide-react";
 import { CosmicDustButton } from "../chat/CosmicDust.tsx";
 import { useStore } from "../state/store.ts";
 import { useViewApi } from "../view/viewApi.ts";
+import { DistanceCard } from "./DistanceCard.tsx";
 import { RediscoverySlot } from "./RediscoveryCard.tsx";
 
 /**
  * 왼쪽 아래 묶음. 아래에서 위로 쌓인다 (left 24 · bottom 88 · gap 12 · 폭 260).
- * 확대 조절(켜진 보기가 알려 줄 때만) + 우주먼지 버튼(chat/), 재발견 혜성 카드. 행성 간 거리 카드는 3D 쪽 데이터와 함께 붙인다.
+ * 위에서 아래로: 확대 조절(켜진 보기가 알려 줄 때만) + 우주먼지 버튼(chat/) → 재발견 혜성 카드 → 행성 간 거리 카드(2.5D · 3D) (handoff 7-3).
+ * column-reverse 라 JSX 순서는 그 반대다.
  */
 export function LeftStack() {
   const zoom = useViewApi((s) => s.zoom);
   const edit = useStore((s) => s.editPos);
   return (
     <div className="stack" data-edit={edit || undefined}>
+      <DistanceCard />
+      <RediscoverySlot />
       <div className="stack__row">
         {zoom && (
           <div className="zoom card" role="group" aria-label="확대 축소">
@@ -23,7 +27,6 @@ export function LeftStack() {
         )}
         <CosmicDustButton />
       </div>
-      <RediscoverySlot />
     </div>
   );
 }

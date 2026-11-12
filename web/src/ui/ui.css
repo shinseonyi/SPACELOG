@@ -104,3 +104,15 @@
 @media (max-width: 760px) {
   .side-panel { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; height: 66vh; }
 }
+
+/* 재발견 혜성 그림 (CometMark): 머리 + 꼬리. 값은 design handoff 6-4 · 7-3 */
+.comet { position: relative; flex: none; display: block; }
+.comet i { position: absolute; display: block; }
+.comet__tail { transform-origin: 0 50%; transform: translateY(-50%) rotate(-36deg); clip-path: polygon(0 0, 100% 50%, 0 100%); opacity: 0.4; }
+.comet__head { border-radius: 50%; }
+.comet--sm { width: 36px; height: 28px; }
+.comet--sm .comet__tail { left: 10px; top: 18px; width: 26px; height: 12px; }
+.comet--sm .comet__head { left: 4px; top: 12px; width: 12px; height: 12px; }
+.comet--lg { width: 56px; height: 56px; }
+.comet--lg .comet__tail { left: 16px; top: 38px; width: 46px; height: 20px; }
+.comet--lg .comet__head { left: 6px; top: 28px; width: 20px; height: 20px; background-color: #000; background-size: 230% auto; background-position: 49% 62%; }

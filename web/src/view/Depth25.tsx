@@ -5,11 +5,8 @@ import { useDemo } from "../demo/demoStore.ts";
 import { useStore } from "../state/store.ts";
 import { DepthScene, type DepthPlanet } from "./Depth25.ts";
 import { useLinkPaths } from "./linkPaths.ts";
-import { planetNodes, recencyRank } from "./look.ts";
+import { DEPTH_STEP, planetNodes, recencyRank } from "./look.ts";
 import "./view.css";
-
-/** 앞뒤 간격: 최근에 기록을 넣은 행성이 앞, 한 단계마다 260 뒤로 (README 6-1) */
-const DEPTH_STEP = 260;
 
 /** 2.5D 보기를 React 화면에 붙이는 껍데기. WebGL 이 없으면 그리지 않는다 (POLICY 3-1) */
 export function Depth25() {

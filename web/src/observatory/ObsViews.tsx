@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { CsvTable } from "../demo/csv.ts";
 import { donutGradient, type Dashboard } from "../demo/dashboard.ts";
 import type { ChartKind } from "../demo/types.ts";
+import { CometMark } from "../ui/CometMark.tsx";
 import { Thumbnail } from "../ui/Thumbnail.tsx";
 import type { Star } from "@spacelog/shared/types";
 import type { Comet } from "./comet.ts";
@@ -147,23 +148,24 @@ export function CometView({ rows, total, onOpen }: { rows: CometRow[]; total: nu
   if (rows.length === 0)
     return (
       <div className="obs-empty">
-        <strong>아직 다시 만날 기록이 없어요.</strong>
-        <span>넣은 지 7일이 넘은 기록이 생기면 혜성이 되어 여기에 모입니다.</span>
+        <strong>아직 재발견할 기록이 없어요.</strong>
+        <span>넣은 지 7일이 지난 기록이 생기면 여기에 재발견 혜성으로 모입니다. 정확히 7일 전 기록은 오늘의 재발견으로 표시돼요.</span>
       </div>
     );
   return (
-    <div className="obs-comets" data-screen-label="재발견 혜성 관측">
-      <p className="obs-note">넣은 지 7일이 넘은 기록 {total}개{total > rows.length ? ` 중 가까운 ${rows.length}개` : ""} · 가까운 날짜부터</p>
+    <div className="obs-card obs-comets" data-screen-label="재발견 혜성 관측">
+      <p className="obs-note">넣은 지 7일이 넘은 기록 {total > rows.length ? `${total}개 중 최근 ${rows.length}개` : `${total}개`} · 가까운 날짜부터</p>
       <ul>
         {rows.map((c) => (
           <li key={c.star.id}>
             <button type="button" className="obs-comet" onClick={() => onOpen(c.star)} title="기록 상세 열기">
-              <i className="obs-dot" style={{ background: c.accent }} />
+              <CometMark accent={c.accent} />
               <span className="obs-comet__text">
-                <span className="obs-comet__title">{c.title}{c.today && <b className="obs-badge">오늘의 재발견</b>}</span>
+                <span className="obs-comet__title">{c.title}</span>
                 <span className="obs-comet__sub">{c.sub}</span>
               </span>
-              <span className="obs-comet__ago">{c.ago}일 전</span>
+              {c.today && <span className="obs-comet__today">오늘의 재발견</span>}
+              <span className="obs-comet__ago" style={{ color: c.accent }}>{c.ago}일 전</span>
             </button>
           </li>
         ))}

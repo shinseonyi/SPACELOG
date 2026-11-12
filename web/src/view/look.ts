@@ -99,6 +99,9 @@ export function planetNodes(planets: Planet[], overrides: Record<string, PlanetO
   });
 }
 
+/** 2.5D 앞뒤 간격: 최근에 기록을 넣은 행성이 앞, 한 단계마다 260 뒤로 (README 6-1). 거리 카드도 같은 값으로 잰다 */
+export const DEPTH_STEP = 260;
+
 /** 가장 최근에 기록을 넣은 행성부터 0,1,2… 순위. 2.5D에서 앞쪽에 놓는 기준 (README 6-1). 기록이 없는 행성은 맨 뒤 */
 export function recencyRank(planets: Pick<Planet, "id">[], stars: { planetId: string; createdAtUtc: string }[]): Map<string, number> {
   const last = new Map<string, string>();

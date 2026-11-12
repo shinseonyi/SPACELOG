@@ -1,7 +1,7 @@
 // 관측소 (W-05, README 6-4): 별자리로 묶은 기록을 한곳에서 본다. 탐사선(probe/)과는 별개의 화면이다.
 // 별자리 관측(대시보드 · 표 · 텍스트 · 사진)과 재발견 혜성 관측. 데이터는 시연용(web/src/demo)과 서버의 기록을 함께 쓴다.
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Download, Orbit, Pencil, Waypoints, X } from "lucide-react";
+import { Bookmark, Copy, Download, Pencil, Telescope, Waypoints, X } from "lucide-react";
 import type { Planet, Star } from "@spacelog/shared/types";
 import { api, RequestError } from "../api/client.ts";
 import type { CsvTable } from "../demo/csv.ts";
@@ -214,14 +214,14 @@ function Panel({ initialComet, routeLinkId }: { initialComet: boolean; routeLink
             ) : (
               <>
                 <h2 className="obs-head__name">{cur.l.name}</h2>
-                <p className="obs-head__meta">기록 {list.length} · CSV 데이터 {csvStars.length} · 사진 {imgs.length} · 행성 {planetCount}</p>
+                <p className="obs-head__meta">기록 {list.length} · CSV 데이터 {csvStars.length} · 행성 {planetCount}</p>
                 {cur.l.memo && <p className="obs-head__memo">관측 목적 · {cur.l.memo}</p>}
               </>
             )}
           </div>
           {!le && (
             <div className="obs-actions">
-              {isDraft ? <Button variant="primary" onClick={saveDraft}>별자리로 저장</Button> : <Button onClick={() => setLe({ name: cur.l.name, memo: cur.l.memo })}><Pencil size={14} aria-hidden /> 이름·목적 수정</Button>}
+              {isDraft ? <Button variant="primary" onClick={saveDraft}><Bookmark size={14} aria-hidden /> 별자리로 저장</Button> : <Button onClick={() => setLe({ name: cur.l.name, memo: cur.l.memo })}><Pencil size={14} aria-hidden /> 별자리 수정</Button>}
               <Button variant="ghost" onClick={remove}>{isDraft ? "선택 비우기" : "별자리 풀기"}</Button>
             </div>
           )}
@@ -330,16 +330,25 @@ function Panel({ initialComet, routeLinkId }: { initialComet: boolean; routeLink
 }
 
 function Shell({ mode, setMode, children }: { mode: "link" | "comet"; setMode(m: "link" | "comet"): void; children: React.ReactNode }) {
+  // 머리말(아이콘 · 제목 · 한 줄 설명 · 닫기) 아래 줄에 모드 전환. 재발견 혜성 관측이 왼쪽 (handoff 6-1)
+  const modes: ["comet" | "link", string][] = [["comet", "재발견 혜성 관측"], ["link", "별자리 관측"]];
   return (
     <section className="obs" aria-label="관측소">
       <header className="obs-header">
-        <h2 className="obs-header__title">관측소</h2>
-        <div className="obs-seg" role="radiogroup" aria-label="관측 방식">
-          <button type="button" role="radio" aria-checked={mode === "link"} className={mode === "link" ? "is-on" : ""} onClick={() => setMode("link")}><Waypoints size={14} aria-hidden /> 별자리 관측</button>
-          <button type="button" role="radio" aria-checked={mode === "comet"} className={mode === "comet" ? "is-on" : ""} data-guide-target="comet-mode" onClick={() => setMode("comet")}><Orbit size={14} aria-hidden /> 재발견 혜성 관측</button>
+        <span className="obs-header__icon" aria-hidden><Telescope size={18} /></span>
+        <div className="obs-header__text">
+          <h2 className="obs-header__title">관측소</h2>
+          <span className="obs-header__sub">CSV 데이터는 대시보드로, 사진은 모아서 봅니다</span>
         </div>
-        <Button className="btn--icon" aria-label="관측소 닫기" onClick={() => store.getState().goBack()}><X size={16} aria-hidden /></Button>
+        <button type="button" className="obs-close" aria-label="관측소 닫기" title="닫기 (Esc)" onClick={() => store.getState().goBack()}><X size={14} aria-hidden /></button>
       </header>
+      <div className="obs-modes">
+        <div className="obs-seg" role="tablist" aria-label="관측 모드">
+          {modes.map(([k, label]) => (
+            <button key={k} type="button" role="tab" aria-selected={mode === k} className={mode === k ? "is-on" : ""} data-guide-target={k === "comet" ? "comet-mode" : undefined} onClick={() => setMode(k)}>{label}</button>
+          ))}
+        </div>
+      </div>
       <div className="obs-body">{children}</div>
     </section>
   );
