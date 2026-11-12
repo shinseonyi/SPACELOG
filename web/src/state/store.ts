@@ -41,7 +41,7 @@ export interface Store extends WebState {
   obsDraft: string[] | null;
   /** 목록에서 체크한 기록. 행성·기간·패널을 넘어 유지된다 (별자리는 여러 행성의 기록을 묶는다, README 1-1) */
   picked: string[];
-  /** 위치 편집 중인가 (2D 에서만. 켜면 행성을 끌어 옮기고 블랙홀이 나타난다) */
+  /** 위치 편집 중인가 (2D · 2.5D. 켜면 행성을 끌어 옮기고 블랙홀이 나타난다) */
   editPos: boolean;
   setEditPos(on: boolean): void;
   /** 블랙홀에 넣을지 묻는 중인 행성 id */

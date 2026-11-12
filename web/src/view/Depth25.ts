@@ -2,6 +2,8 @@
 // 행성은 사진 스프라이트, 시점은 자유 비행. 좌표: 행성 (x, y, z) → 3D (x, -y, -z), 1단위 = 1px.
 // 시안 대비 달라진 점: 별자리 선 · 거리 선은 별자리(5·6단계)·거리 카드와 함께 붙이고, 이름표는 행성 아래에만 놓는다(겹침 피하기 생략).
 import * as THREE from "three";
+import { demo } from "../demo/demoStore.ts";
+import { freeSpot } from "../demo/planets.ts";
 import { dimSide } from "../home/sideDim.ts";
 import { store } from "../state/store.ts";
 import heroUrl from "../assets/planet-hero.png";
@@ -157,11 +159,22 @@ export class DepthScene {
     on(el, "pointerdown", (e) => {
       if (e.button !== 0) return;
       dimSide(); // 우주를 다루기 시작 → 오른쪽 창 반투명
+      // 위치 편집 중 행성을 누르면 시점이 아니라 행성을 끈다
+      if (store.getState().editPos) {
+        const n = this.pickAt(e);
+        if (n) {
+          this.beginPlanetDrag(n, e);
+          try { el.setPointerCapture(e.pointerId); } catch { /* 캡처 못 해도 끌기는 동작 */ }
+          el.style.cursor = "grabbing";
+          return;
+        }
+      }
       this.drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false };
       try { el.setPointerCapture(e.pointerId); } catch { /* 캡처 못 해도 끌기는 동작 */ }
       el.style.cursor = "grabbing";
     });
     on(el, "pointermove", (e) => {
+      if (this.pdrag) return this.movePlanetDrag(e);
       const d = this.drag;
       if (!d) return;
       const dx = e.clientX - d.x, dy = e.clientY - d.y;
@@ -173,7 +186,16 @@ export class DepthScene {
       this.cam.yaw += dx * 0.0035;
       this.cam.pitch = Math.max(-1.3, Math.min(1.3, this.cam.pitch + dy * 0.0035));
     });
+    on(el, "pointercancel", () => {
+      if (this.pdrag) this.endPlanetDrag(null);
+      this.drag = null;
+      el.style.cursor = "grab";
+    });
     on(el, "pointerup", (e) => {
+      if (this.pdrag) {
+        el.style.cursor = "grab";
+        return this.endPlanetDrag(e);
+      }
       const d = this.drag;
       if (!d) return;
       this.drag = null;
@@ -235,7 +257,9 @@ export class DepthScene {
 
     // 스토어 계약: 자동 비행 등록, 조망 요청, 확대 조절
     store.getState().registerFlyToPlanet((id) => this.flyTo(id));
+    this.labels.style.pointerEvents = store.getState().editPos ? "none" : "";
     this.cleanups.push(store.subscribe((s, prev) => {
+      if (s.editPos !== prev.editPos) this.labels.style.pointerEvents = s.editPos ? "none" : ""; // 위치 편집 중엔 이름표 대신 행성을 잡는다
       if (s.camera === "overview" && prev.camera !== "overview") this.overview(1100);
       if (s.selectedPlanetId && s.selectedPlanetId !== prev.selectedPlanetId) this.followMoved(); // 방금 자리가 바뀐 행성을 열었으면 따라간다
     }));
@@ -426,6 +450,7 @@ export class DepthScene {
       label.onpointerdown = (e) => e.stopPropagation();
       label.onclick = (e) => {
         e.stopPropagation();
+        if (store.getState().editPos) return; // 위치 편집 중엔 끌기만
         this.openPlanet(p.id);
       };
       this.labels.appendChild(label);
@@ -472,6 +497,69 @@ export class DepthScene {
       this.labels.appendChild(el);
       this.marks.push({ el, a: a.at.clone(), b: b.at.clone(), stack: m.stack, solo: m.solo ? a : null });
     }
+  }
+
+  // ── 위치 편집: 행성을 끌어 옮긴다 (README 6-1, 2D 와 같은 자리 덮어쓰기 demo.setPlanet). 깊이(z)는 최근 기록이 정하므로 좌우 · 위아래만 ──
+  private pdrag: { n: Node3; plane: THREE.Plane; grab: THREE.Vector3; origin: THREE.Vector3; sx: number; sy: number; moved: boolean } | null = null;
+
+  private rayAt(e: PointerEvent) {
+    const r = this.renderer.domElement.getBoundingClientRect();
+    this.ray.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), this.camera);
+  }
+
+  /** 포인터 아래의 행성 */
+  private pickAt(e: PointerEvent): Node3 | null {
+    this.rayAt(e);
+    const hit = this.ray.intersectObjects([...this.nodes.values()].map((n) => n.pick), false)[0];
+    return hit ? (this.nodes.get(hit.object.userData.id as string) ?? null) : null;
+  }
+
+  /** 행성이 놓인 깊이의 평면(카메라를 향한 z = 일정)을 따라 끈다. 잡은 지점이 손가락에 붙어 있게 그 차이를 기억한다 */
+  private beginPlanetDrag(n: Node3, e: PointerEvent) {
+    this.cancelFly();
+    const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 0, 1), n.at);
+    const p = new THREE.Vector3();
+    this.rayAt(e);
+    if (!this.ray.ray.intersectPlane(plane, p)) p.copy(n.at);
+    this.pdrag = { n, plane, grab: p.sub(n.at), origin: n.at.clone(), sx: e.clientX, sy: e.clientY, moved: false };
+  }
+
+  private movePlanetDrag(e: PointerEvent) {
+    const d = this.pdrag;
+    if (!d) return;
+    if (!d.moved && Math.hypot(e.clientX - d.sx, e.clientY - d.sy) <= 4) return;
+    d.moved = true;
+    this.rayAt(e);
+    const p = new THREE.Vector3();
+    if (!this.ray.ray.intersectPlane(d.plane, p)) return;
+    d.n.at.set(p.x - d.grab.x, p.y - d.grab.y, d.origin.z);
+    this.rebuildLinks(); // 별자리 선이 따라오게
+  }
+
+  /** 놓았다: 블랙홀 위면 보내기를 묻고(묻는 동안 제자리로), 아니면 다른 행성과 겹치지 않는 가까운 자리에 둔다. e 없음 = 취소 */
+  private endPlanetDrag(e: PointerEvent | null) {
+    const d = this.pdrag;
+    if (!d) return;
+    this.pdrag = null;
+    if (!d.moved) return;
+    const back = () => {
+      d.n.at.copy(d.origin);
+      this.rebuildLinks();
+    };
+    if (!e) return back();
+    const hole = document.querySelector("[data-blackhole]")?.getBoundingClientRect();
+    if (hole && e.clientX >= hole.left && e.clientX <= hole.right && e.clientY >= hole.top && e.clientY <= hole.bottom) {
+      const s = store.getState();
+      if (s.planets.length <= 1) s.showToast("마지막 행성은 블랙홀에 넣을 수 없어요");
+      else s.setAskTrash(d.n.p.id);
+      return back();
+    }
+    // 우주 좌표: x 는 그대로, y 는 화면 아래가 + (pos() 의 반대)
+    const others = [...this.nodes.values()].filter((n) => n !== d.n).map((n) => ({ id: n.p.id, x: n.at.x, y: -n.at.y }));
+    const spot = freeSpot(others, Math.round(d.n.at.x), Math.round(-d.n.at.y), d.n.p.id);
+    d.n.at.set(spot.x, -spot.y, d.origin.z);
+    this.rebuildLinks();
+    demo.getState().setPlanet(d.n.p.id, { x: spot.x, y: spot.y });
   }
 
   private openPlanet(id: string) {

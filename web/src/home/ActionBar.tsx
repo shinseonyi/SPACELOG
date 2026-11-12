@@ -13,7 +13,7 @@ import { PlanetLookPicker } from "../ui/PlanetLookPicker.tsx";
 
 /**
  * 오른쪽 아래 버튼 묶음 (README 6-1): 위치 편집 · 행성 추가 · 탐사선 · N · 관측소 · N. 높이 44px 알약.
- * 위치 편집은 2D 에서만. 패널·관측소·탐사선이 열려 있으면 숨긴다. `data-guide-target`은 우주먼지의 길잡이 비행이 찾는 표식 (chat/controller.ts).
+ * 위치 편집은 2D · 2.5D 에서 (3D 는 행성 자리가 고정). 패널·관측소·탐사선이 열려 있으면 숨긴다. `data-guide-target`은 우주먼지의 길잡이 비행이 찾는 표식 (chat/controller.ts).
  */
 export function ActionBar() {
   const cargo = useStore((s) => s.cargo.length);
@@ -26,7 +26,7 @@ export function ActionBar() {
   return (
     <div className="actionbar">
       {adding && <NewPlanetCard onClose={() => setAdding(false)} />}
-      {view === "2d" && (
+      {view !== "3d" && (
         <button type="button" className={`actionbar__btn${edit ? " is-on" : ""}`} aria-pressed={edit} data-guide-target="edit" onClick={() => store.getState().setEditPos(!edit)}>
           <Move size={16} aria-hidden /> 위치 편집
         </button>

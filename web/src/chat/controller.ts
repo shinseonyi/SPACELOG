@@ -373,9 +373,9 @@ export function runAction(action: ActionId) {
   else if (action === "openProbe") s.openProbe();
   else if (action === "view3d") s.setView("3d");
   else if (action === "startEditPositions") {
-    if (s.view !== "2d") {
+    if (s.view === "3d") {
       s.setView("2d");
-      s.showToast("위치 편집은 2D 보기에서 해요. 2D로 바꿨어요");
+      s.showToast("위치 편집은 2D · 2.5D 보기에서 해요. 2D로 바꿨어요");
     }
     store.getState().setEditPos(true);
   }
