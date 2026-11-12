@@ -43,3 +43,7 @@
   .addrec:active:not(:disabled) { transform: scale(var(--press-scale)); }
   .addrec-done { max-width: calc(100vw - 32px - 140px); }
 }
+
+/* 가장 좁은 화면(480px 이하): 오른쪽 세로 버튼 묶음 안, "행성 추가" 왼쪽 (addSlot.ts). 같은 높이 · 같은 알약 */
+.addrec--inline { position: static; transform: none; bottom: auto; left: auto; height: 44px; padding: 0 14px; font: var(--type-button-utility); }
+.addrec--inline:active:not(:disabled) { transform: scale(var(--press-scale)); }

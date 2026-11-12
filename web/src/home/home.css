@@ -27,6 +27,11 @@ kbd { font: var(--type-fine-print); background: var(--color-chip); color: var(--
 .side { position: fixed; right: 24px; top: 88px; bottom: 84px; width: min(300px, calc(100vw - 48px)); z-index: 9; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
 .side__card { pointer-events: auto; padding: 16px; display: flex; flex-direction: column; gap: 4px; min-height: 0; background: rgba(37, 37, 39, 0.78); border-color: var(--color-line-inset); }
 .side__card--list { flex: 0 1 auto; padding: 14px 8px 8px; gap: 8px; }
+/* 처음 화면: 행성 · 별자리 · 기록을 한 창에 쌓는다. 행성 목록은 높이를 나눠 쓰고 넘치면 스크롤 */
+.side--home .side__card--planets { flex: 0 1 auto; max-height: 34%; }
+.side--home .lquick { flex: 0 1 auto; max-height: 26%; overflow: hidden; }
+.side--home .lquick__rows { overflow-y: auto; min-height: 0; }
+.side--home .side__card--list { flex: 1 1 0; min-height: 160px; }
 .side__head { display: flex; align-items: center; gap: 8px; }
 .side__head .side__title { flex: 1; }
 .side__title { margin: 0; padding: 6px 8px 10px; font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); }
@@ -123,6 +128,8 @@ li.row--rec:active { transform: none; }
 
 /* 오른쪽 아래 버튼 묶음 */
 .actionbar { position: fixed; right: 24px; bottom: 24px; z-index: 10; display: flex; gap: 8px; }
+.actionbar__row { display: contents; } /* 넓은 화면에서는 줄이 없는 것처럼 */
+.actionbar__slot { display: contents; }
 .actionbar__btn { height: 44px; padding: 0 18px 0 14px; display: inline-flex; align-items: center; gap: 8px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: var(--color-card); -webkit-backdrop-filter: var(--blur-float); backdrop-filter: var(--blur-float); color: var(--color-body); font: var(--type-button-utility); white-space: nowrap; cursor: pointer; transition: transform var(--press-time); }
 .actionbar__btn:active { transform: scale(var(--press-scale)); }
 .actionbar__btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
@@ -283,3 +290,16 @@ li.row--rec:active { transform: none; }
 }
 /* 휴대폰 폭: 왼쪽 아래 카드(혜성 · 거리)가 오른쪽 세로 버튼과 겹치지 않게 그 앞에서 멈춘다 */
 @media (max-width: 480px) { .rediscovery, .dist { max-width: calc(100vw - 172px); } }
+/* 가장 좁은 화면: "기록 넣기"가 "행성 추가" 왼쪽 줄로 들어온다 */
+@media (max-width: 480px) { .actionbar__row { display: flex; align-items: center; gap: 8px; } }
+/* 좁은 화면(960px 미만)에서는 행성 간 거리 카드를 빼서 왼쪽 아래를 비운다 */
+@media (max-width: 959px) { .dist { display: none; } }
+/* 처음 화면 패널의 닫기 */
+.side--home .side__card--planets .side__head .side__title { padding-right: 0; }
+.side__close { width: 32px; height: 32px; }
+/* 휴대폰 폭: 왼쪽 아래 묶음(확대 조절 · 우주먼지 · 혜성 카드)을 오른쪽 세로 버튼 묶음보다 위로 올린다.
+   "기록 넣기 · 행성 추가" 줄이 혜성 카드와 겹치지 않게. 오른쪽 창은 그 위에 덮는다 */
+@media (max-width: 480px) {
+  .stack { bottom: calc(232px + env(safe-area-inset-bottom, 0px)); }
+  .side { z-index: 11; }
+}

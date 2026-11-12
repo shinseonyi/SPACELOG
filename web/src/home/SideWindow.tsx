@@ -21,7 +21,14 @@ export function SideWindow() {
   const hidden = useStore((s) => s.selectedPlanetId !== null || s.selectedStarId !== null);
   if (!tab || hidden) return null;
   return (
-    <aside className="side" aria-label={tab === "planet" ? "행성 목록" : tab === "rec" ? "기록 목록" : "별자리 목록"}>
+    <aside className={`side${tab === "home" ? " side--home" : ""}`} aria-label={tab === "home" ? "행성 · 별자리 · 기록 목록" : tab === "planet" ? "행성 목록" : tab === "rec" ? "기록 목록" : "별자리 목록"}>
+      {tab === "home" && (
+        <>
+          <PlanetCard closable />
+          <LinkQuickCard />
+          <RecordCard />
+        </>
+      )}
       {tab === "planet" && <PlanetCard />}
       {tab === "planet" && <LinkQuickCard />}
       {tab === "rec" && <RecordCard />}
@@ -30,15 +37,22 @@ export function SideWindow() {
   );
 }
 
-function PlanetCard() {
+function PlanetCard({ closable = false }: { closable?: boolean }) {
   const planets = useStore((s) => s.planets);
   const selected = useStore((s) => s.selectedPlanetId);
   const near = useSceneState((s) => s.nearPlanetId);
   const sorted = [...planets].sort((a, b) => Number(!!a.system) - Number(!!b.system) || (b.starCountInPeriod ?? 0) - (a.starCountInPeriod ?? 0));
   return (
-    <section className="card side__card">
-      <h2 className="side__title">행성으로 바로 날아가기</h2>
-      <ul className="rows">
+    <section className="card side__card side__card--planets">
+      <div className="side__head">
+        <h2 className="side__title">행성으로 바로 날아가기</h2>
+        {closable && (
+          <button type="button" className="btn btn--icon side__close" aria-label="목록 닫기" title="목록 닫기 (위 태그로 다시 열기)" onClick={() => store.getState().closeSide()}>
+            <X size={14} aria-hidden />
+          </button>
+        )}
+      </div>
+      <ul className="rows rows--scroll">
         {sorted.map((p) => {
           const n = p.starCountInPeriod ?? 0;
           const here = p.id === near || p.id === selected;

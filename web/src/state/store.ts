@@ -30,7 +30,8 @@ function savedView(): ViewMode {
 }
 
 /** 우주 홈 오른쪽 창에 열린 목록. 한 번에 하나만 (README 6-1) */
-export type SideTab = "rec" | "planet" | "link";
+/** 오른쪽 창. "home" = 처음 화면(행성 · 별자리 바로 보기 · 기록 목록을 한꺼번에). 나머지는 위 태그로 고른 목록 하나 */
+export type SideTab = "home" | "rec" | "planet" | "link";
 
 export interface Store extends WebState {
   auth: "checking" | "ok" | "required";
@@ -90,6 +91,8 @@ export interface Store extends WebState {
   openLinkView(linkId: string | null): void;
   /** 오른쪽 창의 목록을 연다 (이미 열려 있으면 그대로). 닫지 않는다 */
   openSideTab(tab: SideTab): void;
+  /** 오른쪽 창을 닫는다 (위 태그를 누르면 다시 열린다) */
+  closeSide(): void;
   setView(view: ViewMode): void;
   openProbe(): void;
   /** 관측소 열기. linkId = 저장된 별자리, draftIds = 아직 저장하지 않은 "선택한 기록", comet = 재발견 혜성 관측 (README 6-4) */
@@ -144,7 +147,7 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
       cargo: [],
       exportFormat: "claude",
       auth: "checking",
-      sideTab: "planet",
+      sideTab: "home",
       view: savedView(),
       obsDraft: null,
       picked: [],
@@ -322,6 +325,10 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
         set({ sideTab: tab });
       },
 
+      closeSide() {
+        set({ sideTab: null, linkViewId: null });
+      },
+
       setEditPos(on) {
         set({ editPos: on, ...(on ? {} : { askTrash: null }) });
       },
@@ -337,7 +344,8 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
       },
 
       toggleSideTab(tab) {
-        set({ sideTab: get().sideTab === tab ? null : tab });
+        const cur = get().sideTab;
+        set({ sideTab: cur === tab ? "home" : tab }); // 같은 태그를 다시 누르면 처음 화면으로
       },
 
       openProbe() {

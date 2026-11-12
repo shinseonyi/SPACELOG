@@ -2,13 +2,23 @@
 // - 우주 홈 가운데 아래 [＋ 기록 넣기 · 끌어다 놓기 · 붙여넣기] → 메모 창(메모·링크 한 줄, 파일 고르기)
 // - 화면 어디에 파일·글자를 끌어다 놓거나, 입력 칸 밖에서 붙여넣어도 넣는다
 // - 넣은 뒤 흰 알림 "넣었어요 · 제목 · 행성" + [넣기 취소] 7초. 행성 패널을 연 채 넣으면 그 행성으로 옮긴다
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { Paperclip, Plus, Sparkle, X } from "lucide-react";
 import type { CreateStarsResponse } from "@spacelog/shared/types";
 import { api, RequestError } from "../api/client.ts";
 import { store, useStore } from "../state/store.ts";
 import { addedMessage, classifyText, mergeResults, rejectionLines, splitFiles, textBody } from "./addInput.ts";
+import { INLINE_QUERY, useAddSlot } from "./addSlot.ts";
 import "./add.css";
+
+const inlineMq = typeof window !== "undefined" ? window.matchMedia(INLINE_QUERY) : null;
+const subscribeMq = (cb: () => void) => {
+  inlineMq?.addEventListener("change", cb);
+  return () => inlineMq?.removeEventListener("change", cb);
+};
+/** 가장 좁은 화면인가 (버튼을 "행성 추가" 옆으로) */
+const useInline = () => useSyncExternalStore(subscribeMq, () => !!inlineMq?.matches, () => false);
 
 const UNDO_MS = 7000;
 
@@ -17,6 +27,8 @@ export function AddRecord() {
   const edit = useStore((s) => s.editPos);
   const panelPlanet = useStore((s) => s.planets.find((p) => p.id === s.selectedPlanetId) ?? null);
   const [open, setOpen] = useState(false);
+  const slot = useAddSlot();
+  const inline = useInline() && !!slot;
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -157,13 +169,16 @@ export function AddRecord() {
 
   return (
     <>
-      {showButton && (
-        <button type="button" className="addrec" data-guide-target="add" disabled={busy} onClick={() => setOpen(true)}>
-          <Plus size={16} aria-hidden />
-          <span>{busy ? "넣는 중…" : "기록 넣기"}</span>
-          <span className="addrec__sub">끌어다 놓기 · 붙여넣기</span>
-        </button>
-      )}
+      {showButton && (() => {
+        const button = (
+          <button type="button" className={`addrec${inline ? " addrec--inline" : ""}`} data-guide-target="add" disabled={busy} onClick={() => setOpen(true)}>
+            <Plus size={16} aria-hidden />
+            <span>{busy ? "넣는 중…" : "기록 넣기"}</span>
+            <span className="addrec__sub">끌어다 놓기 · 붙여넣기</span>
+          </button>
+        );
+        return inline && slot ? createPortal(button, slot) : button; // 가장 좁은 화면: 세로 버튼 묶음의 "행성 추가" 왼쪽
+      })()}
 
       {open && (
         <div className="addrec-wrap">

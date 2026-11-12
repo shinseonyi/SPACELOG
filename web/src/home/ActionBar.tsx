@@ -6,6 +6,7 @@ import { demo, useDemo } from "../demo/demoStore.ts";
 import type { PlanetShapeChoice } from "../demo/types.ts";
 import { useSave } from "../panel/useSave.ts";
 import { store, useStore } from "../state/store.ts";
+import { setAddSlot } from "../add/addSlot.ts";
 import { Button } from "../ui/Button.tsx";
 import { suggestColor } from "../ui/planetLookChoice.ts";
 import { PlanetLookPicker } from "../ui/PlanetLookPicker.tsx";
@@ -30,9 +31,13 @@ export function ActionBar() {
           <Move size={16} aria-hidden /> 위치 편집
         </button>
       )}
-      <button type="button" className="actionbar__btn" aria-expanded={adding} onClick={() => setAdding((v) => !v)}>
-        <Plus size={16} aria-hidden /> 행성 추가
-      </button>
+      <div className="actionbar__row">
+        {/* 가장 좁은 화면에서 "기록 넣기"가 이 자리로 온다 (add/addSlot.ts) */}
+        <span className="actionbar__slot" ref={setAddSlot} />
+        <button type="button" className="actionbar__btn" aria-expanded={adding} onClick={() => setAdding((v) => !v)}>
+          <Plus size={16} aria-hidden /> 행성 추가
+        </button>
+      </div>
       <button type="button" className="actionbar__btn" data-guide-target="probe" onClick={() => store.getState().openProbe()}>
         <Rocket size={16} aria-hidden /> 탐사선{cargo > 0 && <span className="actionbar__n">{cargo}</span>}
       </button>
