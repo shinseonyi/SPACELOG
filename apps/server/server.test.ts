@@ -35,8 +35,12 @@ describe("서버 보안·정적 파일", () => {
   // 소개 사이트 사본: /how-to-use/ 아래만 내려준다
   const siteDir = mkdtempSync(join(tmpdir(), "spacelog-site-"));
   mkdirSync(join(siteDir, "how-to-use"));
-  writeFileSync(join(siteDir, "index.html"), "<!doctype html><title>download</title>");
+  mkdirSync(join(siteDir, "download"));
+  writeFileSync(join(siteDir, "index.html"), "<!doctype html><title>site root</title>");
+  writeFileSync(join(siteDir, "styles.css"), "body{}");
+  writeFileSync(join(siteDir, "README.md"), "secret-ish");
   writeFileSync(join(siteDir, "how-to-use", "index.html"), "<!doctype html><title>How to use</title>");
+  writeFileSync(join(siteDir, "download", "index.html"), "<!doctype html><title>download</title>");
 
   before(async () => {
     const config: ServerConfig = { token: TOKEN, basePort: 0, webDir, siteDir, devOrigin: "http://localhost:5173", vaultDir: null };
@@ -76,16 +80,17 @@ describe("서버 보안·정적 파일", () => {
     assert.equal((await call(port, "/api/health", { ...auth, origin: "http://localhost:5173" })).status, 200);
   });
 
-  it("사용 방법(How to use) 페이지: /how-to-use/ 아래만 소개 사이트에서, 그 밖은 아니다", async () => {
+  it("소개 사이트: /how-to-use/ · /download/ · /styles.css 만 내려주고, 그 밖은 아니다", async () => {
     const page = await call(port, "/how-to-use/", {});
     assert.equal(page.status, 200);
     assert.match(page.body, /How to use/);
     assert.equal((await call(port, "/how-to-use", {})).status, 200, "끝 / 없이도");
+    assert.match((await call(port, "/download/", {})).body, /download/, "받는 곳");
+    assert.equal((await call(port, "/styles.css", {})).status, 200, "받는 곳의 스타일");
     assert.equal((await call(port, "/how-to-use/missing.html", {})).status, 404);
-    const up = await call(port, "/how-to-use/../index.html", {});
-    assert.doesNotMatch(up.body, /download/, "../ 로 올라가도 소개 사이트의 다른 페이지(받는 곳)는 내려주지 않는다"); // 경로가 정리되어 웹의 index.html 이 나온다
+    assert.equal((await call(port, "/README.md", {})).status, 404, "소개 사이트의 다른 파일은 내려주지 않는다");
     const home = await call(port, "/", {});
-    assert.match(home.body, /SpaceLog/, "/ 는 그대로 웹");
+    assert.match(home.body, /SpaceLog/, "/ 는 그대로 웹 (소개 사이트의 첫 페이지가 아니다)");
   });
 
   it("다른 Origin은 토큰이 맞아도, 정적 파일이어도 막는다", async () => {

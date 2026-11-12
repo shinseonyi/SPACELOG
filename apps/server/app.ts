@@ -1,5 +1,4 @@
 // 로컬 서버: 요청 처리와 포트 열기. 실행 진입점은 index.ts.
-import { join } from "node:path";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { apiError, ERROR_STATUS, type ErrorCode } from "@spacelog/shared/errors";
 import type { ServerConfig } from "./config.ts";
@@ -60,6 +59,10 @@ export function sendError(res: ServerResponse, code: ErrorCode): void {
   sendJson(res, ERROR_STATUS[code], apiError(code));
 }
 
+/** 소개 사이트에서 내려주는 곳 (site/README.md "페이지 구성") */
+const SITE_DIRS = ["/how-to-use", "/download"];
+const SITE_FILES = ["/styles.css"];
+
 export function createHandler(config: ServerConfig, getPort: () => number) {
   return async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     for (const [k, v] of Object.entries(BASE_HEADERS)) res.setHeader(k, v);
@@ -78,8 +81,9 @@ export function createHandler(config: ServerConfig, getPort: () => number) {
       }
       if (method === "GET" || method === "HEAD") {
         // 사용 방법(How to use) 체험 페이지: 소개 사이트(site/)의 how-to-use/ 를 그대로
-        // how-to-use/ 폴더만 뿌리로 삼아, ../ 로 소개 사이트의 다른 페이지로 올라가지 못한다
-        if (config.siteDir && (path === "/how-to-use" || path.startsWith("/how-to-use/")) && (await serveStatic(join(config.siteDir, "how-to-use"), path.slice("/how-to-use".length) || "/", method, res))) return;
+        // 소개 사이트(site/)의 체험 페이지 · 받는 곳 · 공용 스타일만. 웹의 /assets/ 와 겹치지 않게 경로를 정해 둔다
+        const sitePath = SITE_DIRS.find((d) => path === d || path.startsWith(d + "/"));
+        if (config.siteDir && (sitePath || SITE_FILES.includes(path)) && (await serveStatic(config.siteDir, path === sitePath ? path + "/" : path, method, res))) return;
         if (config.webDir && (await serveStatic(config.webDir, path, method, res))) return;
       }
       sendError(res, "NOT_FOUND");
