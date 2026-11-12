@@ -142,6 +142,37 @@ describe("POST /api/stars", () => {
     assert.equal((await patch({ ids: [] })).status, 400);
   });
 
+  it("PATCH /api/stars/:id: 기록 상세에서 메모(1,000자까지) · 행성을 고친다", async () => {
+    const patchOne = async (id: string, body: object) => {
+      const res = await fetch(`http://127.0.0.1:${port}/api/stars/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { "x-session-token": TOKEN, "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      return { status: res.status, json: await res.json() };
+    };
+    const { json } = await post(form(["one.bin", "", "patch-one"]));
+    const id = json.created[0].id;
+    const study = vault.listPlanets().find((p) => p.name === "공부")!.id;
+
+    const moved = await patchOne(id, { planetId: study });
+    assert.equal(moved.status, 200);
+    assert.equal(moved.json.planetId, study, "고친 별 하나를 그대로 돌려준다");
+    assert.equal(vault.getStar(id)?.planetId, study);
+
+    const long = "가".repeat(1000);
+    assert.equal((await patchOne(id, { memo: long })).status, 200);
+    assert.equal(vault.getStar(id)?.memo, long, "확인 카드(140자)보다 긴 메모도 된다");
+    assert.equal(vault.getStar(id)?.planetId, study, "planetId 없으면 그대로");
+    await patchOne(id, { memo: "" });
+    assert.equal(vault.getStar(id)?.memo, null, "빈 메모는 지운다");
+
+    assert.equal((await patchOne(id, { memo: "가".repeat(1001) })).status, 400);
+    assert.equal((await patchOne(id, {})).status, 400, "고칠 것이 없으면 400");
+    assert.equal((await patchOne(id, { planetId: "없는 행성" })).status, 404);
+    assert.equal((await patchOne("없는 별", { memo: "x" })).status, 404);
+  });
+
   it("틀린 요청은 INVALID_REQUEST", async () => {
     for (const body of [{ kind: "link", url: "javascript:alert(1)" }, { kind: "image" }, new FormData()]) {
       const { status, json } = await post(body);

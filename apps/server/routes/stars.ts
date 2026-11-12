@@ -3,6 +3,7 @@
 //   → CreateStarsResponse. 일부만 실패해도 나머지는 저장한다 (P 3-3)
 //   PATCH /api/stars  { ids, planetId?, memo? } → { stars }. 넣은 직후 확인 카드 일괄 적용 (SPEC 2-6)
 //   GET /api/stars/:id → Star. 기간 밖 별 열기(재발견 딥링크·카드, 웹 스토어의 applyRoute)가 부른다
+//   PATCH /api/stars/:id  { memo?, planetId? } → Star. 기록 상세의 메모 자동 저장 · 다른 행성으로 옮기기 (웹 UpdateStarRequest)
 import type { IncomingMessage } from "node:http";
 import { Readable } from "node:stream";
 import { localDate } from "@spacelog/shared/period";
@@ -91,6 +92,25 @@ export async function bulkUpdateStars(vault: Vault, req: IncomingMessage, now: D
   return { stars: stars.map((s) => ({ ...s, localDate: localDate(s.createdAtUtc, now), originalMissing: vault.originalMissing(s) })) };
 }
 
+/** 기록 상세의 메모(최대 1,000자)는 확인 카드 메모(140자)보다 길다 */
+export const MEMO_MAX = 1000;
+
+/** 별 하나 고치기: 메모 · 행성. 없으면 NOT_FOUND. 고친 별을 돌려준다 */
+export async function updateStar(vault: Vault, id: string, req: IncomingMessage, now: Date): Promise<StarResponse> {
+  const body = await readJson(req, 64 * 1024);
+  if (!isObject(body)) throw RouteError.badRequest("본문이 객체가 아니에요");
+  const { planetId, memo } = body;
+  if (planetId !== undefined && (typeof planetId !== "string" || !planetId)) throw RouteError.badRequest("planetId가 문자열이 아니에요");
+  if (memo !== undefined && memo !== null && (typeof memo !== "string" || memo.length > MEMO_MAX)) {
+    throw RouteError.badRequest(`memo는 ${MEMO_MAX}자 이하 문자열이어야 해요`);
+  }
+  if (planetId === undefined && memo === undefined) throw RouteError.badRequest("고칠 것이 없어요");
+  if (planetId !== undefined && !vault.planetExists(planetId)) throw RouteError.of("NOT_FOUND");
+  const change = { planetId: planetId as string | undefined, memo: memo === undefined ? undefined : (memo as string | null) || null };
+  if (!vault.updateStars([id], change, now.toISOString())) throw RouteError.of("NOT_FOUND");
+  return getStarById(vault, id, now);
+}
+
 /** 별 하나. 없으면 NOT_FOUND (웹은 "별을 찾을 수 없어요"로 처리) */
 export function getStarById(vault: Vault, id: string, now: Date): StarResponse {
   const star = vault.getStar(id);
@@ -104,5 +124,6 @@ export function starRoutes(vault: Vault, deps: { now?: () => Date } = {}): Recor
     "POST /api/stars": (req) => createStars(vault, req, now()),
     "PATCH /api/stars": (req) => bulkUpdateStars(vault, req, now()),
     "GET /api/stars/:id": (_req, params) => getStarById(vault, params.id, now()),
+    "PATCH /api/stars/:id": (req, params) => updateStar(vault, params.id, req, now()),
   };
 }
