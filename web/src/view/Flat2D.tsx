@@ -3,7 +3,7 @@ import { store, useStore } from "../state/store.ts";
 import heroUrl from "../assets/planet-hero.png";
 import nebulaUrl from "../assets/planet-nebula.png";
 import ringUrl from "../assets/planet-ring.png";
-import { clampZoom, landCam, overviewCam, planetNodes, rightOccupied, type Cam2D, type PlanetNode } from "./look.ts";
+import { clampZoom, landCam, leftOccupied, overviewCam, planetNodes, rightOccupied, type Cam2D, type PlanetNode } from "./look.ts";
 import { viewApi } from "./viewApi.ts";
 import "./view.css";
 
@@ -56,7 +56,7 @@ export function Flat2D() {
   const overview = useCallback((ms: number) => {
     cancelFlight();
     const { w, h } = size();
-    move(overviewCam(live.current.nodes, w, h, occupied()), ms);
+    move(overviewCam(live.current.nodes, w, h, occupied(), leftOccupied(w)), ms);
   }, [cancelFlight, move]);
 
   // 자동 비행(착륙) 등록: 도착하면 true, 사용자가 끌거나 키를 눌러 멈추면 false

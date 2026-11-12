@@ -20,6 +20,14 @@ test("미분류 시스템 행성만 성운(조각), 색은 순서대로 돌아�
   assert.equal(planetLook({ colorToken: "planet-2", system: null }).filter, "hue-rotate(175deg) saturate(1.3)");
 });
 
+test("행성 배치는 가운데에 모여 있다 (조망에서 점처럼 작아지지 않는다)", () => {
+  const ps = Array.from({ length: 7 }, (_, i) => planet(`p${i}`, { createdAtUtc: `2026-11-0${i + 1}T00:00:00Z` }));
+  const nodes = planetNodes(ps);
+  const box = boundsOf(nodes)!;
+  assert.ok(box.x1 - box.x0 < 1100 && box.y1 - box.y0 < 800, `${box.x1 - box.x0} x ${box.y1 - box.y0}`);
+  assert.ok(overviewCam(nodes, 1280, 800, 324).z >= 0.6); // 시안 화면(1280x800)에서 행성이 충분히 크게 보인다
+});
+
 test("같은 행성은 늘 같은 자리, 서로 320px 이상 떨어진다", () => {
   const ps = Array.from({ length: 8 }, (_, i) => planet(`p${i}`, { createdAtUtc: `2026-11-0${i + 1}T00:00:00Z` }));
   const a = planetNodes(ps);
@@ -43,6 +51,8 @@ test("조망은 모든 행성이 들어오고, 오른쪽 창만큼 왼쪽으로 
   assert.ok((box.x1 - box.x0) * cam.z <= 1280 - 324);
   assert.ok(cam.x > (box.x0 + box.x1) / 2);
   assert.deepEqual(overviewCam([], 1280, 800, 0), { x: 0, y: 0, z: 1 });
+  // 왼쪽 아래 묶음 자리만큼 오른쪽으로 비켜 놓는다 (카메라 x 가 줄어든다)
+  assert.ok(overviewCam(nodes, 1280, 800, 324, 150).x < cam.x);
 });
 
 test("착륙: 넓은 화면 1.7배, 좁은 화면 1.2배. 오른쪽 가림은 좁은 화면에서 0", () => {

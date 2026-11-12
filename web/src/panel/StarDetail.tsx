@@ -198,10 +198,15 @@ function Preview({ star }: { star: Star }) {
       </div>
     );
   if (star.kind === "image" && src) return <img className="preview preview--image" src={src} alt={starTitle(star)} />;
+  // 썸네일이 아직 없으면(만드는 중·없음) 깜빡이는 빈 네모 대신 종류 아이콘과 안내를 보여 준다
+  const thumb = star.thumbnailStatus === "ready";
   return (
     <div className="preview preview--placeholder">
-      <Thumbnail star={star} size={72} />
-      <span>{star.originalName ?? "이름 없는 기록"}</span>
+      {thumb ? <Thumbnail star={star} size={72} /> : <span className="preview__icon"><KindIcon kind={star.kind} size={32} /></span>}
+      <span className="preview__text">
+        <span>{star.originalName ?? "이름 없는 기록"}</span>
+        {!thumb && star.kind === "image" && <span className="preview__hint">{star.thumbnailStatus === "pending" ? "미리보기를 만드는 중이에요" : "미리보기가 없어요"}</span>}
+      </span>
     </div>
   );
 }

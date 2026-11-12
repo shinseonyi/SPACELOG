@@ -67,4 +67,7 @@
 .preview--link { display: flex; align-items: center; gap: 10px; padding: 14px; font: var(--type-caption); }
 .preview--link a { color: var(--color-primary-on-dark); overflow-wrap: anywhere; }
 .preview--placeholder { display: flex; align-items: center; gap: 14px; padding: 18px 14px; font: var(--type-caption); color: var(--color-body-sub); }
+.preview__icon { flex: none; width: 72px; height: 72px; display: grid; place-items: center; border-radius: var(--r-item); background: var(--color-chip); color: var(--color-body-sub); }
+.preview__text { display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.preview__hint { font: var(--type-fine-print); color: var(--color-body-muted); }
 .skeleton { height: 120px; border-radius: var(--r-field); background: var(--color-inset); }

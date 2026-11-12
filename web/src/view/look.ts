@@ -1,14 +1,11 @@
 // 2D · 2.5D 보기가 함께 쓰는 행성 모습·크기·배치 (README 6-1). 숫자만 다뤄 테스트할 수 있게 둔다.
-// 시연용(README 4-1 결정 기록): 서버 Planet에는 좌표·모양이 없어서, 좌표는 3D와 같은 id 시드 배치(universe/layout.ts)를 평면에 펴서 쓰고,
+// 시연용(README 4-1 결정 기록): 서버 Planet에는 좌표·모양이 없어서, 좌표는 만든 순서대로 가로로 넓은 벌집 칸에 놓아 정하고(compactPositions),
 // 모양은 "미분류" 시스템 행성만 성운으로 정한다. 사용자가 고르는 색·모양·좌표는 7단계(위치 편집·행성 수정)에서 web/src/demo 로 붙인다.
 import type { Planet } from "@spacelog/shared/types";
 import { planetColorToken } from "../ui/planetColor.ts";
-import { planetPositions } from "../universe/layout.ts";
+import { seeded } from "../universe/layout.ts";
 
 export type PlanetShape = "" | "ring" | "nebula";
-
-/** 3D 단위 → 화면 px. 행성끼리 중심 거리가 320px 이상이 되도록 (최소 간격 39 × 10 = 390) */
-export const PX_PER_UNIT = 10;
 
 /** 기본 행성 사진(planet-hero.png)에 입히는 색조 필터. 값은 design/spacelog-data.js. 6번(노랑)은 시안에 없어 같은 방식으로 맞춘 값 */
 const FILTER: Record<string, string> = {
@@ -61,14 +58,41 @@ export interface PlanetNode {
   look: PlanetLook;
 }
 
-/** 행성 목록 → 그릴 노드. 기간이 바뀌어도 같은 행성은 같은 자리다 (planetPositions) */
+const SLOT_W = 360; // 같은 줄 칸 사이 (px)
+const SLOT_H = 310; // 줄 사이. 줄마다 반 칸씩 엇갈려 이웃 칸 중심 거리는 모두 약 358 이상
+const JITTER = 12; // 칸이 격자처럼 보이지 않게 흔드는 폭. 흔들어도 320 이상이 남도록 작게 둔다
+
+/** 가운데에서 가까운 칸부터. 화면이 가로로 넓어 세로 거리는 1.5배로 쳐서 가로로 먼저 채운다 */
+function slots(n: number): { x: number; y: number }[] {
+  const all: { x: number; y: number }[] = [];
+  for (let r = -5; r <= 5; r++) for (let c = -8; c <= 8; c++) all.push({ x: (c + (Math.abs(r) % 2) * 0.5) * SLOT_W, y: r * SLOT_H });
+  return all.sort((a, b) => a.x ** 2 + (a.y * 1.5) ** 2 - (b.x ** 2 + (b.y * 1.5) ** 2) || a.x - b.x || a.y - b.y).slice(0, n);
+}
+
+/**
+ * 2D · 2.5D 행성 배치. 먼저 만든 행성이 가운데에 오고, 새 행성은 바깥 칸으로 (칸은 가로로 넓은 벌집 모양).
+ * 모든 칸의 중심 거리가 320px 이상이다 (README 6-1). 3D 용 배치(universe/layout.ts)는 3D 단위로 넓게 퍼져 있어
+ * 평면에서는 행성이 점처럼 작아 보인다. 행성 목록은 기간과 무관하게 전체가 오므로 기간이 바뀌어도 같은 행성은 같은 자리다.
+ */
+export function compactPositions(planets: Pick<Planet, "id" | "createdAtUtc">[]): Map<string, { x: number; y: number }> {
+  const order = [...planets].sort((a, b) => a.createdAtUtc.localeCompare(b.createdAtUtc) || a.id.localeCompare(b.id));
+  const spots = slots(order.length);
+  return new Map(
+    order.map((p, i) => {
+      const rnd = seeded(p.id);
+      return [p.id, { x: Math.round(spots[i].x + (rnd() - 0.5) * 2 * JITTER), y: Math.round(spots[i].y + (rnd() - 0.5) * 2 * JITTER) }];
+    }),
+  );
+}
+
+/** 행성 목록 → 그릴 노드 */
 export function planetNodes(planets: Planet[]): PlanetNode[] {
-  const pos = planetPositions(planets);
+  const pos = compactPositions(planets);
   const max = Math.max(0, ...planets.map((p) => p.starCountInPeriod ?? 0));
   return planets.map((p) => {
-    const at = pos.get(p.id) ?? [0, 0, 0];
+    const at = pos.get(p.id) ?? { x: 0, y: 0 };
     const count = p.starCountInPeriod ?? 0;
-    return { id: p.id, name: p.name, x: Math.round(at[0] * PX_PER_UNIT), y: Math.round(at[2] * PX_PER_UNIT), count, size: planetSizePx(count, max), look: planetLook(p) };
+    return { id: p.id, name: p.name, x: at.x, y: at.y, count, size: planetSizePx(count, max), look: planetLook(p) };
   });
 }
 
@@ -110,22 +134,27 @@ export const ZOOM_MAX = 2.4;
 export const clampZoom = (z: number) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
 
 /**
- * 조망: 모든 행성이 보이게. 오른쪽 창(rightOcc)이 가린 만큼 왼쪽으로 치우쳐 놓는다.
+ * 조망: 모든 행성이 보이게. 오른쪽 창(rightOcc)과 왼쪽 아래 묶음(leftOcc)이 가린 만큼 비켜 놓는다.
  * 카메라 (x,y)는 화면 중심에 오는 우주 좌표, z는 배율.
  */
-export function overviewCam(nodes: PlanetNode[], w: number, h: number, rightOcc: number): Cam2D {
+export function overviewCam(nodes: PlanetNode[], w: number, h: number, rightOcc: number, leftOcc = 0): Cam2D {
   const b = boundsOf(nodes);
   if (!b) return { x: 0, y: 0, z: 1 };
-  const bandW = Math.max(120, w - rightOcc - 112);
+  const bandW = Math.max(120, w - rightOcc - leftOcc - 112);
   const bandH = Math.max(120, h - 144 - 128 - 52); // 위 바 · 아래 버튼 · 이름표
   const z = clampZoom(Math.min(1.15, bandW / (b.x1 - b.x0), bandH / (b.y1 - b.y0)));
-  return { x: (b.x0 + b.x1) / 2 + rightOcc / 2 / z, y: (b.y0 + b.y1) / 2 + 24 / z, z };
+  return { x: (b.x0 + b.x1) / 2 + (rightOcc - leftOcc) / 2 / z, y: (b.y0 + b.y1) / 2 + 24 / z, z };
 }
 
 /** 행성 하나에 착륙: 그 행성이 (오른쪽 창을 뺀) 화면 가운데에 오고 크게 보인다 */
 export function landCam(node: Pick<PlanetNode, "x" | "y">, w: number, rightOcc: number): Cam2D {
   const z = w < 760 ? 1.2 : 1.7;
   return { x: node.x + rightOcc / 2 / z, y: node.y, z };
+}
+
+/** 왼쪽 아래 묶음(혜성 카드 260px + 가장자리)이 조망에서 비켜 줄 폭. 좁은 화면은 위에서 따로 다뤄 0 */
+export function leftOccupied(w: number): number {
+  return w < 760 ? 0 : 150;
 }
 
 /** 오른쪽에서 가린 폭: 행성 패널(440+16) > 오른쪽 창(300+24) > 없음. 좁은 화면은 전체 폭이라 비우지 않는다 */
