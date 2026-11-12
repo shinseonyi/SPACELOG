@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ArrowUpRight, Rocket, X } from "lucide-react";
 import type { Star } from "@spacelog/shared/types";
+import { demo, useDemo } from "../demo/demoStore.ts";
 import { store, useStore } from "../state/store.ts";
 import { planetColorToken } from "../ui/planetColor.ts";
 import { starTitle } from "../ui/starTitle.ts";
@@ -133,17 +134,43 @@ function RecordCard() {
   );
 }
 
-/** 별자리는 시연용 데이터 계층(5단계)과 별자리 UI(6단계)에서 채운다 */
+/** 별자리 목록. 체크한 별자리만 우주에 선으로 보인다 (README 6-1). 만들기·수정은 6단계 */
 function LinkCard() {
+  const links = useDemo((s) => s.links);
+  const hidden = useDemo((s) => s.hiddenLinkIds);
   return (
     <section className="card side__card">
       <div className="side__head">
-        <h2 className="side__title">별자리 0</h2>
+        <h2 className="side__title">별자리 {links.length}</h2>
         <button type="button" className="btn btn--icon" aria-label="별자리 목록 닫기" onClick={() => store.getState().toggleSideTab("link")}>
           <X size={14} aria-hidden />
         </button>
       </div>
-      <p className="side__empty">아직 별자리가 없어요. 기록을 체크해 별자리를 만들면 여기에 모입니다.</p>
+      {links.length === 0 ? (
+        <p className="side__empty">아직 별자리가 없어요. 기록을 체크해 별자리를 만들면 여기에 모입니다.</p>
+      ) : (
+        <>
+          <p className="side__note">체크한 별자리만 우주에 선으로 보여요</p>
+          <ul className="rows">
+            {links.map((l) => {
+              const shown = !hidden.includes(l.id);
+              return (
+                <li key={l.id} className="row row--rec">
+                  <button type="button" role="checkbox" aria-checked={shown} aria-label={`${l.name} 우주에 ${shown ? "숨기기" : "보이기"}`} title="우주에 보이기 · 숨기기" className={`check${shown ? " is-on" : ""}`} onClick={() => toggleShown(l.id)} />
+                  <span className="row__main">
+                    <span className="row__text">
+                      <span className="row__title">{l.name}</span>
+                      <span className="row__sub">기록 {l.starIds.length}</span>
+                    </span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
     </section>
   );
 }
+
+const toggleShown = (id: string) => demo.getState().toggleLinkShown(id);

@@ -1,10 +1,8 @@
 import { Rocket } from "lucide-react";
 import { store, useStore, type SideTab, type ViewMode } from "../state/store.ts";
+import { useDemo } from "../demo/demoStore.ts";
 import { PeriodPicker } from "./PeriodPicker.tsx";
 import "../view/view.css";
-
-/** 별자리는 5단계(시연용 데이터 계층)에서 생긴다. 그때까지 0 */
-const LINK_COUNT = 0;
 
 const VIEWS: { key: ViewMode; label: string; hint: string }[] = [
   { key: "2d", label: "2D", hint: "평면으로 한눈에 보기" },
@@ -19,6 +17,7 @@ export function TopBar() {
   const cargo = useStore((s) => s.cargo.length);
   const tab = useStore((s) => s.sideTab);
   const view = useStore((s) => s.view);
+  const links = useDemo((s) => s.links.length);
   const chip = (key: SideTab, label: string, n: number) => (
     <button
       type="button"
@@ -35,7 +34,7 @@ export function TopBar() {
       <h1 className="topbar__brand">SPACELOG</h1>
       {chip("rec", "기록", stars)}
       {chip("planet", "행성", planets)}
-      {chip("link", "별자리", LINK_COUNT)}
+      {chip("link", "별자리", links)}
       <span className="topbar__spacer" />
       <div className="viewseg" role="radiogroup" aria-label="보기 방식">
         {VIEWS.map((v) => (

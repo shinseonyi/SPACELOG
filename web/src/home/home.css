@@ -29,6 +29,7 @@ kbd { font: var(--type-fine-print); background: var(--color-chip); color: var(--
 .side__head .side__title { flex: 1; }
 .side__title { margin: 0; padding: 6px 8px 10px; font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); }
 .side__card--list .side__title { padding: 0 16px; }
+.side__note { margin: 0; padding: 0 8px 6px; color: var(--color-body-muted); font: var(--type-fine-print); }
 .side__empty { margin: 0; padding: 12px 8px; color: var(--color-body-muted); font: var(--type-caption); }
 .rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .rows--scroll { overflow-y: auto; min-height: 0; padding: 0 0 4px; }
