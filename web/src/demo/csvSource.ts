@@ -2,7 +2,7 @@
 // 1) 예시 데이터 시드가 등록해 둔 표 → 2) 사용자가 직접 고른 CSV 파일(이 브라우저에 저장, csvStore) → 3) 서버의 원본 파일
 // (GET /api/stars/:id/original, 서버가 만들면 쓸 수 있다)을 받아 읽기. 모두 없으면 null.
 import { requestObjectUrl } from "../api/client.ts";
-import { parseCsv, type CsvTable } from "./csv.ts";
+import { decodeCsv, parseCsv, type CsvTable } from "./csv.ts";
 import { getCsvTable, saveCsvTable } from "./csvStore.ts";
 
 const registered = new Map<string, CsvTable>();
@@ -21,7 +21,7 @@ export async function loadCsvTable(starId: string): Promise<CsvTable | null> {
   try {
     const url = await requestObjectUrl(`/api/stars/${encodeURIComponent(starId)}/original`);
     try {
-      table = parseCsv(await (await fetch(url)).text());
+      table = parseCsv(decodeCsv(await (await fetch(url)).arrayBuffer()));
     } finally {
       URL.revokeObjectURL(url);
     }

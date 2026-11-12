@@ -5,6 +5,7 @@ import { Copy, Download, Orbit, Pencil, Waypoints, X } from "lucide-react";
 import type { Planet, Star } from "@spacelog/shared/types";
 import { api, RequestError } from "../api/client.ts";
 import type { CsvTable } from "../demo/csv.ts";
+import { decodeCsv } from "../demo/csv.ts";
 import { isCsvStar, loadCsvTable, provideCsvText } from "../demo/csvSource.ts";
 import { buildDashboard, COUNT_KEY, toCsv } from "../demo/dashboard.ts";
 import { demo, useDemo } from "../demo/demoStore.ts";
@@ -99,7 +100,7 @@ function Panel({ initialComet, routeLinkId }: { initialComet: boolean; routeLink
   const missing = csvStars.filter((s) => s.id in tables && tables[s.id] === null);
   const chooseCsv = async (star: Star, file: File | undefined) => {
     if (!file) return;
-    const table = provideCsvText(star.id, await file.text());
+    const table = provideCsvText(star.id, decodeCsv(await file.arrayBuffer()));
     if (!table) return store.getState().showToast("CSV로 읽지 못했어요. 머리글과 한 줄 이상이 있는 파일인지 확인해 주세요", "error");
     setTables((cur0) => ({ ...cur0, [star.id]: table }));
     store.getState().showToast(`‘${starTitle(star)}’ 내용을 읽었어요`, "success");

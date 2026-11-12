@@ -11,9 +11,42 @@ export interface CsvTable {
   truncated: boolean;
 }
 
-/** CSV 글자를 열과 행으로 푼다. 따옴표 안의 쉼표·줄바꿈, BOM, \r\n 을 처리한다. 머리글 + 1행 이상이 없으면 null */
+/**
+ * 파일 바이트를 글자로 읽는다. 먼저 UTF-8 로 읽고, 깨진 글자가 나오면 한국어 엑셀이 저장하는 CP949(EUC-KR)로 다시 읽는다.
+ * (엑셀의 "CSV(쉼표로 분리)"는 UTF-8 이 아니라 CP949 라서, UTF-8 로만 읽으면 한글이 깨진다)
+ */
+export function decodeCsv(bytes: ArrayBuffer | Uint8Array): string {
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  } catch {
+    try {
+      return new TextDecoder("euc-kr").decode(bytes);
+    } catch {
+      return new TextDecoder("utf-8").decode(bytes); // euc-kr 을 모르는 환경: 깨지더라도 읽기는 한다
+    }
+  }
+}
+
+const TAB = "\t";
+export type Delimiter = "," | ";" | "\t";
+
+/** 첫 줄(따옴표 밖)에서 가장 많이 나온 구분자: 쉼표 · 세미콜론 · 탭. 하나도 없으면 쉼표 */
+export function detectDelimiter(text: string): Delimiter {
+  const count: Record<string, number> = { ",": 0, ";": 0, [TAB]: 0 };
+  let quoted = false;
+  for (const ch of text) {
+    if (ch === '"') quoted = !quoted;
+    else if (!quoted && (ch === "\n" || ch === "\r")) break;
+    else if (!quoted && ch in count) count[ch]++;
+  }
+  const best = ([TAB, ";", ","] as Delimiter[]).reduce((x, y) => (count[y] > count[x] ? y : x), ",");
+  return count[best] > 0 ? best : ",";
+}
+
+/** CSV 글자를 열과 행으로 푼다. 따옴표 안의 구분자·줄바꿈, BOM, CRLF 를 처리하고 쉼표·세미콜론·탭 구분을 알아본다. 머리글 + 1행 이상이 없으면 null */
 export function parseCsv(input: string): CsvTable | null {
   const text = String(input ?? "").replace(/^﻿/, "");
+  const delimiter = detectDelimiter(text);
   const out: string[][] = [];
   let row: string[] = [];
   let cell = "";
@@ -34,7 +67,7 @@ export function parseCsv(input: string): CsvTable | null {
         } else quoted = false;
       } else cell += ch;
     } else if (ch === '"') quoted = true;
-    else if (ch === ",") {
+    else if (ch === delimiter) {
       row.push(cell);
       cell = "";
     } else if (ch === "\n" || ch === "\r") {
