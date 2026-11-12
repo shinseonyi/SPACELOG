@@ -120,7 +120,7 @@ export function PhotosView({ items, onOpen }: { items: RecordCardItem[]; onOpen(
   if (items.length === 0)
     return (
       <div className="obs-empty">
-        <strong>이 묶음에는 사진이 없어요.</strong>
+        <strong>이 묶음에는 이미지 기록이 없어요.</strong>
         <span>이미지를 기록으로 넣고 이 묶음에 포함하면 여기에 모아 보입니다.</span>
       </div>
     );

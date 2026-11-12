@@ -58,7 +58,9 @@ test("서버: 화면·상태 확인, 답변을 SSE 로 조금씩 보낸다 (가�
   });
   try {
     assert.equal((await fetch(`${url}/healthz`)).status, 200);
-    assert.match(await (await fetch(url)).text(), /챗봇/);
+    const page = await fetch(url);
+    assert.match(await page.text(), /챗봇/);
+    assert.equal(page.headers.get("x-frame-options"), "DENY");
     const res = await post(url, { messages: [{ role: "user", content: "어떻게 써요?" }] });
     assert.equal(res.status, 200);
     assert.match(res.headers.get("content-type") ?? "", /text\/event-stream/);
@@ -71,13 +73,22 @@ test("서버: 화면·상태 확인, 답변을 SSE 로 조금씩 보낸다 (가�
 });
 
 test("서버: 잘못된 요청과 다른 출처, 사용량 초과를 거절한다", async () => {
-  const { server, url } = await start(async function* () { yield "ok"; }, { perIpPerMinute: 2, dailyMax: 100 });
+  const { server, url } = await start(async function* () { yield "ok"; }, { perIpPerMinute: 3, dailyMax: 100 });
   try {
     assert.equal((await post(url, { messages: [] })).status, 400);
     assert.equal((await fetch(`${url}/api/chat`, { method: "POST", body: "{깨짐" })).status, 400);
     assert.equal((await fetch(`${url}/nope`)).status, 404);
     const cross = await post(url, { messages: [{ role: "user", content: "x" }] }, { origin: "https://evil.example" });
     assert.equal(cross.status, 403);
+    assert.equal(cross.headers.get("access-control-allow-origin"), null);
+    // 사용자 PC의 제품 웹(우주먼지 대화창)은 포트와 상관없이 된다. 사전 요청(OPTIONS)도 사용량을 쓰지 않는다
+    const pre = await fetch(`${url}/api/chat`, { method: "OPTIONS", headers: { origin: "http://localhost:47801", "access-control-request-method": "POST" } });
+    assert.equal(pre.status, 204);
+    assert.equal(pre.headers.get("access-control-allow-origin"), "http://localhost:47801");
+    assert.equal(pre.headers.get("access-control-allow-methods"), "POST");
+    const local = await post(url, { messages: [{ role: "user", content: "x" }] }, { origin: "http://127.0.0.1:47800" });
+    assert.equal(local.status, 200);
+    assert.equal(local.headers.get("access-control-allow-origin"), "http://127.0.0.1:47800");
     // 위 요청들이 이미 이 IP 의 사용량을 썼다: 한 번 더 보내면 제한에 걸린다
     const limited = await post(url, { messages: [{ role: "user", content: "x" }] });
     assert.equal(limited.status, 429);

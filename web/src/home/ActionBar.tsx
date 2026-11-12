@@ -9,7 +9,7 @@ import { Button } from "../ui/Button.tsx";
 
 /**
  * 오른쪽 아래 버튼 묶음 (README 6-1): 위치 편집 · 행성 추가 · 탐사선 · N · 관측소 · N. 높이 44px 알약.
- * 위치 편집은 2D 에서만. 패널·관측소·탐사선이 열려 있으면 숨긴다.
+ * 위치 편집은 2D 에서만. 패널·관측소·탐사선이 열려 있으면 숨긴다. `data-guide-target`은 우주먼지의 길잡이 비행이 찾는 표식 (chat/controller.ts).
  */
 export function ActionBar() {
   const cargo = useStore((s) => s.cargo.length);
@@ -23,17 +23,17 @@ export function ActionBar() {
     <div className="actionbar">
       {adding && <NewPlanetCard onClose={() => setAdding(false)} />}
       {view === "2d" && (
-        <button type="button" className={`actionbar__btn${edit ? " is-on" : ""}`} aria-pressed={edit} onClick={() => store.getState().setEditPos(!edit)}>
+        <button type="button" className={`actionbar__btn${edit ? " is-on" : ""}`} aria-pressed={edit} data-guide-target="edit" onClick={() => store.getState().setEditPos(!edit)}>
           <Move size={16} aria-hidden /> 위치 편집
         </button>
       )}
       <button type="button" className="actionbar__btn" aria-expanded={adding} onClick={() => setAdding((v) => !v)}>
         <Plus size={16} aria-hidden /> 행성 추가
       </button>
-      <button type="button" className="actionbar__btn" onClick={() => store.getState().openProbe()}>
+      <button type="button" className="actionbar__btn" data-guide-target="probe" onClick={() => store.getState().openProbe()}>
         <Rocket size={16} aria-hidden /> 탐사선{cargo > 0 && <span className="actionbar__n">{cargo}</span>}
       </button>
-      <button type="button" className="actionbar__btn actionbar__btn--primary" onClick={() => store.getState().openObservatory()}>
+      <button type="button" className="actionbar__btn actionbar__btn--primary" data-guide-target="observatory" onClick={() => store.getState().openObservatory()}>
         <Orbit size={16} aria-hidden /> 관측소{links > 0 && <span className="actionbar__n">{links}</span>}
       </button>
     </div>

@@ -13,9 +13,12 @@ test("기간 안의 별이면 기간을 바꾸지 않는다", () => {
   assert.equal(periodToShowStar("2026-11-11", TODAY, NOW), null);
 });
 
-test("기간 밖의 별이면 직접 지정 [별 날짜 ~ 오늘]", () => {
-  assert.deepEqual(periodToShowStar("2026-11-04", TODAY, NOW), { preset: "custom", from: "2026-11-04", to: "2026-11-11" });
-  assert.deepEqual(periodToShowStar("2026-10-12", WEEK, NOW), { preset: "custom", from: "2026-10-12", to: "2026-11-11" });
+test("기간 밖의 별이면 그 별이 든 가장 좁은 기간으로: 7일 전 → 이번 달, 한 달 전 → 전체 (handoff 7-2)", () => {
+  assert.deepEqual(periodToShowStar("2026-11-10", TODAY, NOW), WEEK);
+  assert.deepEqual(periodToShowStar("2026-11-04", TODAY, NOW), { preset: "custom", from: "2026-11-01", to: "2026-11-11" });
+  assert.deepEqual(periodToShowStar("2026-10-12", WEEK, NOW), { preset: "custom", from: "2025-11-12", to: "2026-11-11" });
+  // 1년보다 오래된 별만 직접 지정 [별 날짜 ~ 오늘] (최대 1년으로 잘린다. 실제 재발견은 7·14·30일 전이라 오지 않는다)
+  assert.deepEqual(periodToShowStar("2025-01-01", WEEK, NOW), { preset: "custom", from: "2025-01-01", to: "2025-12-31" });
 });
 
 test("별 날짜: 서버 localDate 우선, 없으면 지금 PC 시간대로 계산", () => {

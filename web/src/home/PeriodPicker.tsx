@@ -61,6 +61,7 @@ export function PeriodPicker() {
         className="pill-btn"
         aria-haspopup="listbox"
         aria-expanded={open}
+        data-guide-target="period" // 우주먼지의 길잡이 비행 표식 (chat/controller.ts)
         onClick={() => {
           setCustom(false);
           setOpen((v) => !v);

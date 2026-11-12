@@ -61,11 +61,8 @@ li.row--rec:active { transform: none; }
 
 /* 왼쪽 아래 묶음: 아래에서 위로 쌓인다 */
 .stack { position: fixed; left: 24px; bottom: 88px; width: 260px; z-index: 10; display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 12px; }
-.stack__row { display: flex; align-items: flex-end; gap: 10px; }
+.stack__row { display: flex; align-items: center; gap: 14px; } /* 확대 조절 오른쪽에 우주먼지 (chat/chat.css) */
 .stack__row:empty { display: none; }
-.chatbot { border: 0; padding: 0; cursor: pointer; flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--color-primary); color: #fff; transition: transform var(--press-time); }
-.chatbot:active { transform: scale(var(--press-scale)); }
-.chatbot:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 
 /* 오른쪽 아래: 조작 안내 */
 .hint { position: fixed; left: 24px; bottom: 24px; z-index: 10; padding: 8px 10px; display: flex; gap: var(--space-2); align-items: center; max-width: min(520px, calc(100vw - 48px)); }

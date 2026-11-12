@@ -271,9 +271,9 @@ function Panel({ initialComet, routeLinkId }: { initialComet: boolean; routeLink
       )}
       {vmode === "dash" && dash && <Dashboard_ dash={dash} chart={viz.chart} />}
       {vmode === "table" && pick && table && <TableView title={starTitle(pick)} table={table} csv={csvText} />}
-      {vmode === "photos" && (imgs.length > 0 || !!pick) && <PhotosView items={photoItems} onOpen={open} />}
+      {vmode === "photos" && <PhotosView items={photoItems} onOpen={open} />} {/* 사진이 없어도 안내 카드를 보인다 (handoff 6-3) */}
       {vmode === "texts" && <TextsView items={textItems} onOpen={open} />}
-      {!pick && imgs.length === 0 && vmode !== "texts" && missing.length === 0 && (
+      {!pick && imgs.length === 0 && vmode !== "texts" && vmode !== "photos" && missing.length === 0 && (
         <div className="obs-empty">
           <strong>이 묶음에는 대시보드로 볼 CSV 데이터나 모아 볼 사진이 없어요.</strong>
           <span>{list.some((s) => /\.csv$/i.test(s.originalName ?? "")) ? "CSV 파일이 있지만 내용을 읽지 못했어요. 서버가 원본을 주지 않으면 대시보드로 볼 수 없어요." : "CSV 파일을 기록으로 넣고 이 묶음에 포함하면, 그 데이터의 열을 기준으로 대시보드가 만들어집니다."}</span>
@@ -336,7 +336,7 @@ function Shell({ mode, setMode, children }: { mode: "link" | "comet"; setMode(m:
         <h2 className="obs-header__title">관측소</h2>
         <div className="obs-seg" role="radiogroup" aria-label="관측 방식">
           <button type="button" role="radio" aria-checked={mode === "link"} className={mode === "link" ? "is-on" : ""} onClick={() => setMode("link")}><Waypoints size={14} aria-hidden /> 별자리 관측</button>
-          <button type="button" role="radio" aria-checked={mode === "comet"} className={mode === "comet" ? "is-on" : ""} onClick={() => setMode("comet")}><Orbit size={14} aria-hidden /> 재발견 혜성 관측</button>
+          <button type="button" role="radio" aria-checked={mode === "comet"} className={mode === "comet" ? "is-on" : ""} data-guide-target="comet-mode" onClick={() => setMode("comet")}><Orbit size={14} aria-hidden /> 재발견 혜성 관측</button>
         </div>
         <Button className="btn--icon" aria-label="관측소 닫기" onClick={() => store.getState().goBack()}><X size={16} aria-hidden /></Button>
       </header>

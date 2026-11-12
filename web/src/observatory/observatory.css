@@ -119,6 +119,7 @@
 .obs-comets { display: flex; flex-direction: column; gap: 10px; }
 .obs-comets ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .obs-comet { width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 6px 14px; border: 0; border-radius: var(--r-field); background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.obs-comet:hover, .obs-comet:focus-visible { background: var(--color-chip); } /* 마우스를 올리거나 포커스가 가면 바탕 (handoff 6-4) */
 .obs-comet__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .obs-comet__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption-strong); }
 .obs-comet__sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-fine-print); color: var(--color-body-muted); }

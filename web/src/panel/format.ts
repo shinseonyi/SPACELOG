@@ -8,6 +8,14 @@ export function addedAt(iso: string, now: Date = new Date()): string {
   return `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")} ${t}`;
 }
 
+/** 넣은 날이 오늘에서 며칠 전인지. 날짜 단위(오늘 0시 − 넣은 날 0시), 오늘·미래는 0 (handoff 7-1) */
+export function daysAgo(iso: string, now: Date = new Date()): number {
+  const d = new Date(iso);
+  const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.max(0, Math.round((today.getTime() - day.getTime()) / 86_400_000));
+}
+
 /** "11.10" (월.일). 관측소의 기록 줄 */
 export function shortDate(iso: string): string {
   const d = new Date(iso);

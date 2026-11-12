@@ -16,7 +16,12 @@ export interface ChatServerOptions {
   html: string;
   perIpPerMinute?: number;
   dailyMax?: number;
+  /** 로컬 제품 웹 말고도 이 서버에 질문해도 되는 출처 (예: 배포한 소개 사이트). 정확한 origin 문자열 */
+  allowedOrigins?: string[];
 }
+
+/** 제품 웹(우주먼지 대화창)은 사용자 PC의 로컬 서버(localhost:47800 등)에서 뜬다. 포트는 바뀔 수 있어 로컬의 모든 포트를 허용한다 */
+export const isLocalOrigin = (origin: string) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
 
 const json = (res: ServerResponse, status: number, body: unknown) => {
   res.writeHead(status, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
@@ -45,6 +50,7 @@ export function createChatServer(opt: ChatServerOptions): Server {
   const system = systemPrompt(opt.knowledge);
   const perIp = new RateLimiter(opt.perIpPerMinute ?? 12, 60_000);
   const daily = new DailyCap(opt.dailyMax ?? 3000);
+  const extraOrigins = new Set(opt.allowedOrigins ?? []);
 
   return createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", "http://x");
@@ -56,18 +62,29 @@ export function createChatServer(opt: ChatServerOptions): Server {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" });
       return void res.end(opt.html);
     }
-    if (!(req.method === "POST" && url.pathname === "/api/chat")) return json(res, 404, { error: "찾을 수 없어요" });
+    const isChat = url.pathname === "/api/chat";
+    if (!isChat || (req.method !== "POST" && req.method !== "OPTIONS")) return json(res, 404, { error: "찾을 수 없어요" });
 
-    // 다른 사이트에서 이 주소로 몰래 요청하는 것을 막는다 (같은 출처만)
+    // 질문을 보내도 되는 곳: 이 서버의 화면(같은 출처), 사용자 PC의 제품 웹(localhost), 따로 허용한 출처. 그 밖의 사이트는 거절
     const origin = req.headers.origin;
+    let sameOrigin = !origin;
     if (origin) {
-      let sameOrigin = false;
       try {
         sameOrigin = new URL(origin).host === req.headers.host;
       } catch {
         sameOrigin = false;
       }
-      if (!sameOrigin) return json(res, 403, { error: "이 주소에서는 사용할 수 없어요" });
+    }
+    const crossAllowed = !!origin && !sameOrigin && (isLocalOrigin(origin) || extraOrigins.has(origin));
+    if (!sameOrigin && !crossAllowed) return json(res, 403, { error: "이 주소에서는 사용할 수 없어요" });
+    if (crossAllowed) {
+      res.setHeader("access-control-allow-origin", origin!);
+      res.setHeader("vary", "origin");
+    }
+    if (req.method === "OPTIONS") {
+      // 브라우저의 사전 요청 (제품 웹 → 이 서버). 본문 없이 허용 범위만 알린다
+      res.writeHead(204, { "access-control-allow-methods": "POST", "access-control-allow-headers": "content-type", "access-control-max-age": "600" });
+      return void res.end();
     }
     if (!perIp.allow(clientIp(req))) return json(res, 429, { error: "질문이 너무 빨라요. 잠시 뒤에 다시 물어봐 주세요" });
     if (!daily.take()) return json(res, 429, { error: "오늘 답변할 수 있는 횟수를 다 썼어요. 내일 다시 물어봐 주세요" });
@@ -107,5 +124,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     html: readFileSync(here("./public/index.html"), "utf8"),
     perIpPerMinute: Number(process.env.CHATBOT_PER_MINUTE ?? 12),
     dailyMax: Number(process.env.CHATBOT_DAILY_MAX ?? 3000),
+    allowedOrigins: (process.env.CHATBOT_ALLOWED_ORIGINS ?? "").split(/\s+/).filter(Boolean), // 로컬 제품 웹 말고 더 허용할 출처
   }).listen(port, () => console.log(`[chatbot] http://localhost:${port} (model ${model})`));
 }

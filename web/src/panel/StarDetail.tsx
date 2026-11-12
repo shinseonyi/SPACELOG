@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, ExternalLink, FolderOpen, Rocket, Trash2 } from "lucide-react";
+import { localDate } from "@spacelog/shared/period";
 import type { Star } from "@spacelog/shared/types";
 import { api, requestObjectUrl, RequestError } from "../api/client.ts";
+import { narrowestPeriodFor, periodFor, within } from "../home/periodOptions.ts";
 import { store, useStore } from "../state/store.ts";
 import { Button } from "../ui/Button.tsx";
 import { ConfirmDialog } from "../ui/ConfirmDialog.tsx";
@@ -10,7 +12,7 @@ import { SidePanel } from "../ui/SidePanel.tsx";
 import { starTitle } from "../ui/starTitle.ts";
 import { Thumbnail } from "../ui/Thumbnail.tsx";
 import { planetLook } from "../view/look.ts";
-import { addedAt, fileSize } from "./format.ts";
+import { addedAt, daysAgo, fileSize } from "./format.ts";
 import { useSave } from "./useSave.ts";
 import "./panel.css";
 
@@ -40,6 +42,17 @@ export function StarDetail({ starId }: { starId: string }) {
       alive = false;
     };
   }, [starId]);
+
+  // 기간 밖의 기록(재발견 혜성 등)을 열면 그 기록이 든 가장 좁은 기간으로 맞춘다. 기록마다 한 번만 — 사용자가 기간을 직접 고르면 그대로 둔다 (handoff 7-2)
+  const fitted = useRef<string | null>(null);
+  useEffect(() => {
+    if (!star || fitted.current === starId) return;
+    fitted.current = starId;
+    const day = localDate(star.createdAtUtc);
+    if (within(store.getState().period, day)) return;
+    const key = narrowestPeriodFor(day);
+    if (key) void store.getState().setPeriod(periodFor(key));
+  }, [star, starId]);
 
   const planet = planets.find((p) => p.id === star?.planetId);
   const siblings = useMemo(
@@ -89,6 +102,7 @@ function Detail({ star, planetId, accent }: { star: Star; planetId: string; acce
   const base = useRef(star.memo ?? ""); // 서버에 있는 값
   const title = starTitle(star);
   const canOpen = star.kind === "image" || star.kind === "file";
+  const ago = daysAgo(star.createdAtUtc);
 
   // 메모 자동 저장: 멈춘 뒤 0.7초
   useEffect(() => {
@@ -120,7 +134,11 @@ function Detail({ star, planetId, accent }: { star: Star; planetId: string; acce
   return (
     <div className="detail">
       <h3 className="detail__title">{title}</h3>
-      <p className="detail__meta" style={{ color: accent }}>{addedAt(star.createdAtUtc)} 넣음{star.sizeBytes !== null && ` · ${fileSize(star.sizeBytes)}`}</p>
+      {/* 오늘 넣은 기록이 아니면 날짜를 행성 색·굵게 하고 "N일 전"을 붙인다 — 재발견으로 연 예전 기록이 오늘 것과 헷갈리지 않게 (handoff 7-1) */}
+      <p className="detail__meta">
+        {ago === 0 ? `${addedAt(star.createdAtUtc)} 넣음` : <b style={{ color: accent }}>{addedAt(star.createdAtUtc)} 넣음 · {ago}일 전</b>}
+        {star.sizeBytes !== null && ` · ${fileSize(star.sizeBytes)}`}
+      </p>
       {star.originalMissing && <p className="note note--warn" role="alert">보관함에서 원본 파일을 찾지 못했어요.</p>}
 
       <Preview star={star} />

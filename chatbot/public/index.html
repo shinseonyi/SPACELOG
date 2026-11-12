@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SpaceLog 챗봇</title>
+<title>SpaceLog 우주먼지</title>
 <meta name="description" content="SpaceLog 사용법을 물어보세요. 어디서 어떻게 하는지 안내해 드려요." />
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet" />
 <style>
@@ -33,19 +33,20 @@
 <div class="app">
   <header>
     <h1>SPACELOG</h1>
-    <p>사용법 안내 챗봇</p>
+    <p>우주먼지 · 사용법 안내</p>
   </header>
   <div id="log" role="log" aria-live="polite">
-    <div class="msg bot">안녕하세요! SpaceLog 사용법을 물어보세요. 예를 들어 “별자리는 어떻게 만들어요?”처럼 물어보면 어디를 눌러야 하는지 알려 드려요.</div>
+    <div class="msg bot">안녕하세요, 우주먼지예요.
+작아서 이 우주 어디든 떠다녀 봤어요. 무엇을 찾고 있나요?</div>
   </div>
   <div class="hints" id="hints">
-    <button type="button">기록은 어떻게 넣나요?</button>
-    <button type="button">별자리는 어떻게 만들어요?</button>
-    <button type="button">CSV 대시보드는 어디서 봐요?</button>
-    <button type="button">탐사선은 뭔가요?</button>
+    <button type="button">기록은 어떻게 넣어요</button>
+    <button type="button">별자리가 뭐예요</button>
+    <button type="button">CSV를 그래프로 보고 싶어요</button>
+    <button type="button">AI에게 보내려면</button>
   </div>
   <form id="form">
-    <input id="q" maxlength="1000" autocomplete="off" placeholder="궁금한 점을 적어 주세요" aria-label="질문" />
+    <input id="q" maxlength="1000" autocomplete="off" placeholder="어디서 무엇을 하는지 물어보세요" aria-label="질문" />
     <button id="send" type="submit">보내기</button>
   </form>
   <p class="note">질문은 답변을 만들기 위해 서버로 보내지고 저장되지 않아요. 내 기록은 볼 수 없어요. 개인정보는 적지 마세요.</p>

@@ -24,6 +24,7 @@ export function TopBar() {
       className={`chip${tab === key ? " is-on" : ""}`}
       aria-pressed={tab === key}
       title={`${label} 목록 열기 · 닫기`}
+      data-guide-target={key === "link" ? "links" : undefined} // 우주먼지의 길잡이 비행 표식 (chat/controller.ts)
       onClick={() => store.getState().toggleSideTab(key)}
     >
       {label} {n}
@@ -44,7 +45,7 @@ export function TopBar() {
       <span className="topbar__spacer" />
       <div className="viewseg" role="radiogroup" aria-label="보기 방식">
         {VIEWS.map((v) => (
-          <button key={v.key} type="button" role="radio" aria-checked={view === v.key} title={v.hint} className={view === v.key ? "is-on" : ""} onClick={() => store.getState().setView(v.key)}>
+          <button key={v.key} type="button" role="radio" aria-checked={view === v.key} title={v.hint} className={view === v.key ? "is-on" : ""} data-guide-target={v.key === "3d" ? "view3d" : undefined} onClick={() => store.getState().setView(v.key)}>
             {v.label}
           </button>
         ))}

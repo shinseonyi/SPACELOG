@@ -1,5 +1,8 @@
 import { useEffect } from "react";
 import { ERROR_MESSAGES } from "@spacelog/shared/errors";
+import { chat } from "./chat/chatStore.ts";
+import { closeChat } from "./chat/controller.ts";
+import { CosmicDust } from "./chat/CosmicDust.tsx";
 import { ActionBar } from "./home/ActionBar.tsx";
 import { Blackhole } from "./home/Blackhole.tsx";
 import { ControlsHint } from "./home/ControlsHint.tsx";
@@ -46,6 +49,7 @@ export function App() {
       <ActionBar />
       <Blackhole />
       <Observatory />
+      <CosmicDust />
       <ProbeModal />
       <ToastHost />
     </div>
@@ -71,13 +75,15 @@ function AuthRequired() {
   );
 }
 
-/** Esc: 탐사선 → 상세 → 패널 → 조망 (SPEC 3-5). 입력 중이거나 대화상자가 열려 있으면 무시 */
+/** Esc: 우주먼지 대화창 → 탐사선·관측소 → 상세 → 패널 → 조망 (SPEC 3-5, handoff 6-5). 입력 중이거나 대화상자가 열려 있으면 무시 */
 function useEscape() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || e.defaultPrevented) return;
       if (e.target instanceof Element && e.target.closest("input, textarea, select, [contenteditable='true']")) return;
       if (document.querySelector("dialog[open]")) return; // 대화상자는 스스로 닫힌다
+      // 대화창이 보이는 동안은 그것만 닫는다. 관측소 뒤에 숨어 있을 때는 관측소가 먼저
+      if (chat.getState().open && store.getState().route.name !== "observatory") return closeChat();
       store.getState().goBack();
     };
     window.addEventListener("keydown", onKey);
