@@ -155,10 +155,11 @@ li.row--rec:active { transform: none; }
 /* 960 ~ 991px: 가운데 배너가 오른쪽 창(폭 300 + 24)에 닿는다. 오른쪽 창이 열려 있으면 그 왼쪽 빈 곳의 가운데로 */
 @media (min-width: 960px) and (max-width: 991px) { .side ~ .home-banner { left: calc((100vw - 324px) / 2); } }
 /* 959px 이하: 오른쪽 창이 열려 있으면 배너를 그 카드(메뉴) 아래에 끼운다 (home/bannerSlot.ts) */
-.side__banner { flex: none; pointer-events: auto; }
+.side__banner { flex: none; display: flex; justify-content: center; pointer-events: none; }
 .side__banner:empty { display: none; }
-.side__banner .home-banner { position: static; transform: none; width: auto; max-width: none; }
-.side__banner .home-banner--notice { border-radius: var(--r-panel); }
+.side__banner .home-banner { position: static; transform: none; width: 100%; max-width: none; pointer-events: auto; }
+/* 기간 자동 확장 안내는 글 길이만큼(가운데 정렬). 좁아 줄이 바뀌면 둥근 사각형 */
+.side__banner .home-banner--notice { width: max-content; max-width: 100%; border-radius: var(--r-panel); }
 
 /* 빈 우주 안내: 흰 카드 (넣기 알림 .addrec-done 과 같은 흰 면) + [확인]으로 닫기 */
 .empty { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 12; box-sizing: border-box; width: max-content; max-width: min(420px, calc(100vw - 32px)); padding: 24px 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; border-radius: var(--r-panel); background: #fff; color: var(--color-ink-on-light); box-shadow: var(--shadow-float); animation: fade-in 0.2s ease-out; }
