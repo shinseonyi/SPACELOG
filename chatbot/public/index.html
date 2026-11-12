@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SpaceLog 챗봇</title>
+<meta name="description" content="SpaceLog 사용법을 물어보세요. 어디서 어떻게 하는지 안내해 드려요." />
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet" />
+<style>
+  :root { color-scheme: dark; --panel: rgb(30,30,32); --inset: rgba(255,255,255,.06); --line: rgba(255,255,255,.12); --primary: #0066cc; --muted: #7a7a7a; --sub: #ccc; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; color: #fff; font: 400 15px/1.55 "Pretendard Variable", Pretendard, -apple-system, "Segoe UI", "Malgun Gothic", system-ui, sans-serif; letter-spacing: -.2px; word-break: keep-all; }
+  .app { max-width: 720px; height: 100%; margin: 0 auto; display: flex; flex-direction: column; padding: 16px; gap: 12px; }
+  header { display: flex; align-items: center; gap: 10px; }
+  header h1 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: .12em; }
+  header p { margin: 0; color: var(--muted); font-size: 12px; }
+  #log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 2px; }
+  .msg { max-width: 88%; padding: 10px 14px; border-radius: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .bot { align-self: flex-start; background: var(--panel); border: 1px solid var(--line); }
+  .me { align-self: flex-end; background: var(--primary); }
+  .err { color: #ff8a80; }
+  .hints { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hints button { height: 34px; padding: 0 14px; border-radius: 9999px; border: 1px solid rgba(255,255,255,.24); background: transparent; color: #fff; font: inherit; font-size: 13px; cursor: pointer; }
+  form { display: flex; gap: 8px; }
+  input { flex: 1; min-width: 0; height: 46px; padding: 0 16px; border-radius: 9999px; border: 1px solid rgba(255,255,255,.24); background: var(--inset); color: #fff; font: inherit; }
+  input:focus-visible, button:focus-visible { outline: 2px solid #0071e3; outline-offset: 2px; }
+  form button { height: 46px; padding: 0 20px; border-radius: 9999px; border: 0; background: var(--primary); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+  form button:disabled { opacity: .5; cursor: default; }
+  .note { margin: 0; text-align: center; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>SPACELOG</h1>
+    <p>사용법 안내 챗봇</p>
+  </header>
+  <div id="log" role="log" aria-live="polite">
+    <div class="msg bot">안녕하세요! SpaceLog 사용법을 물어보세요. 예를 들어 “별자리는 어떻게 만들어요?”처럼 물어보면 어디를 눌러야 하는지 알려 드려요.</div>
+  </div>
+  <div class="hints" id="hints">
+    <button type="button">기록은 어떻게 넣나요?</button>
+    <button type="button">별자리는 어떻게 만들어요?</button>
+    <button type="button">CSV 대시보드는 어디서 봐요?</button>
+    <button type="button">탐사선은 뭔가요?</button>
+  </div>
+  <form id="form">
+    <input id="q" maxlength="1000" autocomplete="off" placeholder="궁금한 점을 적어 주세요" aria-label="질문" />
+    <button id="send" type="submit">보내기</button>
+  </form>
+  <p class="note">질문은 답변을 만들기 위해 서버로 보내지고 저장되지 않아요. 내 기록은 볼 수 없어요. 개인정보는 적지 마세요.</p>
+</div>
+<script>
+  const log = document.getElementById("log"), form = document.getElementById("form"), q = document.getElementById("q"), send = document.getElementById("send");
+  const history = [];
+  const add = (cls, text) => { const d = document.createElement("div"); d.className = "msg " + cls; d.textContent = text; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; };
+
+  async function ask(text) {
+    document.getElementById("hints")?.remove();
+    add("me", text);
+    history.push({ role: "user", content: text });
+    const bot = add("bot", "…");
+    let answer = "";
+    send.disabled = true;
+    try {
+      const res = await fetch("/api/chat", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ messages: history }) });
+      if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || "지금은 답변하지 못했어요"); }
+      const reader = res.body.getReader(), dec = new TextDecoder();
+      let buf = "";
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let i;
+        while ((i = buf.indexOf("\n\n")) >= 0) {
+          const line = buf.slice(0, i).replace(/^data: /, ""); buf = buf.slice(i + 2);
+          if (line === "[DONE]") continue;
+          const ev = JSON.parse(line);
+          if (ev.error) throw new Error(ev.error);
+          answer += ev.text; bot.textContent = answer; log.scrollTop = log.scrollHeight;
+        }
+      }
+      history.push({ role: "assistant", content: answer || "(답변이 비어 있어요)" });
+    } catch (e) {
+      bot.classList.add("err"); bot.textContent = e.message || "지금은 답변하지 못했어요. 잠시 뒤에 다시 시도해 주세요";
+      history.pop(); // 실패한 질문은 대화에서 뺀다 (다시 물어볼 수 있게)
+    } finally { send.disabled = false; q.focus(); }
+  }
+  form.addEventListener("submit", (e) => { e.preventDefault(); const t = q.value.trim(); if (!t || send.disabled) return; q.value = ""; void ask(t); });
+  document.querySelectorAll("#hints button").forEach((b) => b.addEventListener("click", () => void ask(b.textContent)));
+</script>
+</body>
+</html>
