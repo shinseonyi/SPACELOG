@@ -1,0 +1,62 @@
+[
+  {
+    "id": "p1",
+    "name": "제품 기획",
+    "color": "파랑",
+    "accent": "#8fb4ff",
+    "base": "#2f6fe0",
+    "shape": "default",
+    "x": -250,
+    "y": -30
+  },
+  {
+    "id": "p2",
+    "name": "읽은 것들",
+    "color": "주황",
+    "accent": "#ffb07a",
+    "base": "#c2561f",
+    "shape": "default",
+    "x": 230,
+    "y": -170
+  },
+  {
+    "id": "p3",
+    "name": "생각 조각",
+    "color": "보라",
+    "accent": "#c4a8ff",
+    "base": "#7a4fd6",
+    "shape": "default",
+    "x": 280,
+    "y": 170
+  },
+  {
+    "id": "p4",
+    "name": "디자인 레퍼런스",
+    "color": "분홍",
+    "accent": "#ff8fcf",
+    "base": "#b8327f",
+    "shape": "default",
+    "x": -40,
+    "y": 250
+  },
+  {
+    "id": "p5",
+    "name": "회의록",
+    "color": "초록",
+    "accent": "#6fdcaa",
+    "base": "#1f7a55",
+    "shape": "default",
+    "x": -520,
+    "y": 220
+  },
+  {
+    "id": "p6",
+    "name": "CSV 데이터",
+    "color": "하늘",
+    "accent": "#7fe3ff",
+    "base": "#0d7490",
+    "shape": "default",
+    "x": -560,
+    "y": -150
+  }
+]

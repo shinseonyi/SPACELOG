@@ -1,0 +1,23 @@
+[
+  {
+    "id": "sample-2",
+    "kind": "file",
+    "title": "요구사항 초안 v2.pdf",
+    "source": "PDF · 640KB",
+    "usedInStep": null
+  },
+  {
+    "id": "sample-3",
+    "kind": "link",
+    "title": "로컬 퍼스트 소프트웨어 글",
+    "source": "inkandswitch.com",
+    "usedInStep": 1
+  },
+  {
+    "id": "sample-4",
+    "kind": "text",
+    "title": "탐사선 이름 아이디어",
+    "source": "텍스트 · 64자",
+    "usedInStep": null
+  }
+]

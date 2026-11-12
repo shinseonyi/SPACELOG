@@ -1,0 +1,17 @@
+[
+  {
+    "id": "seed-csv",
+    "name": "cvs 활용 데이터 대시보드",
+    "purpose": "운동 기록을 활용한 cvs 활용 데이터 대시보드 만들기 프로젝트",
+    "recordIds": [
+      "c6",
+      "s14"
+    ],
+    "view": {
+      "mode": "dashboard",
+      "chart": "bar"
+    },
+    "onboardingOnly": true,
+    "note": "체험 가이드 6단계에서 만들어지고, 체험이 끝나면 지워지는 별자리. 처음부터 넣어 두지 않습니다."
+  }
+]

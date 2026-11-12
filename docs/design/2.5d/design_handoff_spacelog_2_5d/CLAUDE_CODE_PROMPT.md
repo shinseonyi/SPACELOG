@@ -26,6 +26,7 @@ apps/collector/ = Electron)에 적용하기 위한 핸드오프야. design/ 폴�
 3. `2.5D 보기를 추가하고 2.5D/3D 전환을 넣어 줘. 기존 universe/ 3D는 3D 보기로 유지해.`
 4. `행성 패널과 기록 상세를 README 6-2, 6-3대로 구현해서 App.tsx의 PanelPlaceholder를 교체해 줘.`
 5. `(서버 변경은 보류) README 7장의 새 데이터(별자리, 행성 모습·좌표, 블랙홀 보관함, CSV 내용)를 web/src/demo/에 시연용으로 만들어 줘. 타입·예시 데이터·localStorage 저장·CSV 읽기를 포함하고, apps/server, packages/shared, mocks/api는 건드리지 마.`
+5-1. `mock-data/README.md를 읽고, 예시 데이터(행성 6, 기록 41, 체험 별자리 1. 이미지 예시는 뺐음)를 처음 실행할 때 한 번 넣는 시연용 시드로 web/src/demo/에 반영해 줘. 서버가 아니라 웹에서 넣고, 날짜는 daysAgo로 오늘 기준 변환해야 해. 이미 기록이 있는 사용자에게는 넣지 마.`
 6. `별자리 UI와 관측소(README 6-4)를 새 화면으로 구현해 줘. 탐사선(probe/)은 기능을 그대로 두고 README 6-4b대로 스타일과 싣는 버튼만 맞춰 줘. CSV 대시보드 규칙은 design/W05_Observatory.dc.html의 로직을 참고해.`
 7. `위치 편집, 블랙홀, 행성 수정을 구현해 줘.`
 8. `수집 앱(apps/collector)의 스타일과 문구를 README 6-5대로 바꿔 줘.`

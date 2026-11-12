@@ -348,7 +348,6 @@
 | `planet-ring.png` | 고리 행성 | 디자이너 제공 |
 | `planet-nebula.png` | 성운 (배경 투명 처리함) | 허블 망원경의 고양이 눈 성운 사진으로 보입니다. 공개 전 출처 표기 조건 확인 |
 | `blackhole-wide.png` | 블랙홀 | 영화 속 블랙홀과 비슷한 화풍. 공개 전 사용 권한 확인 |
-| `blackhole.png` | 쓰지 않음 (원형으로 자른 이전 판) | |
 
 아이콘: Lucide (`lucide-react` 추가 권장). 시안은 CDN의 정적 SVG를 씁니다.
 
@@ -379,6 +378,7 @@
 | `design/W04_Ship.dc.html` | 탐사선 |
 | `design/S01_Dropzone.dc.html` · `S02_Confirm.dc.html` · `S04_Settings.dc.html` | 수집 앱 화면 |
 | `design/spacelog-data.js` | 예시 데이터, 상태 변경 규칙(`reduce`), 기간·재발견 계산, CSV 파서 |
+| `mock-data/` | 온보딩·목업용 예시 데이터 (행성 6, 기록 41, 체험 별자리 1, 체험 예시 카드 3. 이미지 예시 제외). 날짜는 `daysAgo` 상대값이라 넣을 때 오늘 기준으로 바꿔야 함. 시연용으로는 `web/src/demo/`의 시드로 쓴다 (`mock-data/README.md`) |
 | `design/spacelog-3d.js` | 3D 보기 참고 구현 (three.js r149) |
 | `design/spacelog-tour.js` | 체험 가이드 단계와 문구 |
 | `design/design.md` | 디자인 규칙 (2~8절의 값이 기준. 용어 일부는 이전 것이라 이 README가 우선) |
