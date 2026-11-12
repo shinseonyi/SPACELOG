@@ -233,6 +233,7 @@ export class DepthScene {
     store.getState().registerFlyToPlanet((id) => this.flyTo(id));
     this.cleanups.push(store.subscribe((s, prev) => {
       if (s.camera === "overview" && prev.camera !== "overview") this.overview(1100);
+      if (s.selectedPlanetId && s.selectedPlanetId !== prev.selectedPlanetId) this.followMoved(); // 방금 자리가 바뀐 행성을 열었으면 따라간다
     }));
     viewApi.setState({ zoom: { percent: 100, zoomIn: () => this.dolly(1), zoomOut: () => this.dolly(-1), fit: () => this.overview(900) } });
 
@@ -321,14 +322,54 @@ export class DepthScene {
     return new THREE.Vector3(p.x, -p.y, -p.depth);
   }
 
+  /** 행성 자리가 바뀌면(기록을 옮겨 깊이가 달라짐 등) 옛 자리에서 새 자리로 미끄러진다 */
+  private glide: { t: number; ms: number; moves: { n: Node3; from: THREE.Vector3; to: THREE.Vector3 }[] } | null = null;
+
   setPlanets(planets: DepthPlanet[]) {
     const sig = JSON.stringify(planets.map((p) => [p.id, p.name, p.x, p.y, p.depth, p.count, p.size, p.look.filter, p.look.shape]));
     if (sig === this.sig) return;
     const first = this.planets.length === 0;
+    const old = new Map([...this.nodes].map(([id, n]) => [id, n.at.clone()]));
     this.sig = sig;
     this.planets = planets;
     this.rebuild();
-    if (first && planets.length > 0) this.overview(0);
+    if (first && planets.length > 0) return this.overview(0);
+    // 자리가 바뀐 행성은 옛 자리에서 출발해 미끄러진다. 열려 있는 행성이 움직였으면 카메라도 따라간다 (안 그러면 화면 밖 · 잘림)
+    const moves: NonNullable<typeof this.glide>["moves"] = [];
+    this.nodes.forEach((n, id) => {
+      const from = old.get(id);
+      if (!from || from.distanceTo(n.at) < 0.5) return;
+      moves.push({ n, from, to: n.at.clone() });
+      n.at.copy(from);
+    });
+    if (!moves.length) return;
+    this.glide = { t: 0, ms: 900, moves };
+    const at = performance.now();
+    for (const m of moves) this.moved.set(m.n.p.id, at);
+    setTimeout(() => this.followMoved(), 80); // 기록을 옮기면 자리가 먼저 바뀌고 열린 행성은 조금 뒤에 바뀐다 — 둘 다 지난 뒤에 따라간다
+  }
+
+  /** 방금(2.5초 안) 자리가 바뀐 행성과 그 시각. 열려 있는 행성이 여기 있으면 카메라가 따라간다 */
+  private readonly moved = new Map<string, number>();
+  private followMoved() {
+    const sel = store.getState().selectedPlanetId;
+    const at = sel ? this.moved.get(sel) : undefined;
+    if (!sel || at === undefined) return;
+    this.moved.delete(sel);
+    if (performance.now() - at < 2500) void this.flyTo(sel);
+  }
+
+  /** 미끄러지는 중이면 한 걸음. 끝나면 별자리 선 · 이름표를 새 자리로 다시 그린다 */
+  private stepGlide(dt: number) {
+    const g = this.glide;
+    if (!g) return;
+    g.t = Math.min(1, g.t + (dt * 1000) / g.ms);
+    const e = g.t * g.t * (3 - 2 * g.t);
+    for (const m of g.moves) m.n.at.lerpVectors(m.from, m.to, e);
+    if (g.t >= 1) {
+      this.glide = null;
+      this.rebuildLinks();
+    }
   }
 
   private rebuild() {
@@ -589,6 +630,7 @@ export class DepthScene {
     this.stars.position.copy(cam.pos);
     this.reportPercent(now);
 
+    this.stepGlide(dt);
     let dmin = Infinity, dmax = 0;
     this.nodes.forEach((n) => {
       n.orbit.rotation.z += dt * 0.22;
