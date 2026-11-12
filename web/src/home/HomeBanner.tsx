@@ -11,6 +11,7 @@ export function HomeBanner() {
   const expanded = useStore((s) => s.periodAutoExpanded);
   const webgl = useSceneState((s) => s.webgl);
   const starsHidden = useSceneState((s) => s.starsHidden);
+  const view = useStore((s) => s.view);
   const isToday = useStore((s) => s.period.preset === "today");
 
   let banner = null;
@@ -20,8 +21,8 @@ export function HomeBanner() {
         {NETWORK_MESSAGE}
       </Banner>
     );
-  else if (webgl === false) banner = <Banner tone="info">이 브라우저에서는 3D 우주를 볼 수 없어요. 왼쪽 목록에서 행성을 골라 보세요</Banner>;
-  else if (starsHidden)
+  else if (view !== "2d" && webgl === false) banner = <Banner tone="info">이 브라우저에서는 3D 우주를 볼 수 없어요. 2D 보기로 바꾸거나 목록에서 행성을 골라 보세요</Banner>;
+  else if (view === "3d" && starsHidden)
     // 기록 상한 초과 상태 (DESIGN W-01): 기간이 이미 오늘이면 버튼을 넣지 않는다
     banner = (
       <Banner tone="warning" action={isToday ? undefined : { label: "오늘만 보기", onClick: () => void store.getState().setPeriod(todayPeriod()) }}>

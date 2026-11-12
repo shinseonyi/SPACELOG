@@ -15,6 +15,8 @@ import { SidePanel } from "./ui/SidePanel.tsx";
 import { ToastHost } from "./ui/Toast.tsx";
 import { PerfMeter } from "./universe/PerfMeter.tsx";
 import { UniverseCanvas } from "./universe/UniverseCanvas.tsx";
+import { Depth25 } from "./view/Depth25.tsx";
+import { Flat2D } from "./view/Flat2D.tsx";
 import { ProbeModal } from "./probe/ProbeModal.tsx";
 
 /**
@@ -31,7 +33,7 @@ export function App() {
   if (auth === "required") return <AuthRequired />;
   return (
     <div className="app">
-      <UniverseCanvas />
+      <UniverseView />
       <TopBar />
       <ControlsHint />
       <SideWindow />
@@ -45,6 +47,14 @@ export function App() {
       <ToastHost />
     </div>
   );
+}
+
+/** 켜진 보기 하나만 그린다. 보기를 바꾸면 이전 보기는 내려가며 자기 비행 등록을 푼다 */
+function UniverseView() {
+  const view = useStore((s) => s.view);
+  if (view === "3d") return <UniverseCanvas />;
+  if (view === "2.5d") return <Depth25 />;
+  return <Flat2D />;
 }
 
 function AuthRequired() {

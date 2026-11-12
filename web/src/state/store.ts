@@ -15,6 +15,18 @@ export interface ToastItem {
 /** 3D 쪽(이슈 #3)이 등록하는 자동 비행. 도착하면 true, 이동 키로 멈추면 false (DESIGN 9-4) */
 export type FlyHandler = (planetId: string) => Promise<boolean>;
 
+/** 우주 보기 방식: 2D(평면) · 2.5D(깊이감 있게 날아다님) · 3D(기존 3D 장면) */
+export type ViewMode = "2d" | "2.5d" | "3d";
+const VIEW_KEY = "spacelog.view";
+function savedView(): ViewMode {
+  try {
+    const v = localStorage.getItem(VIEW_KEY);
+    return v === "2.5d" || v === "3d" ? v : "2d";
+  } catch {
+    return "2d";
+  }
+}
+
 /** 우주 홈 오른쪽 창에 열린 목록. 한 번에 하나만 (README 6-1) */
 export type SideTab = "rec" | "planet" | "link";
 
@@ -22,6 +34,8 @@ export interface Store extends WebState {
   auth: "checking" | "ok" | "required";
   /** 오른쪽 창에 열린 목록. 같은 칩을 다시 누르면 닫힌다. 화면 설정이라 서버와 무관 */
   sideTab: SideTab | null;
+  /** 우주 보기 방식. 브라우저에만 저장하는 화면 설정 */
+  view: ViewMode;
   route: Route;
   loading: boolean;
   toasts: ToastItem[];
@@ -56,6 +70,7 @@ export interface Store extends WebState {
   refresh(): Promise<void>;
   setExportFormat(format: WebState["exportFormat"]): void;
   toggleSideTab(tab: SideTab): void;
+  setView(view: ViewMode): void;
   openProbe(): void;
 
   // ── 라우팅·알림 ──
@@ -103,6 +118,7 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
       exportFormat: "claude",
       auth: "checking",
       sideTab: "planet",
+      view: savedView(),
       route: { name: "home" },
       loading: false,
       toasts: [],
@@ -256,6 +272,16 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
 
       setExportFormat(exportFormat) {
         set({ exportFormat });
+      },
+
+      setView(view) {
+        if (get().view === view) return;
+        try {
+          localStorage.setItem(VIEW_KEY, view);
+        } catch {
+          // 저장 못 해도 이번 방문에서는 바뀐다
+        }
+        set({ view, camera: "overview" });
       },
 
       toggleSideTab(tab) {

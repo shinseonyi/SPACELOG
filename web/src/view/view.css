@@ -1,0 +1,39 @@
+/* 2D · 2.5D 보기. 우주 위 요소의 값은 README 6-1 */
+.flat { position: absolute; inset: 0; overflow: hidden; background: var(--color-canvas); user-select: none; touch-action: none; cursor: grab; }
+.flat:active { cursor: grabbing; }
+.flat__stars { position: absolute; inset: -200px; pointer-events: none; }
+.flat__stars i { position: absolute; display: block; border-radius: 50%; background: #fff; }
+.flat__world { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-origin: 0 0; }
+
+.flat__planet { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; transition: opacity 200ms; }
+.flat__planet:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 12px; border-radius: 50%; }
+.flat__body { position: relative; display: block; }
+.flat__disc { position: absolute; inset: 0; border-radius: 50%; background-color: #000; background-size: 230% auto; background-position: 49% 62%; display: block; }
+.flat__nebula { position: absolute; inset: -55%; width: 210%; height: 210%; object-fit: contain; pointer-events: none; }
+.flat__ring { position: absolute; left: -52.2%; top: -16.5%; width: 204.3%; height: 136.2%; pointer-events: none; }
+.flat__orbit { position: absolute; inset: -18px; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.16); animation: flat-spin 60s linear infinite; pointer-events: none; display: block; }
+.flat__orbit i { position: absolute; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; display: block; }
+.flat__label { display: flex; flex-direction: column; align-items: center; gap: 2px; white-space: nowrap; transform-origin: top center; }
+.flat__name { font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); color: #fff; }
+.flat__count { font: var(--type-fine-print); letter-spacing: var(--tracking-fine-print); }
+@keyframes flat-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .flat__orbit { animation: none; } }
+
+/* 2.5D 이름표 (Three.js 위 DOM 층) */
+.depth__label { position: absolute; left: 0; top: 0; transform: translate(-9999px, 0); display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 8px; border: 0; background: none; cursor: pointer; pointer-events: auto; white-space: nowrap; color: inherit; }
+.depth__label:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; border-radius: var(--r-item); }
+.depth__name { font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); color: #fff; }
+.depth__count { font: var(--type-fine-print); letter-spacing: var(--tracking-fine-print); }
+
+/* 확대 조절 · 보기 전환 */
+.zoom { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px; border-radius: var(--r-pill); }
+.zoom button { border: 0; background: transparent; color: var(--color-body); cursor: pointer; display: grid; place-items: center; transition: transform var(--press-time); }
+.zoom button:active { transform: scale(var(--press-scale)); }
+.zoom button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.zoom__step { width: 40px; height: 40px; border-radius: 50%; }
+.zoom__fit { min-width: 48px; height: 28px; padding: 0 4px; border-radius: var(--r-pill); background: var(--color-chip) !important; font: var(--type-fine-print); font-variant-numeric: tabular-nums; }
+.viewseg { flex: none; display: flex; gap: 2px; height: 40px; box-sizing: border-box; padding: 3px; border-radius: var(--r-pill); border: 1px solid var(--color-line-card); background: var(--color-inset); }
+.viewseg button { height: 32px; padding: 0 14px; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--color-body-sub); font: var(--type-button-utility); letter-spacing: var(--tracking-button-utility); white-space: nowrap; cursor: pointer; transition: transform var(--press-time); }
+.viewseg button:active { transform: scale(var(--press-scale)); }
+.viewseg button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.viewseg button.is-on { background: #fff; color: var(--color-ink-on-light); }
