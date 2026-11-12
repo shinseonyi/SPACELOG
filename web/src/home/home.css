@@ -67,16 +67,15 @@ li.row--rec:active { transform: none; }
 /* 행성 간 거리 카드 (2.5D · 3D): 왼쪽 아래 묶음의 맨 아래 */
 .dist { width: 260px; max-width: calc(100vw - 48px); box-sizing: border-box; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; border-radius: var(--r-panel); border: 1px solid var(--color-line-card); background: var(--color-card-solid); }
 .dist__title { font: var(--type-fine-print); letter-spacing: 0.04em; color: var(--color-body-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dist__list { list-style: none; margin: 0 -4px; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.dist__list--rest { max-height: 154px; overflow-y: auto; }
+.dist__list { list-style: none; margin: 0 -4px; padding: 0 4px; display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow-y: auto; } /* 접지 않고 전부. 길면 카드 안에서 스크롤 */
 .dist__row { width: 100%; min-height: 28px; display: flex; align-items: center; gap: 8px; padding: 0 4px; border: 0; border-radius: 8px; background: none; color: var(--color-body); text-align: left; cursor: pointer; transition: transform var(--press-time); }
 .dist__row:active { transform: scale(0.97); }
-.dist__row:focus-visible, .dist__more:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
+.dist__row:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
 .dist__dot { width: 8px; height: 8px; flex: none; border-radius: 50%; display: block; }
 .dist__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption); }
 .dist__d { flex: none; font: var(--type-caption-strong); font-variant-numeric: tabular-nums; }
-.dist__more { display: flex; align-items: center; gap: 6px; width: 100%; min-height: 28px; padding: 6px 0 0; border: 0; border-top: 1px solid var(--color-line-inset); background: none; color: var(--color-body-muted); font: var(--type-fine-print); letter-spacing: 0.04em; text-align: left; cursor: pointer; }
-.dist__more span { flex: 1; }
+.dist__d.is-empty { font: var(--type-fine-print); color: var(--color-body-muted); }
+.dist__row.is-on .dist__name { font-weight: 600; }
 @media (max-width: 760px) { .dist { display: none; } } /* 좁은 화면에서는 행성 목록(위쪽 칩)으로 */
 
 /* 오른쪽 아래: 조작 안내 */

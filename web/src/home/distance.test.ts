@@ -1,28 +1,24 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { distancesFrom, formatDistance, referencePlanet, type Point3 } from "./distance.ts";
+import { formatStamp, recencyRows } from "./distance.ts";
 
-const pts = new Map<string, Point3>([
-  ["a", [0, 0, 0]],
-  ["b", [300, 400, 0]],
-  ["c", [0, 0, 260]],
-  ["d", [0, 0, -260]],
-]);
+const at = (d: number, h: number, m = 0) => new Date(2026, 10, d, h, m).toISOString();
 
-test("기준 행성에서 가까운 순서, 기준 행성은 빼고 같은 거리면 id 순", () => {
-  assert.deepEqual(distancesFrom("a", pts), [{ id: "c", d: 260 }, { id: "d", d: 260 }, { id: "b", d: 500 }]);
-  assert.deepEqual(distancesFrom("없음", pts), []);
+test("모든 행성을 최근에 기록을 넣은 순서로, 기록 없는 행성은 맨 뒤(id 순)", () => {
+  const stars = [
+    { planetId: "a", createdAtUtc: at(10, 9) },
+    { planetId: "a", createdAtUtc: at(12, 8) },
+    { planetId: "b", createdAtUtc: at(12, 14, 30) },
+    { planetId: "c", createdAtUtc: at(5, 23) },
+  ];
+  const rows = recencyRows(["e", "a", "d", "c", "b"], stars);
+  assert.deepEqual(rows.map((r) => r.id), ["b", "a", "c", "d", "e"]);
+  assert.equal(rows[0].last, at(12, 14, 30));
+  assert.equal(rows[1].last, at(12, 8)); // 그 행성의 가장 최근 기록
+  assert.equal(rows[3].last, null);
 });
 
-test("기준 행성: 착륙한 행성 → 없으면 가장 최근에 기록을 넣은 행성", () => {
-  const rank = new Map([["a", 2], ["b", 0], ["c", 1]]);
-  assert.equal(referencePlanet(["a", "b", "c"], "c", rank), "c");
-  assert.equal(referencePlanet(["a", "b", "c"], null, rank), "b");
-  assert.equal(referencePlanet(["a", "b", "c"], "지운 행성", rank), "b");
-  assert.equal(referencePlanet([], null, rank), null);
-});
-
-test("거리 표시는 천 단위 쉼표 + m", () => {
-  assert.equal(formatDistance(627), "627m");
-  assert.equal(formatDistance(1234), "1,234m");
+test("시각 표시는 월.일 시:분 (24시간제, 두 자리)", () => {
+  assert.equal(formatStamp(at(12, 14, 30)), "11.12 14:30");
+  assert.equal(formatStamp(new Date(2026, 0, 3, 7, 5).toISOString()), "01.03 07:05");
 });
