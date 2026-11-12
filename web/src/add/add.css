@@ -5,8 +5,9 @@
 .addrec:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .addrec:disabled { cursor: default; opacity: 0.7; }
 .addrec__sub { color: var(--color-body-muted); font: var(--type-fine-print); }
-@media (max-width: 1099px) { .addrec__sub { display: none; } }
-@media (max-width: 1023px) { .addrec { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } } /* 좁으면 아래 줄(조작 안내·버튼 묶음) 위로 */
+/* 1280px 미만에서는 아래 줄(왼쪽 조작 안내 · 오른쪽 버튼 묶음)과 부딪혀 그 위로 올린다 (폭별 측정). 휴대폰 폭에서는 부제를 뺀다 */
+@media (max-width: 1279px) { .addrec { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } }
+@media (max-width: 479px) { .addrec__sub { display: none; } .addrec { bottom: calc(136px + env(safe-area-inset-bottom, 0px)); } }
 
 .addrec-wrap { position: fixed; left: 16px; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 26; display: flex; justify-content: center; pointer-events: none; }
 .addrec-sheet { pointer-events: auto; width: 420px; max-width: 100%; box-sizing: border-box; padding: 16px; display: flex; flex-direction: column; gap: 12px; border-radius: var(--r-panel); border: 1px solid var(--color-line-card); background: rgb(30, 30, 32); box-shadow: var(--shadow-float); animation: fade-in 0.2s ease-out; }
@@ -32,5 +33,6 @@
 .addrec-done__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .addrec-done button { flex: none; height: 32px; padding: 0 14px; border: 0; border-radius: var(--r-pill); background: var(--color-primary); color: #fff; font: var(--type-caption); cursor: pointer; transition: transform var(--press-time); }
 .addrec-done button:active { transform: scale(var(--press-scale)); }
-@media (max-width: 1023px) { .addrec-done { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } }
+@media (max-width: 1279px) { .addrec-done { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } }
+@media (max-width: 479px) { .addrec-done { bottom: calc(136px + env(safe-area-inset-bottom, 0px)); } }
 @media (prefers-reduced-motion: reduce) { .addrec-sheet, .addrec-done { animation: none; } }

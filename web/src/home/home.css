@@ -112,6 +112,7 @@ li.row--rec:active { transform: none; }
 .rediscovery__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); }
 .rediscovery__sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-fine-print); color: var(--color-body-muted); }
 
+@media (max-width: 1279px) { .near { bottom: calc(136px + env(safe-area-inset-bottom, 0px)); } } /* 기록 넣기가 한 줄 위로 올라가므로 그 위 */
 @media (max-width: 760px) {
   .hint__keys { display: none; }
   .topbar { left: 16px; right: 16px; top: 12px; padding-left: 16px; }
