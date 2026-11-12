@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { sceneState } from "../universe/sceneState.ts";
 import { webglSupported } from "../universe/webglSupport.ts";
+import { useDemo } from "../demo/demoStore.ts";
 import { useStore } from "../state/store.ts";
 import { DepthScene, type DepthPlanet } from "./Depth25.ts";
 import { useLinkPaths } from "./linkPaths.ts";
@@ -16,10 +17,11 @@ export function Depth25() {
   const scene = useRef<DepthScene | null>(null);
   const planets = useStore((s) => s.planets);
   const stars = useStore((s) => s.stars);
+  const overrides = useDemo((s) => s.planets);
   const data = useMemo<DepthPlanet[]>(() => {
     const rank = recencyRank(planets, stars);
-    return planetNodes(planets).map((n) => ({ ...n, depth: (rank.get(n.id) ?? 0) * DEPTH_STEP }));
-  }, [planets, stars]);
+    return planetNodes(planets, overrides).map((n) => ({ ...n, depth: (rank.get(n.id) ?? 0) * DEPTH_STEP }));
+  }, [planets, stars, overrides]);
   const paths = useLinkPaths();
   const latest = useRef(data);
   latest.current = data;

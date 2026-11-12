@@ -158,3 +158,43 @@ li.row--rec:active { transform: none; }
 .chip--pick .chip__label:focus-visible { outline: 2px solid #fff; outline-offset: 1px; border-radius: var(--r-pill); }
 .chip--pick .chip__x { width: 20px; height: 20px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.22); color: #fff; cursor: pointer; padding: 0; }
 .chip--pick .chip__x:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+
+/* 블랙홀 (위치 편집 중 왼쪽 아래) */
+.bh { position: fixed; left: 8px; bottom: 8px; z-index: 12; width: 300px; height: 169px; padding: 0; border: 0; background: none; cursor: pointer; color: inherit; }
+.bh__img { position: absolute; inset: 0; background: center / cover no-repeat; mix-blend-mode: screen; -webkit-mask-image: radial-gradient(ellipse closest-side, #000 62%, transparent 100%); mask-image: radial-gradient(ellipse closest-side, #000 62%, transparent 100%); pointer-events: none; }
+.bh__text { position: absolute; left: 0; right: 0; bottom: 2px; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.bh__name { font: var(--type-caption-strong); }
+.bh__sub { font: var(--type-fine-print); color: var(--color-body-muted); }
+.bh:focus-visible { outline: 2px solid var(--color-focus); outline-offset: -2px; border-radius: var(--r-panel); }
+.bh-list, .bh-card { position: fixed; left: 24px; bottom: 188px; z-index: 14; box-sizing: border-box; padding: 16px; border-radius: var(--r-panel); background: var(--color-card-solid); border: 1px solid var(--color-line-card); box-shadow: var(--shadow-float); display: flex; flex-direction: column; gap: 10px; }
+.bh-list { width: 420px; max-width: calc(100vw - 48px); max-height: calc(100vh - 300px); overflow: auto; }
+.bh-card { width: 340px; max-width: calc(100vw - 48px); }
+.bh-card p { margin: 0; font: var(--type-caption); color: var(--color-body-sub); line-height: 1.5; text-wrap: pretty; }
+.bh-card__actions { display: flex; gap: 8px; justify-content: flex-end; }
+.bh-card__actions .btn, .bh-list .btn { height: 34px; padding: 0 14px; }
+.bh-list__head { display: flex; align-items: center; gap: 8px; }
+.bh-list__head strong { flex: 1; font: var(--type-caption-strong); }
+.bh-list__head .btn--icon { width: 28px; height: 28px; padding: 0; }
+.bh-list__empty { margin: 0; font: var(--type-caption); color: var(--color-body-muted); }
+.bh-list ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.bh-list li { display: flex; align-items: center; gap: 10px; min-height: 52px; }
+.bh-list__dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+.bh-list__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.bh-list__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption-strong); }
+.bh-list__sub { font: var(--type-fine-print); color: var(--color-body-muted); }
+/* 위치 편집 중에는 조작 안내를 숨기고 왼쪽 아래 묶음을 블랙홀 위로 올린다 */
+.stack[data-edit] { bottom: 188px; }
+.stack[data-edit] ~ .bh-list, .stack[data-edit] ~ .bh-card { left: 300px; bottom: 24px; }
+
+/* 오른쪽 아래: 행성 추가 카드 · 위치 편집 켜짐 */
+.actionbar { flex-wrap: wrap; justify-content: flex-end; max-width: calc(100vw - 48px); }
+.actionbar__btn.is-on { background: #fff; color: var(--color-ink-on-light); border-color: #fff; }
+.newplanet { position: absolute; right: 0; bottom: 56px; width: 280px; max-width: calc(100vw - 48px); box-sizing: border-box; padding: 16px; border-radius: var(--r-panel); background: var(--color-card-solid); border: 1px solid var(--color-line-card); box-shadow: var(--shadow-float); display: flex; flex-direction: column; gap: 10px; }
+.newplanet strong { font: var(--type-caption-strong); }
+.newplanet input { box-sizing: border-box; height: 40px; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: var(--color-chip); color: var(--color-body); font: var(--type-caption); }
+.newplanet input[aria-invalid="true"] { border-color: #ff8a80; }
+.newplanet input:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
+.newplanet__error { margin: -4px 0 0; font: var(--type-fine-print); color: #ff8a80; }
+.newplanet__actions { display: flex; gap: 8px; justify-content: flex-end; }
+.newplanet__actions .btn { height: 36px; padding: 0 14px; }
+.actionbar { position: fixed; }

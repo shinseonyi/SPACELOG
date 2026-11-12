@@ -61,3 +61,21 @@ export function purgePlanet(data: DemoData, planetId: string): DemoData {
 export function trashedIds(data: DemoData): Set<string> {
   return new Set(data.trash.map((t) => t.planetId));
 }
+
+/**
+ * 서버에서 받은 우주에 시연용 덧씌우기를 적용한다: 블랙홀에 보관한 행성과 그 행성의 기록을 뺀다 (README 7장 "보관 중인
+ * 행성의 기록은 목록·개수에서 빠진다"), 사용자가 고른 행성 색을 입힌다. 덧씌울 게 없으면 받은 객체를 그대로 돌려준다.
+ */
+export function applyDemoToUniverse<P extends { id: string; colorToken: string }, S extends { planetId: string }>(
+  data: Pick<DemoData, "planets" | "trash">,
+  planets: P[],
+  stars: S[],
+): { planets: P[]; stars: S[] } {
+  const gone = trashedIds(data as DemoData);
+  const recolor = Object.values(data.planets).some((o) => o.colorToken);
+  if (gone.size === 0 && !recolor) return { planets, stars };
+  return {
+    planets: planets.filter((p) => !gone.has(p.id)).map((p) => (data.planets[p.id]?.colorToken ? { ...p, colorToken: data.planets[p.id].colorToken as string } : p)),
+    stars: gone.size ? stars.filter((s) => !gone.has(s.planetId)) : stars,
+  };
+}

@@ -19,7 +19,7 @@ function toLink(v: unknown): Link | null {
 
 function toTrash(v: unknown): TrashedPlanet | null {
   if (!isObj(v) || typeof v.planetId !== "string" || typeof v.name !== "string") return null;
-  return { planetId: v.planetId, name: v.name, colorToken: typeof v.colorToken === "string" ? v.colorToken : "planet-1", starIds: strings(v.starIds), trashedAtUtc: typeof v.trashedAtUtc === "string" ? v.trashedAtUtc : new Date(0).toISOString() };
+  return { planetId: v.planetId, name: v.name, colorToken: typeof v.colorToken === "string" ? v.colorToken : "planet-1", starIds: strings(v.starIds), ...(typeof v.starCount === "number" ? { starCount: v.starCount } : {}), trashedAtUtc: typeof v.trashedAtUtc === "string" ? v.trashedAtUtc : new Date(0).toISOString() };
 }
 
 /** 저장된 값을 읽는다. 없거나 깨졌거나 모양이 다르면 읽을 수 있는 만큼만 살리고 나머지는 비운다 */

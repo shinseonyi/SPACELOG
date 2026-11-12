@@ -60,3 +60,20 @@ test("착륙: 넓은 화면 1.7배, 좁은 화면 1.2배. 오른쪽 가림은 �
   assert.equal(landCam({ x: 0, y: 0 }, 400, 0).z, 1.2);
   assert.deepEqual([rightOccupied(1280, true, true), rightOccupied(1280, false, true), rightOccupied(1280, false, false), rightOccupied(400, true, true)], [456, 324, 0, 0]);
 });
+
+test("사용자가 옮긴 위치와 고른 모양이 기본 배치·기본 모양보다 앞선다", () => {
+  const ps = [planet("a"), planet("b", { system: "uncategorized", createdAtUtc: "2026-11-02T00:00:00Z" })];
+  const base = planetNodes(ps);
+  assert.deepEqual([base[1].look.shape, base[1].look.unit], ["nebula", "조각"]); // 미분류는 기본이 성운
+
+  const moved = planetNodes(ps, { a: { x: 700, y: -300, shape: "ring" }, b: { shape: "" } });
+  assert.deepEqual([moved[0].x, moved[0].y, moved[0].look.shape], [700, -300, "ring"]);
+  assert.deepEqual([moved[1].x, moved[1].y], [base[1].x, base[1].y]); // 위치를 안 옮긴 행성은 기본 배치 그대로
+  assert.deepEqual([moved[1].look.shape, moved[1].look.unit], ["", "기록"]); // 기본 모양을 직접 골랐으면 성운이 아니다
+});
+
+test("x 나 y 하나만 있으면 옮긴 것으로 치지 않는다", () => {
+  const ps = [planet("a")];
+  const base = planetNodes(ps);
+  assert.deepEqual([planetNodes(ps, { a: { x: 5 } })[0].x, planetNodes(ps, { a: { y: 5 } })[0].y], [base[0].x, base[0].y]);
+});

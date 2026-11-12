@@ -6,6 +6,9 @@
 .flat__world { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-origin: 0 0; }
 
 .flat__planet { position: absolute; transform: translate(-50%, -50%); display: block; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; transition: opacity 200ms; }
+.flat__planet.is-edit { cursor: grab; touch-action: none; }
+.flat__planet.is-edit .flat__body { outline: 1px dashed rgba(255, 255, 255, 0.35); outline-offset: 10px; border-radius: 50%; }
+.flat__planet.is-dragging { cursor: grabbing; z-index: 50; }
 .flat__planet:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 12px; border-radius: 50%; }
 .flat__body { position: relative; display: block; }
 .flat__disc { position: absolute; inset: 0; border-radius: 50%; background-color: #000; background-size: 230% auto; background-position: 49% 62%; display: block; }

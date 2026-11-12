@@ -3,7 +3,7 @@ import test from "node:test";
 import { analyzeColumns, CSV_MAX_COLS, CSV_MAX_ROWS, parseCsv } from "./csv.ts";
 import { createDemoStore } from "./demoStore.ts";
 import { addLinkStars, autoLinkName, createLink, editLink, linksOfPlanet, planetsOfLink, removeStarsFromLinks, setLinkStars, unlink } from "./links.ts";
-import { forgetPlanet, freeSpot, PLANET_GAP, purgePlanet, restorePlanet, setPlanetOverride, trashedIds, trashPlanet } from "./planets.ts";
+import { applyDemoToUniverse, forgetPlanet, freeSpot, PLANET_GAP, purgePlanet, restorePlanet, setPlanetOverride, trashedIds, trashPlanet } from "./planets.ts";
 import { DEMO_KEY, loadDemo, saveDemo, type KeyValue } from "./storage.ts";
 import { emptyDemoData, type Link } from "./types.ts";
 
@@ -150,4 +150,20 @@ test("상태 저장소: 바꿀 때마다 저장하고, 새로 열면 이어 쓴�
 
   b.getState().starsGone(["s1", "s2"]); // 기록이 모두 지워지면 별자리도, 숨김 표시도 정리된다
   assert.deepEqual([b.getState().links.length, b.getState().hiddenLinkIds.length], [0, 0]);
+});
+
+test("블랙홀 보관: 행성과 그 기록을 우주에서 빼고, 고른 색을 입힌다. 덧씌울 게 없으면 그대로", () => {
+  const planets = [{ id: "p1", colorToken: "planet-1" }, { id: "p2", colorToken: "planet-2" }];
+  const stars = [{ planetId: "p1", id: "a" }, { planetId: "p2", id: "b" }];
+  const none = applyDemoToUniverse(emptyDemoData(), planets, stars);
+  assert.equal(none.planets, planets);
+  assert.equal(none.stars, stars);
+
+  const d = trashPlanet(setPlanetOverride(emptyDemoData(), "p1", { colorToken: "planet-3" }), { planetId: "p2", name: "읽은 것들", colorToken: "planet-2", starIds: ["b"] });
+  const out = applyDemoToUniverse(d, planets, stars);
+  assert.deepEqual(out.planets, [{ id: "p1", colorToken: "planet-3" }]);
+  assert.deepEqual(out.stars.map((s) => s.id), ["a"]);
+  // 꺼내면 다시 보인다
+  const back = applyDemoToUniverse(restorePlanet(d, "p2").data, planets, stars);
+  assert.deepEqual(back.planets.map((p) => p.id), ["p1", "p2"]);
 });

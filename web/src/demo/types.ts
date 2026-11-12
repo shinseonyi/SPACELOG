@@ -61,6 +61,8 @@ export interface TrashedPlanet {
   colorToken: string;
   /** 보관할 때의 기록 id. 보관 중에는 목록·개수에서 뺀다 */
   starIds: string[];
+  /** 보관할 때 행성에 든 기록 수 (보관함 목록에 "기록 N개"로 보인다) */
+  starCount?: number;
   trashedAtUtc: string;
 }
 

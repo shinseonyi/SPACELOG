@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { ERROR_MESSAGES } from "@spacelog/shared/errors";
 import { ActionBar } from "./home/ActionBar.tsx";
+import { Blackhole } from "./home/Blackhole.tsx";
 import { ControlsHint } from "./home/ControlsHint.tsx";
 import { EmptyState } from "./home/EmptyState.tsx";
 import { HomeBanner } from "./home/HomeBanner.tsx";
@@ -43,6 +44,7 @@ export function App() {
       <PerfMeter />
       <PanelHost />
       <ActionBar />
+      <Blackhole />
       <Observatory />
       <ProbeModal />
       <ToastHost />

@@ -1,4 +1,5 @@
 import { Minus, MessageCircle, Plus } from "lucide-react";
+import { useStore } from "../state/store.ts";
 import { useViewApi } from "../view/viewApi.ts";
 import { RediscoverySlot } from "./RediscoveryCard.tsx";
 
@@ -11,8 +12,9 @@ const CHATBOT_URL = (import.meta.env.VITE_CHATBOT_URL as string | undefined) || 
  */
 export function LeftStack() {
   const zoom = useViewApi((s) => s.zoom);
+  const edit = useStore((s) => s.editPos);
   return (
-    <div className="stack">
+    <div className="stack" data-edit={edit || undefined}>
       <div className="stack__row">
         {zoom && (
           <div className="zoom card" role="group" aria-label="확대 축소">

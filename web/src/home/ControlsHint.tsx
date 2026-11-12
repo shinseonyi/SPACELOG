@@ -25,6 +25,8 @@ export function ControlsHint() {
       // 저장 못 하면 다음에도 펼쳐 보인다
     }
   }, []);
+  const edit = useStore((s) => s.editPos);
+  if (edit) return null; // 위치 편집 중에는 블랙홀이 이 자리를 쓴다
   if (view !== "2d" && webgl === false) return null; // 3D류 보기는 WebGL 이 있어야 한다
   return (
     <div className="hint card">

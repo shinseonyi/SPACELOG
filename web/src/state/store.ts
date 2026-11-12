@@ -2,8 +2,10 @@
 // React 화면은 useStore(selector)로, 3D 코드는 store.getState()/store.subscribe()로 쓴다.
 import { createStore, useStore as useZustand } from "zustand";
 import { todayPeriod, weekPeriod } from "@spacelog/shared/period";
-import type { CargoItem, Period, WebState } from "@spacelog/shared/types";
+import type { CargoItem, Period, Planet, Star, WebState } from "@spacelog/shared/types";
 import { api, RequestError } from "../api/client.ts";
+import { demo } from "../demo/demoStore.ts";
+import { applyDemoToUniverse } from "../demo/planets.ts";
 import { formatHash, type Route } from "../router.ts";
 
 export interface ToastItem {
@@ -38,6 +40,12 @@ export interface Store extends WebState {
   obsDraft: string[] | null;
   /** 목록에서 체크한 기록. 행성·기간·패널을 넘어 유지된다 (별자리는 여러 행성의 기록을 묶는다, README 1-1) */
   picked: string[];
+  /** 위치 편집 중인가 (2D 에서만. 켜면 행성을 끌어 옮기고 블랙홀이 나타난다) */
+  editPos: boolean;
+  setEditPos(on: boolean): void;
+  /** 블랙홀에 넣을지 묻는 중인 행성 id */
+  askTrash: string | null;
+  setAskTrash(planetId: string | null): void;
   /** 오른쪽 창에서 기록 창이 열린 별자리 */
   linkViewId: string | null;
   togglePicked(id: string): void;
@@ -107,6 +115,11 @@ function dedupe(items: CargoItem[]): CargoItem[] {
   return items.filter((i) => !seen.has(cargoKey(i)) && !!seen.add(cargoKey(i)));
 }
 
+/** 서버에서 받은 우주에 시연용 덧씌우기(블랙홀 보관 · 행성 색)를 적용한다 */
+function shown<U extends { stars: Star[]; planets: Planet[] }>(u: U): { stars: Star[]; planets: Planet[] } {
+  return applyDemoToUniverse(demo.getState(), u.planets, u.stars) as { stars: Star[]; planets: Planet[] };
+}
+
 export function createWebStore(navigate: (hash: string) => void = defaultNavigate) {
   let fly: FlyHandler | null = null;
   let toastSeq = 0;
@@ -136,6 +149,8 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
       obsDraft: null,
       picked: [],
       linkViewId: null,
+      editPos: false,
+      askTrash: null,
       route: { name: "home" },
       loading: false,
       toasts: [],
@@ -249,13 +264,13 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
         try {
           const u = await api.universe(today.from, today.to);
           if (u.stars.length > 0) {
-            set({ period: today, stars: u.stars, planets: u.planets });
+            set({ period: today, ...shown(u) });
           } else {
             // 오늘 0건 → 이번 주로 넓힌다 (POLICY 3-2)
             const week = weekPeriod();
             const w = await api.universe(week.from, week.to);
             const expanded = w.stars.length > 0;
-            set(expanded ? { period: week, periodAutoExpanded: true, stars: w.stars, planets: w.planets } : { period: today, stars: [], planets: w.planets });
+            set(expanded ? { period: week, periodAutoExpanded: true, ...shown(w) } : { period: today, stars: [], planets: shown(w).planets });
           }
           set({ lastSyncedAt: new Date().toISOString() });
           get().applyRoute(get().route); // 딥링크 별의 행성 찾기
@@ -273,10 +288,11 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
         try {
           const u = await api.universe(period.from, period.to);
           if (seq !== loadSeq) return; // 더 최근 요청이 있다
-          const ids = new Set(u.planets.map((p) => p.id));
+          const { stars: shownStars, planets: shownPlanets } = shown(u);
+          const ids = new Set(shownPlanets.map((p) => p.id));
           set({
-            stars: u.stars,
-            planets: u.planets,
+            stars: shownStars,
+            planets: shownPlanets,
             lastSyncedAt: new Date().toISOString(),
             cargo: get().cargo.filter((c) => c.type !== "planet" || ids.has(c.planetId)),
           });
@@ -299,11 +315,19 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
         } catch {
           // 저장 못 해도 이번 방문에서는 바뀐다
         }
-        set({ view, camera: "overview" });
+        set({ view, camera: "overview", editPos: false, askTrash: null });
       },
 
       openSideTab(tab) {
         set({ sideTab: tab });
+      },
+
+      setEditPos(on) {
+        set({ editPos: on, ...(on ? {} : { askTrash: null }) });
+      },
+
+      setAskTrash(planetId) {
+        set({ askTrash: planetId });
       },
 
       openLinkView(linkId) {
@@ -384,6 +408,13 @@ function defaultNavigate(hash: string) {
 }
 
 export const store = createWebStore();
+
+// 시연용 덧씌우기(블랙홀 보관 · 행성 색)가 바뀌면 우주를 다시 걸러 보인다. 위치만 바뀔 때는 다시 받지 않는다
+const colorKey = (planets: Record<string, { colorToken?: string }>) => Object.entries(planets).map(([id, o]) => `${id}:${o.colorToken ?? ""}`).join(",");
+demo.subscribe((s, prev) => {
+  if (store.getState().auth !== "ok") return;
+  if (s.trash !== prev.trash || colorKey(s.planets) !== colorKey(prev.planets)) void store.getState().refresh();
+});
 
 export function useStore<T>(selector: (s: Store) => T): T {
   return useZustand(store, selector);

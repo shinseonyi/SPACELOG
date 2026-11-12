@@ -3,6 +3,7 @@
 // 모양은 "미분류" 시스템 행성만 성운으로 정한다. 사용자가 고르는 색·모양·좌표는 7단계(위치 편집·행성 수정)에서 web/src/demo 로 붙인다.
 import type { Planet } from "@spacelog/shared/types";
 import { planetColorToken } from "../ui/planetColor.ts";
+import type { PlanetOverride } from "../demo/types.ts";
 import { seeded } from "../universe/layout.ts";
 
 export type PlanetShape = "" | "ring" | "nebula";
@@ -35,9 +36,10 @@ const ACCENT_HEX: Record<string, string> = {
   "planet-5": "#6fdcaa", "planet-6": "#ffd36f", "planet-7": "#7fe3ff", "planet-8": "#ff8f7a",
 };
 
-export function planetLook(p: Pick<Planet, "colorToken" | "system">): PlanetLook {
+/** 사용자가 고른 모양(shapeChoice)이 있으면 그것을, 없으면 "미분류"만 성운 */
+export function planetLook(p: Pick<Planet, "colorToken" | "system">, shapeChoice?: PlanetShape): PlanetLook {
   const token = planetColorToken(p.colorToken);
-  const shape: PlanetShape = p.system === "uncategorized" ? "nebula" : "";
+  const shape: PlanetShape = shapeChoice ?? (p.system === "uncategorized" ? "nebula" : "");
   return { accent: `var(--${token})`, accentHex: ACCENT_HEX[token], filter: FILTER[token], shape, unit: shape === "nebula" ? "조각" : "기록" };
 }
 
@@ -85,14 +87,15 @@ export function compactPositions(planets: Pick<Planet, "id" | "createdAtUtc">[])
   );
 }
 
-/** 행성 목록 → 그릴 노드 */
-export function planetNodes(planets: Planet[]): PlanetNode[] {
+/** 행성 목록 → 그릴 노드. 사용자가 옮기거나 모양을 고른 행성은 그 값을 쓴다 (7단계 덧씌우기) */
+export function planetNodes(planets: Planet[], overrides: Record<string, PlanetOverride> = {}): PlanetNode[] {
   const pos = compactPositions(planets);
   const max = Math.max(0, ...planets.map((p) => p.starCountInPeriod ?? 0));
   return planets.map((p) => {
-    const at = pos.get(p.id) ?? { x: 0, y: 0 };
+    const o = overrides[p.id];
+    const at = typeof o?.x === "number" && typeof o?.y === "number" ? { x: o.x, y: o.y } : (pos.get(p.id) ?? { x: 0, y: 0 });
     const count = p.starCountInPeriod ?? 0;
-    return { id: p.id, name: p.name, x: at.x, y: at.y, count, size: planetSizePx(count, max), look: planetLook(p) };
+    return { id: p.id, name: p.name, x: at.x, y: at.y, count, size: planetSizePx(count, max), look: planetLook(p, o?.shape) };
   });
 }
 

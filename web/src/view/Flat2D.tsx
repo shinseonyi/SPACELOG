@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { demo, useDemo } from "../demo/demoStore.ts";
+import { freeSpot } from "../demo/planets.ts";
 import { store, useStore } from "../state/store.ts";
 import heroUrl from "../assets/planet-hero.png";
 import nebulaUrl from "../assets/planet-nebula.png";
@@ -25,11 +27,16 @@ const STARFIELD = (() => {
  */
 export function Flat2D() {
   const planets = useStore((s) => s.planets);
-  const nodes = useMemo(() => planetNodes(planets), [planets]);
+  const overrides = useDemo((s) => s.planets);
+  const nodes = useMemo(() => planetNodes(planets, overrides), [planets, overrides]);
   const paths = useLinkPaths();
   const segs = useMemo(() => segmentsOf(paths), [paths]);
   const marks = useMemo(() => marksOf(paths), [paths]);
-  const at = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
+  const editPos = useStore((s) => s.editPos);
+  const [pdrag, setPdrag] = useState<{ id: string; x: number; y: number } | null>(null);
+  const pmeta = useRef<{ id: string; sx: number; sy: number; px: number; py: number; moved: boolean } | null>(null);
+  const shownNodes = useMemo(() => (pdrag ? nodes.map((n) => (n.id === pdrag.id ? { ...n, x: pdrag.x, y: pdrag.y } : n)) : nodes), [nodes, pdrag]);
+  const at = useMemo(() => new Map(shownNodes.map((n) => [n.id, n])), [shownNodes]);
   const [cam, setCam] = useState<Cam2D>({ x: 0, y: 0, z: 1 });
   const [anim, setAnim] = useState(0);
   const root = useRef<HTMLDivElement>(null);
@@ -229,6 +236,42 @@ export function Flat2D() {
     };
   }, [cancelFlight]);
 
+  // 위치 편집: 행성을 끌어 옮긴다. 놓은 곳이 블랙홀이면 보내기를 묻고, 다른 행성과 320px 안이면 가까운 빈자리로 옮긴다 (README 6-1)
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      const m = pmeta.current;
+      if (!m) return;
+      if (!m.moved && Math.hypot(e.clientX - m.sx, e.clientY - m.sy) > 4) m.moved = true;
+      if (!m.moved) return;
+      const z = live.current.cam.z;
+      setPdrag({ id: m.id, x: Math.round(m.px + (e.clientX - m.sx) / z), y: Math.round(m.py + (e.clientY - m.sy) / z) });
+    };
+    const onUp = (e: PointerEvent) => {
+      const m = pmeta.current;
+      pmeta.current = null;
+      if (!m || !m.moved) return setPdrag(null);
+      const z = live.current.cam.z;
+      const x = Math.round(m.px + (e.clientX - m.sx) / z);
+      const y = Math.round(m.py + (e.clientY - m.sy) / z);
+      setPdrag(null);
+      const hole = document.querySelector("[data-blackhole]")?.getBoundingClientRect();
+      if (hole && e.clientX >= hole.left && e.clientX <= hole.right && e.clientY >= hole.top && e.clientY <= hole.bottom) {
+        const s = store.getState();
+        if (s.planets.length <= 1) s.showToast("마지막 행성은 블랙홀에 넣을 수 없어요");
+        else s.setAskTrash(m.id);
+        return;
+      }
+      const spot = freeSpot(live.current.nodes.filter((n) => n.id !== m.id), x, y, m.id);
+      demo.getState().setPlanet(m.id, { x: spot.x, y: spot.y });
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+  }, []);
+
   const onBgClick = (e: React.MouseEvent) => {
     if (drag.current?.moved || (e.target as Element).closest("button")) return;
     const s = store.getState();
@@ -260,8 +303,20 @@ export function Flat2D() {
             return a && b ? <line key={`${s.linkId}-${i}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} /> : null;
           })}
         </svg>
-        {nodes.map((n) => (
-          <PlanetButton key={n.id} node={n} labelScale={labelScale} />
+        {shownNodes.map((n) => (
+          <PlanetButton
+            key={n.id}
+            node={n}
+            labelScale={labelScale}
+            editing={editPos}
+            dragging={pdrag?.id === n.id}
+            onEditDown={(e) => {
+              if (e.button !== 0) return;
+              e.stopPropagation(); // 바탕 끌기(화면 이동)가 아니라 행성 끌기
+              cancelFlight();
+              pmeta.current = { id: n.id, sx: e.clientX, sy: e.clientY, px: n.x, py: n.y, moved: false };
+            }}
+          />
         ))}
         {marks.map((m) => {
           const a = at.get(m.a);
@@ -289,17 +344,18 @@ export function Flat2D() {
   );
 }
 
-function PlanetButton({ node: n, labelScale }: { node: PlanetNode; labelScale: number }) {
+function PlanetButton({ node: n, labelScale, editing, dragging, onEditDown }: { node: PlanetNode; labelScale: number; editing: boolean; dragging: boolean; onEditDown(e: React.PointerEvent): void }) {
   const { look } = n;
   const dots = Math.min(n.count, 12);
   const open = () => (n.count > 0 ? void store.getState().flyToPlanet(n.id, "openPanel") : store.getState().openPanel(n.id));
   return (
     <button
       type="button"
-      className="flat__planet"
+      className={`flat__planet${editing ? " is-edit" : ""}${dragging ? " is-dragging" : ""}`}
       style={{ left: n.x, top: n.y, width: n.size, height: n.size, opacity: n.count ? 1 : 0.45 }}
       aria-label={`${n.name}, ${look.unit} ${n.count}개. 눌러서 착륙`}
-      onClick={open}
+      onPointerDown={editing ? onEditDown : undefined}
+      onClick={editing ? undefined : open}
     >
       <span className="flat__body" style={{ width: n.size, height: n.size }}>
         {n.count > 0 && (

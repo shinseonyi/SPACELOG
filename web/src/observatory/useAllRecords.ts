@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Planet, Star } from "@spacelog/shared/types";
 import { api, RequestError } from "../api/client.ts";
+import { demo } from "../demo/demoStore.ts";
+import { applyDemoToUniverse } from "../demo/planets.ts";
 import { allPeriod } from "../home/periodOptions.ts";
 import { useStore } from "../state/store.ts";
 
@@ -15,7 +17,7 @@ export function useAllRecords(): { stars: Star[]; planets: Planet[] } | null {
     let alive = true;
     const p = allPeriod();
     api.universe(p.from, p.to).then(
-      (u) => alive && setData({ stars: u.stars, planets: u.planets }),
+      (u) => alive && setData(applyDemoToUniverse(demo.getState(), u.planets, u.stars) as { stars: Star[]; planets: Planet[] }),
       (e) => {
         if (!(e instanceof RequestError)) throw e;
         if (alive) setData((cur) => cur ?? { stars: [], planets: [] });

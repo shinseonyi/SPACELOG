@@ -2,6 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { MoreHorizontal, Rocket } from "lucide-react";
 import { PLANET_NAME_MAX, type Planet, type Star } from "@spacelog/shared/types";
 import { api } from "../api/client.ts";
+import { demo, useDemo } from "../demo/demoStore.ts";
+import { PLANET_COLORS, type PlanetShapeChoice } from "../demo/types.ts";
+import { planetColorToken } from "../ui/planetColor.ts";
 import { PickedTools } from "../home/PickedTools.tsx";
 import { PERIOD_LABEL, periodFor, periodKey } from "../home/periodOptions.ts";
 import { store, useStore } from "../state/store.ts";
@@ -17,12 +20,13 @@ import { useSave } from "./useSave.ts";
 import "./panel.css";
 
 const RANGES: RangeKey[] = ["today", "week", "month", "all"];
-type Sheet = null | "create" | "rename" | "merge";
+type Sheet = null | "create" | "rename" | "merge" | "edit";
 
 /** 행성 패널 (README 6-2). 행성 수정(색·모양)과 별자리 구역은 5~7단계에서 붙인다 */
 export function PlanetPanel({ planetId }: { planetId: string }) {
   const planet = useStore((s) => s.planets.find((p) => p.id === planetId));
   const planets = useStore((s) => s.planets);
+  const shapeChoice = useDemo((s) => s.planets[planetId]?.shape);
   const allStars = useStore((s) => s.stars);
   const period = useStore((s) => s.period);
   const stars = useMemo(() => allStars.filter((s) => s.planetId === planetId).sort((a, b) => b.createdAtUtc.localeCompare(a.createdAtUtc)), [allStars, planetId]);
@@ -58,7 +62,7 @@ export function PlanetPanel({ planetId }: { planetId: string }) {
   }, [menu]);
 
   if (!planet) return null;
-  const look = planetLook(planet);
+  const look = planetLook(planet, shapeChoice);
   const system = planet.system !== null;
   const total = planet.starCountTotal ?? 0;
   const others = planets.filter((p) => p.id !== planetId);
@@ -81,6 +85,7 @@ export function PlanetPanel({ planetId }: { planetId: string }) {
           <Button className="btn--icon" aria-label="행성 메뉴" aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((v) => !v)}><MoreHorizontal size={16} aria-hidden /></Button>
           {menu && (
             <ul className="menu" role="menu">
+              <MenuItem label="행성 수정" onPick={() => { setMenu(false); setSheet("edit"); }} />
               <MenuItem label="새 행성 만들기" onPick={() => { setMenu(false); setSheet("create"); }} />
               <MenuItem label="이름 바꾸기" disabled={system} hint="미분류는 이름을 바꿀 수 없어요" onPick={() => { setMenu(false); setSheet("rename"); }} />
               <MenuItem label="다른 행성에 합치기" disabled={system || others.length === 0} hint={system ? "미분류는 합칠 수 없어요" : "합칠 행성이 없어요"} onPick={() => { setMenu(false); setMergeTo(others[0]?.id ?? ""); setSheet("merge"); }} />
@@ -97,6 +102,21 @@ export function PlanetPanel({ planetId }: { planetId: string }) {
         ) : undefined
       }
     >
+      {sheet === "edit" && (
+        <EditSheet
+          planet={planet}
+          shape={look.shape}
+          planets={planets}
+          busy={busy}
+          onCancel={() => setSheet(null)}
+          onSave={async ({ name, colorToken, shape }) => {
+            demo.getState().setPlanet(planet.id, { colorToken, shape }); // 색·모양은 시연용 덧씌우기라 바로 적용된다
+            if (name !== planet.name && !(await run(() => api.renamePlanet(planet.id, name), "이름을 바꿨어요"))) return;
+            setSheet(null);
+            if (name !== planet.name) await store.getState().refresh();
+          }}
+        />
+      )}
       {sheet === "create" && (
         <NameSheet
           title="새 행성 만들기"
@@ -256,6 +276,61 @@ function NameSheet({ title, submitLabel, initial = "", self, planets, busy, onCa
       <div className="sheet__actions">
         <Button onClick={onCancel}>취소</Button>
         <Button type="submit" variant="primary" disabled={!ok || busy}>{submitLabel}</Button>
+      </div>
+    </form>
+  );
+}
+
+const SHAPES: { key: PlanetShapeChoice; label: string }[] = [
+  { key: "", label: "기본" },
+  { key: "ring", label: "고리" },
+  { key: "nebula", label: "성운" },
+];
+const NAME_MAX = 16; // 시안(README 6-2)은 16자
+
+/** 행성 수정 시트 (README 6-2): 이름 · 색 7가지 · 모양(기본 / 고리 / 성운). 색·모양은 시연용으로 이 브라우저에 저장된다 */
+function EditSheet({ planet, shape: current, planets, busy, onCancel, onSave }: {
+  planet: Planet;
+  shape: PlanetShapeChoice;
+  planets: Planet[];
+  busy: boolean;
+  onCancel(): void;
+  onSave(v: { name: string; colorToken: string; shape: PlanetShapeChoice }): void;
+}) {
+  const system = planet.system !== null;
+  const [name, setName] = useState(planet.name);
+  const [colorToken, setColorToken] = useState(planetColorToken(planet.colorToken));
+  const [shape, setShape] = useState<PlanetShapeChoice>(current);
+  const trimmed = name.trim();
+  const dup = planets.some((p) => p.id !== planet.id && p.name.toLowerCase() === trimmed.toLowerCase());
+  const error = !trimmed ? "이름을 입력해 주세요" : dup ? "같은 이름의 행성이 있어요" : "";
+  return (
+    <form className="sheet" aria-label="행성 수정" onSubmit={(e) => { e.preventDefault(); if (!error) onSave({ name: trimmed, colorToken, shape }); }}>
+      <h3 className="sheet__title">행성 수정</h3>
+      <label className="field">
+        행성 이름
+        <input value={name} maxLength={NAME_MAX} disabled={system} title={system ? "미분류는 이름을 바꿀 수 없어요" : undefined} onChange={(e) => setName(e.target.value)} aria-invalid={!!error} />
+      </label>
+      {error && !system && <p className="field__error" role="alert">{error}</p>}
+      <div className="field">
+        색상
+        <div className="swatches" role="radiogroup" aria-label="색상">
+          {PLANET_COLORS.map((c) => (
+            <button key={c.token} type="button" role="radio" aria-checked={colorToken === c.token} aria-label={c.label} title={c.label} className={`swatch${colorToken === c.token ? " is-on" : ""}`} style={{ background: `var(--${c.token})` }} onClick={() => setColorToken(c.token)} />
+          ))}
+        </div>
+      </div>
+      <div className="field">
+        모양
+        <div className="shapes" role="radiogroup" aria-label="모양">
+          {SHAPES.map((s) => (
+            <button key={s.key || "default"} type="button" role="radio" aria-checked={shape === s.key} className={`shape${shape === s.key ? " is-on" : ""}`} onClick={() => setShape(s.key)}>{s.label}</button>
+          ))}
+        </div>
+      </div>
+      <div className="sheet__actions">
+        <Button onClick={onCancel}>취소</Button>
+        <Button type="submit" variant="primary" disabled={busy || (!system && !!error)}>저장</Button>
       </div>
     </form>
   );
