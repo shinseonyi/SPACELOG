@@ -302,7 +302,8 @@ export function Flat2D() {
           <PlanetButton
             key={n.id}
             node={n}
-            blur={blurOf(n, focusId ? at.get(focusId) : undefined)}
+            blur={blurOf(n, focusId ? at.get(focusId) : undefined, cam.z)}
+            zoom={cam.z}
             labelScale={labelScale}
             editing={editPos}
             dragging={pdrag?.id === n.id}
@@ -344,13 +345,13 @@ export function Flat2D() {
   );
 }
 
-/** 심도 효과: 고른 행성(패널 열림)에서 멀수록 흐리게. 고른 행성 · 고른 것이 없으면 0 */
-function blurOf(n: PlanetNode, focus: PlanetNode | undefined): number {
+/** 심도 효과: 고른 행성(패널 열림)에서 화면상 멀수록 흐리게 (확대 · 축소를 따라간다). 고른 행성 · 고른 것이 없으면 0 */
+function blurOf(n: PlanetNode, focus: PlanetNode | undefined, zoom: number): number {
   if (!focus || focus.id === n.id) return 0;
-  return focusBlur(Math.hypot(n.x - focus.x, n.y - focus.y), FLAT_BLUR_REF);
+  return focusBlur(Math.hypot(n.x - focus.x, n.y - focus.y) * zoom, FLAT_BLUR_REF);
 }
 
-function PlanetButton({ node: n, blur, labelScale, editing, dragging, onEditDown }: { node: PlanetNode; blur: number; labelScale: number; editing: boolean; dragging: boolean; onEditDown(e: React.PointerEvent): void }) {
+function PlanetButton({ node: n, blur, zoom, labelScale, editing, dragging, onEditDown }: { node: PlanetNode; blur: number; zoom: number; labelScale: number; editing: boolean; dragging: boolean; onEditDown(e: React.PointerEvent): void }) {
   const { look } = n;
   const dots = Math.min(n.count, 12);
   const open = () => (n.count > 0 ? void store.getState().flyToPlanet(n.id, "openPanel") : store.getState().openPanel(n.id));
@@ -358,7 +359,7 @@ function PlanetButton({ node: n, blur, labelScale, editing, dragging, onEditDown
     <button
       type="button"
       className={`flat__planet${editing ? " is-edit" : ""}${dragging ? " is-dragging" : ""}`}
-      style={{ left: n.x, top: n.y, width: n.size, height: n.size, opacity: n.count ? 1 : 0.45, filter: blur > 0.01 ? `blur(${(blur * FLAT_BLUR_PX).toFixed(2)}px) brightness(${(1 - blur * FLAT_DIM).toFixed(2)})` : undefined }}
+      style={{ left: n.x, top: n.y, width: n.size, height: n.size, opacity: n.count ? 1 : 0.45, filter: blur > 0.01 ? `blur(${((blur * FLAT_BLUR_PX) / zoom).toFixed(2)}px) brightness(${(1 - blur * FLAT_DIM).toFixed(2)})` : undefined }} /* 세계가 zoom 배로 그려지므로 화면 px 로 맞춘다 */
       aria-label={`${n.name}, ${look.unit} ${n.count}개. 눌러서 착륙`}
       onPointerDown={editing ? onEditDown : undefined}
       onClick={editing ? undefined : open}
