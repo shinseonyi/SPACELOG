@@ -1,10 +1,11 @@
 import { ArrowRight, ArrowUp, X } from "lucide-react";
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useStore } from "../state/store.ts";
 import { Button } from "../ui/Button.tsx";
 import { CHATBOT_OK, CHATBOT_URL } from "./chatApi.ts";
 import { useChat } from "./chatStore.ts";
-import { closeChat, installRelayout, runAction, sendChat, toggleChat } from "./controller.ts";
+import { closeChat, installRelayout, runAction, sendChat, spotlightRects, toggleChat } from "./controller.ts";
+import { spotMask, unionBox } from "./spotlight.ts";
 import { consumeDragClick, startDustDrag } from "./dustPos.ts";
 import { ACTION_LABEL, BOT_NAME, FOLLOW_UP, suggestions, WAITING } from "./faq.ts";
 import "./chat.css";
@@ -91,6 +92,39 @@ function GuideGlow() {
   );
 }
 
+/**
+ * 대화창 뒤 덮개: 다른 화면을 어둡고 흐리게. 누르면 닫는다.
+ * 길잡이가 가리키는 동안(날아간 빛무리 · 제자리 "Here!")에도 덮개는 두고, 가리키는 버튼(과 우주먼지) 둘레만 구멍을 뚫어 또렷하게 — 그동안은 눌러도 닫히지 않는다
+ */
+function ChatDim() {
+  const guide = useChat((s) => s.guide);
+  const here = useChat((s) => s.here);
+  const spot = guide !== null || here;
+  const [mask, setMask] = useState<string | null>(null);
+  useEffect(() => {
+    const update = () => {
+      const u = unionBox(spotlightRects());
+      setMask(u ? spotMask(u) : null);
+    };
+    update();
+    const t = setTimeout(update, 120); // 답이 그려진 뒤 버튼 자리를 다시 잰다
+    window.addEventListener("resize", update);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("resize", update);
+    };
+  }, [guide, here]);
+  const hole = spot ? mask : null;
+  return (
+    <div
+      className={`chat-dim${spot ? " chat-dim--spot" : ""}`}
+      aria-hidden
+      style={hole ? { WebkitMaskImage: hole, maskImage: hole } : undefined}
+      onClick={spot ? undefined : closeChat}
+    />
+  );
+}
+
 function ChatPanel() {
   const open = useChat((s) => s.open);
   const height = useChat((s) => s.height);
@@ -100,7 +134,6 @@ function ChatPanel() {
   const setInput = useChat((s) => s.setInput);
   const edit = useStore((s) => s.editPos);
   const obsOpen = useStore((s) => s.route.name === "observatory");
-  const guiding = useChat((s) => s.guide !== null || s.here);
   const log = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLInputElement>(null);
 
@@ -120,8 +153,7 @@ function ChatPanel() {
 
   return (
     <>
-      {/* 뒤 화면을 어둡고 흐리게. 길잡이 빛무리가 가리키는 버튼은 또렷해야 하므로 그동안은 뺀다 */}
-      {!dim && !guiding && <div className="chat-dim" aria-hidden onClick={closeChat} />}
+      {!dim && <ChatDim />}
       <section
         className="chat"
         role="dialog"

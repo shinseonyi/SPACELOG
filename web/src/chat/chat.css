@@ -33,8 +33,8 @@
 } /* 길잡이 빛이 버튼 아래에 머물 때: 말풍선도 빛 아래 */
 .dust__bubble span { display: block; padding: 3px 11px; border-radius: var(--r-pill); border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.07); box-shadow: 0 0 16px rgba(255, 255, 255, 0.16), inset 0 0 8px rgba(255, 255, 255, 0.1); color: #fff; font: 300 12px/1 var(--f-body); letter-spacing: 0.16em; white-space: nowrap; text-shadow: 0 0 6px rgba(255, 255, 255, 0.95), 0 0 16px rgba(255, 255, 255, 0.55); animation: sl-drift 4.4s ease-in-out infinite; }
 
-/* 길잡이 빛무리: 답이 가리키는 버튼 옆으로 날아가 머문다. 대화창(z 20)보다 아래, 2단계는 관측소(z 25)보다 위 */
-.guide { position: fixed; width: 48px; height: 48px; margin: -24px 0 0 -24px; z-index: 15; pointer-events: none; transition: opacity 700ms ease; }
+/* 길잡이 빛무리: 답이 가리키는 버튼 옆으로 날아가 머문다. 덮개(z 19)보다 위 · 대화창(z 20, DOM 에서 뒤)보다 아래, 2단계는 관측소(z 25)보다 위 */
+.guide { position: fixed; width: 48px; height: 48px; margin: -24px 0 0 -24px; z-index: 20; pointer-events: none; transition: opacity 700ms ease; }
 .guide--move { transition: left 900ms cubic-bezier(0.25, 0.1, 0.25, 1), top 900ms cubic-bezier(0.25, 0.1, 0.25, 1), opacity 700ms ease; }
 .guide--over { z-index: 30; }
 .guide--fade { opacity: 0; }
@@ -52,8 +52,10 @@
 }
 /* 761 ~ 991px: 가운데에 두면 오른쪽 창(폭 300 + 24)에 닿는다. 오른쪽 창이 열려 있으면 그 왼쪽 빈 곳의 가운데로 (홈 배너와 같은 폭. 760px 이하는 오른쪽 창이 가로를 꽉 채운다) */
 @media (min-width: 761px) and (max-width: 991px) { .side ~ .chat { left: calc((100vw - 324px) / 2); } }
-/* 대화창 뒤 덮개: 다른 화면을 조금 어둡고 흐리게. 누르면 닫는다. 길잡이 빛무리가 날아가 있거나 위치 편집 · 관측소 중엔 뺀다 (CosmicDust.tsx) */
+/* 대화창 뒤 덮개: 다른 화면을 조금 어둡고 흐리게. 누르면 닫는다. 위치 편집 · 관측소 중엔 뺀다 (CosmicDust.tsx)
+   길잡이가 가리키는 동안(--spot)은 가리키는 곳만 구멍(mask)을 뚫고, 눌러도 닫히지 않는다 */
 .chat-dim { position: fixed; inset: 0; z-index: 19; background: rgba(0, 0, 0, 0.4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); animation: fade-in 200ms ease-out; }
+.chat-dim--spot { pointer-events: none; }
 .chat[data-dim="edit"] { opacity: 0.16; pointer-events: none; }
 .chat[data-dim="obs"] { opacity: 0; pointer-events: none; }
 .chat__head { flex: none; display: flex; align-items: center; gap: 10px; padding: 14px 12px 12px 16px; border-bottom: 1px solid var(--color-line-inset); }

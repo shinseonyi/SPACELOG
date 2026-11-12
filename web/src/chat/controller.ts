@@ -3,6 +3,7 @@
 import { store } from "../state/store.ts";
 import { askChatbot, CHATBOT_OK, type ChatTurn } from "./chatApi.ts";
 import { chat } from "./chatStore.ts";
+import type { Box } from "./spotlight.ts";
 import { answerFor, FAILED, NO_COMET_YET, STAY, STAY_HERE, UNKNOWN, type ActionId, type GuideTarget } from "./faq.ts";
 
 /** 챗봇 버튼(빛무리)의 표식. LeftStack 의 버튼에 붙어 있다 */
@@ -70,9 +71,12 @@ function nearSource(target: GuideTarget): boolean {
 
 let hereTimers: ReturnType<typeof setTimeout>[] = [];
 let hereCtrl: AbortController | null = null;
+/** 제자리 "Here!"가 가리키는 버튼 (덮개 구멍용) */
+let hereTarget: GuideTarget | null = null;
 function cancelHere() {
   hereCtrl?.abort();
   hereCtrl = null;
+  hereTarget = null;
   for (const t of hereTimers) clearTimeout(t);
   hereTimers = [];
   if (chat.getState().here) chat.getState().setHere(false);
@@ -80,6 +84,7 @@ function cancelHere() {
 /** 제자리에서 "Here!": 가리킨 버튼을 누르면 잠시 머문 뒤 거둔다 (날아간 빛무리와 같은 리듬) */
 function pointHere(target: GuideTarget) {
   cancelHere();
+  hereTarget = target;
   chat.getState().setHere(true);
   const el = document.querySelector<HTMLElement>(`[data-guide-target="${target}"]`);
   if (!el) return;
@@ -121,6 +126,22 @@ function watchTarget(target: GuideTarget) {
   if (!el) return;
   settleCtrl = new AbortController();
   el.addEventListener("click", settleGuide, { once: true, signal: settleCtrl.signal });
+}
+
+/**
+ * 대화창 뒤 덮개에서 또렷하게 남길 곳들 (CosmicDust ChatDim): 길잡이가 가리키는 버튼, 제자리 "Here!"면 우주먼지(말풍선 포함)와 그 버튼.
+ * 2단계(관측소 위)는 관측소가 덮개보다 위층이라 구멍이 필요 없다
+ */
+export function spotlightRects(): Box[] {
+  const s = chat.getState();
+  const out: Box[] = [];
+  const push = (r: DOMRect | null, up = 0) => r && out.push({ left: r.left, top: r.top - up, right: r.right, bottom: r.bottom });
+  if (s.guide && !s.guide.over && currentTarget) push(rectOf(`[data-guide-target="${currentTarget}"]`));
+  if (s.here && hereTarget) {
+    push(rectOf(`[data-guide-target="${hereTarget}"]`));
+    push(rectOf(".dust"), 36); // 위 "hello/Here!" 말풍선(-32)과 두 바퀴 도는 움직임(-18)까지
+  }
+  return out;
 }
 
 /** 대화창 높이: 화면 가운데에 뜨므로 위아래 88px(상단 바)을 뺀 높이, 420 ~ 680 */
