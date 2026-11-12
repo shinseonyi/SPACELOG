@@ -49,7 +49,7 @@ export function Flat2D() {
   const size = () => ({ w: root.current?.clientWidth ?? 1280, h: root.current?.clientHeight ?? 800 });
   const occupied = () => {
     const s = store.getState();
-    return rightOccupied(size().w, s.selectedPlanetId !== null || s.selectedStarId !== null, s.sideTab !== null);
+    return rightOccupied(size().w, s.selectedPlanetId !== null || s.selectedStarId !== null);
   };
 
   const cancelFlight = useCallback(() => {
@@ -79,7 +79,7 @@ export function Flat2D() {
           cancelFlight();
           const node = live.current.nodes.find((n) => n.id === id);
           if (!node) return resolve(false);
-          const occ = rightOccupied(size().w, true, false); // 곧 패널이 열린다
+          const occ = rightOccupied(size().w, true); // 곧 패널이 열린다
           move(landCam(node, size().w, occ), FLY_MS);
           flight.current = {
             done: resolve,
@@ -123,13 +123,6 @@ export function Flat2D() {
     };
   }, [overview, move]);
 
-  // 오른쪽 창이 열리고 닫힐 때 가려진 만큼 다시 맞춘다 (조망 상태일 때만)
-  useEffect(() => {
-    return store.subscribe((s, prev) => {
-      if (s.sideTab !== prev.sideTab && !s.selectedPlanetId && s.camera === "overview") overview(400);
-    });
-  }, [overview]);
-
   // 확대 조절(왼쪽 아래)에 연결
   useEffect(() => {
     const zoomBy = (k: number) => {
@@ -137,7 +130,7 @@ export function Flat2D() {
       const c = live.current.cam;
       move({ ...c, z: clampZoom(c.z * k) }, 250);
     };
-    viewApi.setState({ zoom: { label: `${Math.round(cam.z * 100)}%`, zoomIn: () => zoomBy(1.25), zoomOut: () => zoomBy(0.8), fit: () => overview(600) } });
+    viewApi.setState({ zoom: { percent: Math.round(cam.z * 100), zoomIn: () => zoomBy(1.25), zoomOut: () => zoomBy(0.8), fit: () => overview(600) } });
   }, [cam.z, cancelFlight, move, overview]);
   useEffect(() => () => viewApi.setState({ zoom: null }), []);
 

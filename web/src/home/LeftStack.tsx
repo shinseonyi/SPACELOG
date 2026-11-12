@@ -21,7 +21,10 @@ export function LeftStack() {
         {zoom && (
           <div className="zoom card" role="group" aria-label="확대 축소">
             <button type="button" className="zoom__step" aria-label="확대" title="확대 (Shift)" onClick={zoom.zoomIn}><Plus size={18} aria-hidden /></button>
-            <button type="button" className="zoom__fit" aria-label={`배율 ${zoom.label}. 모든 행성이 보이게 맞추기`} title="모든 행성이 보이게 맞추기" onClick={zoom.fit}>{zoom.label}</button>
+            <button type="button" className="zoom__fit" aria-label={`맞춤: 모든 행성이 보이게 맞추기. 지금 배율 ${zoom.percent}%`} title="모든 행성이 보이게 맞추기" onClick={zoom.fit}>
+              <span className="zoom__fit-label">맞춤</span>
+              <span className="zoom__pct">({zoom.percent}%)</span>
+            </button>
             <button type="button" className="zoom__step" aria-label="축소" title="축소 (Space)" onClick={zoom.zoomOut}><Minus size={18} aria-hidden /></button>
           </div>
         )}

@@ -65,7 +65,7 @@ test("조망은 모든 행성이 들어오고, 오른쪽 창만큼 왼쪽으로 
 test("착륙: 넓은 화면 1.7배, 좁은 화면 1.2배. 오른쪽 가림은 좁은 화면에서 0", () => {
   assert.equal(landCam({ x: 0, y: 0 }, 1280, 456).z, 1.7);
   assert.equal(landCam({ x: 0, y: 0 }, 400, 0).z, 1.2);
-  assert.deepEqual([rightOccupied(1280, true, true), rightOccupied(1280, false, true), rightOccupied(1280, false, false), rightOccupied(400, true, true)], [456, 324, 0, 0]);
+  assert.deepEqual([rightOccupied(1280, true), rightOccupied(1280, false), rightOccupied(400, true)], [456, 0, 0]); // 오른쪽 목록 창은 세지 않는다
 });
 
 test("사용자가 옮긴 위치와 고른 모양이 기본 배치·기본 모양보다 앞선다", () => {

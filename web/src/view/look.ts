@@ -169,7 +169,8 @@ export function leftOccupied(w: number): number {
 }
 
 /** 오른쪽에서 가린 폭: 행성 패널(440+16) > 오른쪽 창(300+24) > 없음. 좁은 화면은 전체 폭이라 비우지 않는다 */
-export function rightOccupied(w: number, panelOpen: boolean, sideOpen: boolean): number {
+/** 오른쪽이 가려진 폭. 행성 패널만 센다 — 오른쪽 목록 창(행성으로 바로 날아가기 등)은 켜고 꺼도 시점이 밀리지 않게 세지 않는다 */
+export function rightOccupied(w: number, panelOpen: boolean): number {
   if (w < 760) return 0;
-  return panelOpen ? 456 : sideOpen ? 324 : 0;
+  return panelOpen ? 456 : 0;
 }

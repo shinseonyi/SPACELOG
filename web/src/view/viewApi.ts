@@ -2,8 +2,11 @@
 import { createStore, useStore } from "zustand";
 
 export interface ZoomControl {
-  /** 가운데 버튼 글자. 2D는 "100%" 같은 배율 */
-  label: string;
+  /**
+   * 지금 배율(%). 가운데 [맞춤] 버튼 아래에 "(78%)"로 보인다. 2D·2.5D 같은 자리.
+   * 2D: 평면 확대 배율. 2.5D: 맞춤(모든 행성이 보이는 거리)을 100%로, 가까이 날아가면 커지고 멀어지면 작아진다
+   */
+  percent: number;
   zoomIn(): void;
   zoomOut(): void;
   /** 모든 행성이 보이게 맞추기 */

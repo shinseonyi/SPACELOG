@@ -87,6 +87,10 @@ export class DepthScene {
   private sw = 0;
   private sh = 0;
   private occ = 0;
+  /** 맞춤 시점의 바라보는 중심과 거리. 배율(%) = 맞춤 거리 / 지금 거리 */
+  private fit = { center: new THREE.Vector3(0, 0, 0), dist: 1600 };
+  private pct = 100;
+  private pctAt = 0;
   private raf = 0;
   private last = performance.now();
   private disposed = false;
@@ -221,7 +225,7 @@ export class DepthScene {
     this.cleanups.push(store.subscribe((s, prev) => {
       if (s.camera === "overview" && prev.camera !== "overview") this.overview(1100);
     }));
-    viewApi.setState({ zoom: { label: "맞춤", zoomIn: () => this.dolly(1), zoomOut: () => this.dolly(-1), fit: () => this.overview(900) } });
+    viewApi.setState({ zoom: { percent: 100, zoomIn: () => this.dolly(1), zoomOut: () => this.dolly(-1), fit: () => this.overview(900) } });
 
     this.raf = requestAnimationFrame((t) => this.frame(t));
   }
@@ -432,7 +436,10 @@ export class DepthScene {
 
   overview(ms: number) {
     const ps = this.planets;
-    if (!ps.length) return this.pose(new THREE.Vector3(0, 0, 1600), { yaw: 0, pitch: 0 }, ms, false);
+    if (!ps.length) {
+      this.fit = { center: new THREE.Vector3(0, 0, 0), dist: 1600 };
+      return this.pose(new THREE.Vector3(0, 0, 1600), { yaw: 0, pitch: 0 }, ms, false);
+    }
     const lo = new THREE.Vector3(Infinity, Infinity, Infinity), hi = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
     ps.forEach((p) => {
       const c = this.pos(p), r = p.size;
@@ -443,6 +450,7 @@ export class DepthScene {
     const asp = Math.max(200, (this.host.clientWidth || 16) - this.occupied()) / (this.host.clientHeight || 9);
     const D = ((Math.max(ex / asp, ey) * 0.5) / Math.tan((FOV * Math.PI) / 360)) * 1.15 + 200;
     const pos = new THREE.Vector3(c.x, c.y + ey * 0.08, hi.z + D);
+    this.fit = { center: c.clone(), dist: pos.distanceTo(c) };
     this.pose(pos, this.angles(pos, c), ms, false);
   }
 
@@ -452,9 +460,20 @@ export class DepthScene {
     this.wheel += dir * 900;
   }
 
+  /** 확대 조절의 배율(%)을 알린다. 값이 바뀔 때만, 0.1초에 한 번까지 (매 프레임 화면을 다시 그리지 않게) */
+  private reportPercent(now: number) {
+    if (now - this.pctAt < 100) return;
+    const pct = Math.max(1, Math.round((this.fit.dist / Math.max(1, this.cam.pos.distanceTo(this.fit.center))) * 100));
+    if (pct === this.pct) return;
+    this.pct = pct;
+    this.pctAt = now;
+    const z = viewApi.getState().zoom;
+    if (z) viewApi.setState({ zoom: { ...z, percent: pct } });
+  }
+
   private occupied() {
     const s = store.getState();
-    return rightOccupied(this.host.clientWidth, s.selectedPlanetId !== null || s.selectedStarId !== null, s.sideTab !== null);
+    return rightOccupied(this.host.clientWidth, s.selectedPlanetId !== null || s.selectedStarId !== null);
   }
 
   private frame(now: number) {
@@ -514,6 +533,7 @@ export class DepthScene {
     this.camera.rotation.set(cam.pitch, cam.yaw, 0, "YXZ");
     this.camera.updateMatrixWorld();
     this.stars.position.copy(cam.pos);
+    this.reportPercent(now);
 
     let dmin = Infinity, dmax = 0;
     this.nodes.forEach((n) => {
