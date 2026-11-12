@@ -25,6 +25,7 @@ const collector: CollectorBridge = {
   confirm: (input) => ipcRenderer.invoke("confirm", input),
   status: () => ipcRenderer.invoke("status"),
   setMode: (mode, height) => ipcRenderer.send("set-mode", mode, height),
+  moveDropzone: (dy, done) => ipcRenderer.send("move-dropzone", dy, done),
   openUniverse: () => ipcRenderer.send("open-universe"),
   openRediscovery: () => ipcRenderer.send("open-rediscovery"),
   undo: (ids) => ipcRenderer.invoke("undo", ids),

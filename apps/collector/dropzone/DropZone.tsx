@@ -1,4 +1,5 @@
 // 드롭존 상태 머신 (SPEC 1-1): collapsed → expanded → dragOver → saving → confirm / error
+import { ChevronsRight, Orbit, Settings } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CollectorBridge, DropzoneStatus, SaveResult } from "../main/ipcTypes.ts";
 import { ConfirmCard, type Preview } from "./ConfirmCard.tsx";
@@ -14,6 +15,7 @@ declare global {
 export type DropState = "collapsed" | "expanded" | "dragOver" | "saving" | "confirm" | "error";
 
 const COLLAPSE_AFTER_LEAVE_MS = 2000; // 마우스 나감 2초 후 접힘
+const DRAG_THRESHOLD = 4; // 접힌 손잡이: 이만큼(px) 움직이기 전까지는 클릭으로 본다
 const ERROR_MS = 4000; // 오류 토스트 4초
 
 const c = window.collector;
@@ -28,6 +30,8 @@ export function DropZone() {
   const [memo, setMemo] = useState("");
   const prevState = useRef<DropState>("collapsed");
   const leaveTimer = useRef<number | null>(null);
+  /** 접힌 손잡이를 누르고 있는 동안: 마지막 포인터 화면 y 와 끌기 시작 여부 */
+  const grab = useRef<{ y: number; moved: boolean } | null>(null);
   const dragDepth = useRef(0);
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -147,8 +151,7 @@ export function DropZone() {
   }, [state]);
 
   function onMouseEnter() {
-    if (leaveTimer.current) window.clearTimeout(leaveTimer.current);
-    if (state === "collapsed") setState("expanded");
+    if (leaveTimer.current) window.clearTimeout(leaveTimer.current); // 펼친 창에 마우스가 돌아오면 접지 않는다 (접힌 손잡이는 눌러야 펼친다)
   }
   function onMouseLeave() {
     if (state !== "expanded") return;
@@ -208,9 +211,58 @@ export function DropZone() {
   const dragHandlers = { onDragEnter, onDragOver: (e: React.DragEvent) => e.preventDefault(), onDragLeave, onDrop };
 
   if (state === "collapsed") {
+    // 마우스를 올리기만 해서는 펼치지 않는다. 누르면 펼치고, 누른 채 끌면 손잡이(창)를 세로로 옮긴다
     return (
-      <div className="handle" onMouseEnter={onMouseEnter} {...dragHandlers} title="SpaceLog 드롭존" aria-label="SpaceLog 드롭존 펼치기">
-        <span className={`planet-dot${serverDown ? " is-error" : lowDisk ? " is-warn" : ""}`} aria-hidden />
+      <div
+        className="handle"
+        {...dragHandlers}
+        title="SpaceLog 드롭존 · 눌러서 펼치기, 끌어서 옮기기"
+        aria-label="SpaceLog 드롭존 펼치기"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setState("expanded");
+          }
+        }}
+        onPointerDown={(e) => {
+          if (e.button !== 0) return;
+          grab.current = { y: e.screenY, moved: false };
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }}
+        onPointerMove={(e) => {
+          const g = grab.current;
+          if (!g) return;
+          const dy = e.screenY - g.y; // 창이 포인터를 따라 움직이므로 화면 좌표로 잰다
+          if (!g.moved && Math.abs(dy) < DRAG_THRESHOLD) return;
+          if (!g.moved) {
+            g.moved = true;
+            e.currentTarget.classList.add("is-dragging");
+          }
+          g.y = e.screenY;
+          c.moveDropzone(dy, false);
+        }}
+        onPointerUp={(e) => {
+          const g = grab.current;
+          grab.current = null;
+          e.currentTarget.classList.remove("is-dragging");
+          if (!g) return;
+          if (g.moved) c.moveDropzone(0, true); // 끝: 위치 저장
+          else setState("expanded"); // 끌지 않고 뗐으면 클릭 → 펼친다
+        }}
+        onPointerCancel={(e) => {
+          if (grab.current?.moved) c.moveDropzone(0, true);
+          grab.current = null;
+          e.currentTarget.classList.remove("is-dragging");
+        }}
+      >
+        {/* 우주먼지: 웹의 챗봇 빛무리(web/src/chat/chat.css .glow)를 20px 로 줄인 것. 오른쪽 아래 점은 서버 오류·디스크 부족 표시 */}
+        <span className={`dust-dot${serverDown ? " is-error" : lowDisk ? " is-warn" : ""}`} aria-hidden>
+          <i className="dust-dot__halo" />
+          <i className="dust-dot__core" />
+          <span className="dust-dot__sparks"><i /><i /><i /><i /><i /><i /></span>
+        </span>
         <span className="handle-count" aria-label="오늘 넣은 기록">
           {status?.todayCount ?? "·"}
         </span>
@@ -230,9 +282,10 @@ export function DropZone() {
   return (
     <div className="panel" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...dragHandlers}>
       <header className="p-head">
-        <span className="p-logo" aria-hidden><i /></span>
+        {/* 시안 S01: 28px 원 안 Lucide orbit 14px · 접기는 chevrons-right 16px (design.md 8장: Lucide 선 아이콘만) */}
+        <span className="p-logo" aria-hidden><Orbit size={14} /></span>
         <span className="p-brand">SPACELOG</span>
-        <button type="button" className="icon-btn" title="접기" aria-label="접기" onClick={() => setState("collapsed")}>»</button>
+        <button type="button" className="icon-btn" title="접기" aria-label="접기" onClick={() => setState("collapsed")}><ChevronsRight size={16} aria-hidden /></button>
       </header>
       {lowDisk && status?.freeBytes != null && (
         <div className="band band-warn" role="status">
@@ -321,7 +374,7 @@ export function DropZone() {
           </button>
         </div>
         <button type="button" className="icon-btn outline" onClick={() => c.openSettings()} title="설정" aria-label="설정">
-          ⚙
+          <Settings size={16} aria-hidden />
         </button>
       </footer>
     </div>

@@ -71,6 +71,8 @@ export interface CollectorBridge {
   confirm(input: ConfirmInput): Promise<{ ok: boolean; error: string | null }>;
   status(): Promise<DropzoneStatus>;
   setMode(mode: DropzoneMode, height?: number): void;
+  /** 접힌 손잡이를 끌어 세로로 옮긴다 (오른쪽 가장자리에 붙은 채). done 이면 위치를 저장한다 */
+  moveDropzone(dy: number, done: boolean): void;
   openUniverse(): void;
   /** 오늘의 재발견 기록을 웹에서 연다 (트레이의 "재발견 알림 보기"와 같다) */
   openRediscovery(): void;

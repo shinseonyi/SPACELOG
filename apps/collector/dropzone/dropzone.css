@@ -36,20 +36,38 @@ kbd { font: 400 12px/1 inherit; padding: 3px 8px; border-radius: 6px; background
    불투명 창이면 귀퉁이에 배경색이 남아 운영체제의 모서리와 겹쳐 두 겹으로 보인다 */
 /* collapsed: 가장자리 손잡이 */
 .handle { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); cursor: pointer; -webkit-app-region: no-drag; }
-.planet-dot { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #8fb4ff, #2f6fe0); position: relative; }
-.planet-dot.is-error::after, .planet-dot.is-warn::after { content: ""; position: absolute; right: -3px; bottom: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); border: 1px solid var(--panel); }
-.planet-dot.is-warn::after { background: var(--warn); }
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); cursor: pointer; -webkit-app-region: no-drag; touch-action: none; }
+.handle.is-dragging { cursor: grabbing; } /* 누른 채 끌면 창이 세로로 따라온다 (DropZone.tsx) */
+/* 우주먼지(흰 빛무리) 20px — 웹 우주 홈의 챗봇 버튼과 같은 모양(web/src/chat/chat.css .glow 의 48px 을 줄임): 바깥 빛 · 핵 · 도는 반짝이 6개 */
+.dust-dot { position: relative; width: 20px; height: 20px; flex: none; }
+.dust-dot i, .dust-dot__sparks { position: absolute; display: block; }
+.dust-dot i { border-radius: 50%; }
+.dust-dot__halo { inset: -6px; background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.16) 38%, transparent 70%); animation: sl-glow 3.2s ease-in-out infinite; }
+.dust-dot__core { inset: 4px; background: radial-gradient(circle, #fff 0%, rgba(255, 255, 255, 0.85) 35%, transparent 72%); animation: sl-glow 2.1s ease-in-out infinite; }
+.dust-dot__sparks { inset: 0; animation: sl-glow-spin 14s linear infinite; }
+.dust-dot__sparks i { width: 1px; height: 1px; background: #fff; box-shadow: 0 0 3px 0.5px rgba(255, 255, 255, 0.9); animation: sl-twinkle 1.6s ease-in-out infinite; }
+.dust-dot__sparks i:nth-child(1) { left: 3px; top: 4px; width: 1.5px; height: 1.5px; }
+.dust-dot__sparks i:nth-child(2) { left: 15px; top: 3px; animation-duration: 1.85s; animation-delay: 0.7s; }
+.dust-dot__sparks i:nth-child(3) { left: 17px; top: 12.5px; width: 1.5px; height: 1.5px; animation-duration: 2.1s; animation-delay: 1.3s; }
+.dust-dot__sparks i:nth-child(4) { left: 5px; top: 15px; animation-duration: 2.35s; animation-delay: 1.9s; }
+.dust-dot__sparks i:nth-child(5) { left: 10px; top: 1px; animation-duration: 2.6s; animation-delay: 2.4s; }
+.dust-dot__sparks i:nth-child(6) { left: 2px; top: 10px; animation-duration: 2.85s; animation-delay: 0.4s; }
+.dust-dot.is-error::after, .dust-dot.is-warn::after { content: ""; position: absolute; right: -3px; bottom: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); border: 1px solid var(--panel); z-index: 1; }
+.dust-dot.is-warn::after { background: var(--warn); }
+@keyframes sl-glow { 0%, 100% { transform: scale(0.86); opacity: 0.75; } 50% { transform: scale(1.12); opacity: 1; } }
+@keyframes sl-twinkle { 0%, 100% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1); opacity: 1; } }
+@keyframes sl-glow-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .dust-dot i, .dust-dot__sparks { animation: none; } }
 .handle-count { font: 600 17px/1 inherit; color: #fff; font-variant-numeric: tabular-nums; }
 .handle-label { font-size: 10px; color: var(--muted); }
 
 /* expanded / dragOver / saving / error */
 .panel { height: 100%; display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); }
 .p-head { display: flex; align-items: center; gap: 8px; }
-.p-logo { width: 28px; height: 28px; border-radius: 50%; background: var(--chip); display: grid; place-items: center; flex: none; }
-.p-logo i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #fff; border-right-color: transparent; transform: rotate(-30deg); display: block; }
+.p-logo { width: 28px; height: 28px; border-radius: 50%; background: var(--chip); color: #fff; display: grid; place-items: center; flex: none; } /* 안에 Lucide orbit 14px */
 .p-brand { flex: 1; font-weight: 600; letter-spacing: 0.12em; }
 .icon-btn { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--chip); color: #fff; display: grid; place-items: center; cursor: pointer; padding: 0; flex: none; }
+.icon-btn svg { opacity: 0.8; } /* 시안: 접기·설정 아이콘은 80% */
 .icon-btn.outline { background: transparent; border: 1px solid var(--line); width: 40px; height: 40px; }
 
 .zone { height: 148px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center;

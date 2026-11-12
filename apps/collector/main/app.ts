@@ -2,7 +2,7 @@
 // 드롭존 창 + 트레이 + 전역 단축키 + 재발견 알림 + 로컬 서버(utilityProcess).
 import type { Settings, UniverseResponse } from "@spacelog/shared/types";
 import { BrowserWindow, Notification, app, dialog, ipcMain, screen, shell } from "electron";
-import { appendFileSync, mkdirSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { readdir, stat, statfs } from "node:fs/promises";
 import path from "node:path";
 import { Api } from "./api.ts";
@@ -114,14 +114,40 @@ function placeDropzone(mode: DropzoneMode, height?: number): void {
   }
 }
 
+/** 접힌 손잡이를 끌어 옮긴 세로 위치. 설정(settings.json)과 섞지 않고 따로 둔다 — 화면 배치는 설정이 아니다 */
+const DROPZONE_POS_FILE = path.join(app.getPath("userData"), "dropzone-position.json");
+function savedDropzoneY(): number | null {
+  try {
+    const y = (JSON.parse(readFileSync(DROPZONE_POS_FILE, "utf8")) as { y?: unknown }).y;
+    return typeof y === "number" && Number.isFinite(y) ? y : null;
+  } catch {
+    return null;
+  }
+}
+function moveDropzone(dy: number, done: boolean): void {
+  if (!dropzone) return;
+  const b = dropzone.getBounds();
+  const { workArea } = screen.getDisplayMatching(b);
+  const y = Math.min(Math.max(b.y + Math.round(dy), workArea.y + 8), workArea.y + workArea.height - b.height - 8);
+  dropzone.setPosition(b.x, y);
+  if (done) {
+    try {
+      writeFileSync(DROPZONE_POS_FILE, JSON.stringify({ y }));
+    } catch {
+      /* 저장 못 해도 이번 실행에서는 그 자리 */
+    }
+  }
+}
+
 function createDropzone(): void {
   const { workArea } = screen.getPrimaryDisplay();
   const { width, height } = MODE_SIZE.collapsed;
+  const saved = savedDropzoneY();
   dropzone = new BrowserWindow({
     width,
     height,
     x: workArea.x + workArea.width - width - EDGE_GAP,
-    y: workArea.y + Math.round(workArea.height / 3),
+    y: saved === null ? workArea.y + Math.round(workArea.height / 3) : Math.min(Math.max(saved, workArea.y + 8), workArea.y + workArea.height - height - 8),
     frame: false,
     resizable: false,
     maximizable: false,
@@ -291,6 +317,7 @@ ipcMain.handle("save", async (_e, input: DropInput, source: "drop" | "paste") =>
 ipcMain.handle("confirm", (_e, input: ConfirmInput) => ingest.confirm(input));
 ipcMain.handle("status", () => lastStatus ?? refreshStatus());
 ipcMain.on("set-mode", (_e, mode: DropzoneMode, height?: number) => placeDropzone(mode, height));
+ipcMain.on("move-dropzone", (_e, dy: number, done: boolean) => moveDropzone(dy, done));
 ipcMain.on("open-universe", () => openWeb("#/"));
 ipcMain.on("open-rediscovery", () => void openRediscovery());
 ipcMain.handle("undo", (_e, ids: string[]) => ingest.undo(ids));
