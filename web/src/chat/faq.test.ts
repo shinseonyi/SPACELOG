@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { answerFor, QUESTION_POOL, suggestions } from "./faq.ts";
+import { ACTION_LABEL, answerFor, NO_COMET_YET, QUESTION_POOL, suggestions } from "./faq.ts";
 
 test("추천 질문 9개는 모두 정해진 답이 있고, 바로 가기와 날아갈 곳이 시안대로다", () => {
   const got = QUESTION_POOL.map((q) => answerFor(q));
@@ -22,6 +22,11 @@ test("위에서부터 먼저 맞는 답을 고른다. 대소문자를 가리지 
   assert.equal(answerFor("  3d 로 볼 수 있나요 ")?.action, "view3d");
   assert.equal(answerFor("너는 누구야")?.action, undefined);
   assert.equal(answerFor("점심 메뉴 골라 줘"), null);
+});
+
+test("혜성이 아직 없을 때의 안내는 묻는 말로 끝나고, [네] 버튼 라벨이 있다", () => {
+  assert.ok(NO_COMET_YET.endsWith("알려드릴까요?"));
+  assert.equal(ACTION_LABEL.guideComet, "네, 알려 주세요");
 });
 
 test("추천 질문: 처음 5개, 그 뒤 아직 묻지 않은 4개", () => {

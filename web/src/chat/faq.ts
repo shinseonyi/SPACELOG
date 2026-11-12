@@ -2,7 +2,7 @@
 // 여기 없는 질문은 챗봇 서버(AI)에 묻는다 (controller.ts). 순수 함수만 있어 테스트가 쉽다.
 
 /** 답 아래의 바로 가기 버튼이 하는 일 (handoff 5-8) */
-export type ActionId = "openLinks" | "openObservatory" | "openProbe" | "startEditPositions" | "view3d";
+export type ActionId = "openLinks" | "openObservatory" | "openProbe" | "startEditPositions" | "view3d" | "guideComet";
 /** 답과 함께 빛무리가 날아가 머무는 화면 요소. `data-guide-target` 값과 같다 (handoff 5-5, 9) */
 export type GuideTarget = "links" | "observatory" | "probe" | "edit" | "view3d" | "period" | "add";
 
@@ -22,6 +22,8 @@ export const STAY = "제가 그 옆에 가 있을게요.";
 /** 우주먼지가 가리킬 버튼 바로 위에 있어 날아가지 않을 때 */
 export const STAY_HERE = "제 바로 아래 버튼이에요.";
 export const FOLLOW_UP = "다른 궁금한 게 있으신가요?";
+/** 재발견 혜성 답인데 아직 볼 혜성이 없을 때(넣은 지 7일 지난 기록이 없다). 위치 안내는 [네]를 누르면 */
+export const NO_COMET_YET = "아직 7일이 지난 기록이 없어서 지금은 볼 수 있는 혜성이 없어요. 기록을 넣고 7일이 지나면 왼쪽 아래 혜성 카드로 찾아와요.\n보는 곳의 위치를 미리 알려드릴까요?";
 export const WAITING = "떠올리는 중이에요";
 
 export const ACTION_LABEL: Record<ActionId, string> = {
@@ -30,9 +32,10 @@ export const ACTION_LABEL: Record<ActionId, string> = {
   openProbe: "탐사선 열기",
   startEditPositions: "위치 편집 켜기",
   view3d: "3D로 보기",
+  guideComet: "네, 알려 주세요",
 };
 
-const ACTION_TARGET: Record<ActionId, GuideTarget> = { openLinks: "links", openObservatory: "observatory", openProbe: "probe", startEditPositions: "edit", view3d: "view3d" };
+const ACTION_TARGET: Record<ActionId, GuideTarget> = { openLinks: "links", openObservatory: "observatory", openProbe: "probe", startEditPositions: "edit", view3d: "view3d", guideComet: "observatory" };
 
 /** 추천 질문 9개 (순서대로). 처음에 5개, 답마다 아직 묻지 않은 것 4개 */
 export const QUESTION_POOL = ["기록은 어떻게 넣어요", "별자리가 뭐예요", "재발견 혜성이 뭐예요", "AI에게 보내려면", "행성을 지우고 싶어요", "CSV를 그래프로 보고 싶어요", "예전 기록을 다시 보려면", "3D로 볼 수 있나요", "기록이 안 보여요"];

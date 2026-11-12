@@ -3,7 +3,7 @@
 import { store } from "../state/store.ts";
 import { askChatbot, CHATBOT_OK, type ChatTurn } from "./chatApi.ts";
 import { chat } from "./chatStore.ts";
-import { answerFor, FAILED, STAY, STAY_HERE, UNKNOWN, type ActionId, type GuideTarget } from "./faq.ts";
+import { answerFor, FAILED, NO_COMET_YET, STAY, STAY_HERE, UNKNOWN, type ActionId, type GuideTarget } from "./faq.ts";
 
 /** 챗봇 버튼(빛무리)의 표식. LeftStack 의 버튼에 붙어 있다 */
 export const SOURCE_SEL = '[data-guide-source="dust"]';
@@ -238,6 +238,14 @@ export function sendChat(raw: string) {
   if (a) {
     thinkTimer = setTimeout(() => {
       thinkTimer = null;
+      // 재발견 혜성인데 아직 볼 혜성이 없으면(7일 지난 기록 없음) 날아가지 않고 안내만. 위치는 [네]를 누르면 알려 준다
+      if (a.then === "comet" && !cometAvailable()) {
+        chat.getState().push({ who: "bot", text: `${a.text}\n${NO_COMET_YET}`, action: "guideComet" });
+        chat.getState().setTyping(false);
+        currentTarget = null;
+        chat.getState().setGuide(null);
+        return;
+      }
       // 가리킬 버튼이 우주먼지 바로 아래면(넓은 화면의 "기록 넣기") 날아가지 않고 제자리에서 "Here!"
       if (a.target && a.then !== "comet" && nearSource(a.target)) {
         chat.getState().push({ who: "bot", text: `${a.text}\n${STAY_HERE}`, action: a.action });
@@ -248,15 +256,9 @@ export function sendChat(raw: string) {
         return;
       }
       const spot = a.target ? locate(a.target) : null;
-      const from = sourcePoint();
       chat.getState().push({ who: "bot", text: spot ? `${a.text}\n${STAY}` : a.text, action: a.action });
       chat.getState().setTyping(false);
-      currentTarget = spot && from ? (a.target ?? null) : null;
-      if (spot && from) {
-        fly(from, spot);
-        if (a.then !== "comet" && a.target) watchTarget(a.target); // 재발견 혜성 답은 2단계가 이어받는다
-      } else chat.getState().setGuide(null);
-      if (a.then === "comet") waitForObservatory();
+      guideTo(a.target, a.then);
     }, THINK_MS);
     return;
   }
@@ -310,9 +312,35 @@ export function sendChat(raw: string) {
   })();
 }
 
+/** 오늘 볼 재발견 혜성이 있는가 = 왼쪽 아래 혜성 카드가 떠 있는가 (넣은 지 7일 지난 기록이 있어야 뜬다) */
+function cometAvailable(): boolean {
+  return rectOf(".rediscovery") !== null;
+}
+
+/** 빛무리가 답이 가리키는 버튼으로 날아간다. 재발견 혜성 답은 관측소가 열리면 2단계가 이어받는다 */
+function guideTo(target: GuideTarget | undefined, then?: "comet") {
+  const spot = target ? locate(target) : null;
+  const from = sourcePoint();
+  currentTarget = spot && from ? (target ?? null) : null;
+  if (spot && from) {
+    fly(from, spot);
+    if (then !== "comet" && target) watchTarget(target);
+  } else chat.getState().setGuide(null);
+  if (then === "comet") waitForObservatory();
+}
+
 /** 답 아래의 바로 가기 버튼 (5-4). 가리키던 일을 대신 해 준 것이라, 빛무리도 잠시 뒤 사라진다 */
 export function runAction(action: ActionId) {
   const s = store.getState();
+  if (action === "guideComet") {
+    // 혜성이 아직 없을 때의 [네, 알려 주세요]: 그제야 관측소 버튼으로 날아간다
+    cancelComet();
+    cancelSettle();
+    cancelHere();
+    chat.getState().push({ who: "bot", text: STAY });
+    guideTo("observatory", "comet");
+    return;
+  }
   if (chat.getState().guide && !chat.getState().cometWait) settleGuide();
   if (action === "openLinks") s.openSideTab("link");
   else if (action === "openObservatory") s.openObservatory();
