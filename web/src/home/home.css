@@ -82,6 +82,15 @@ kbd { font: var(--type-fine-print); background: var(--color-chip); color: var(--
 .rows--scroll { overflow-y: auto; min-height: 0; padding: 0 0 4px; }
 .row { width: 100%; height: 36px; padding: 0 8px; display: flex; align-items: center; gap: 12px; border: 0; border-radius: var(--r-item); background: transparent; color: var(--color-body); font: var(--type-caption-strong); text-align: left; cursor: pointer; transition: transform var(--press-time); }
 .row:active { transform: scale(var(--press-scale)); }
+/* 오른쪽 창의 줄(행성 · 기록 · 별자리)은 올리면 면이 살짝 밝아져 누를 수 있음을 보인다. 마우스가 있는 기기에서만 */
+.row, li.row--rec, .lquick__open, .lmenu__open, .check { transition: background-color 120ms ease, border-color 120ms ease, transform var(--press-time); }
+@media (hover: hover) {
+  .row:hover, li.row--rec:hover, .lquick__open:hover, .lmenu__open:hover { background: var(--color-chip); }
+  .row.is-here:hover, li.row--rec.is-picked:hover { background: var(--color-selected); }
+  .row:hover .row__go, .lmenu__open:hover .lmenu__chev { opacity: 1; }
+  .check:hover { border-color: #fff; }
+  .lmenu__edit:hover { background: var(--color-chip); opacity: 1; }
+}
 .row.is-here { background: var(--color-selected); }
 .row.is-empty { opacity: 0.55; }
 .row__dot { width: 8px; height: 8px; flex: none; border-radius: 50%; display: block; }
