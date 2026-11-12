@@ -9,6 +9,7 @@ import { planetColorToken } from "../ui/planetColor.ts";
 import { starTitle } from "../ui/starTitle.ts";
 import { useSceneState } from "../universe/sceneState.ts";
 import { FOLD_QUERY, useMedia } from "../ui/useMedia.ts";
+import { setBannerSlot } from "./bannerSlot.ts";
 
 const time = (iso: string) => new Date(iso).toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" });
 const accent = (token: string) => `var(--${planetColorToken(token)})`;
@@ -43,6 +44,7 @@ function CardTitle({ title, fold, className = "" }: { title: string; fold: Retur
 export function SideWindow() {
   const tab = useStore((s) => s.sideTab);
   const hidden = useStore((s) => s.selectedPlanetId !== null || s.selectedStarId !== null);
+  const narrow = useMedia(FOLD_QUERY);
   if (!tab || hidden) return null;
   return (
     <aside className={`side${tab === "home" ? " side--home" : ""}`} aria-label={tab === "home" ? "행성 · 별자리 · 기록 목록" : tab === "planet" ? "행성 목록" : tab === "rec" ? "기록 목록" : "별자리 목록"}>
@@ -57,6 +59,8 @@ export function SideWindow() {
       {tab === "planet" && <LinkQuickCard />}
       {tab === "rec" && <RecordCard />}
       {tab === "link" && <LinkCard />}
+      {/* 좁은 화면: 홈 배너가 메뉴와 겹치지 않게 카드 아래에 그린다 (HomeBanner 포털) */}
+      {narrow && <div className="side__banner" ref={setBannerSlot} />}
     </aside>
   );
 }
