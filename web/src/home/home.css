@@ -109,6 +109,10 @@ li.row--rec:active { transform: none; }
 /* 넓은 화면(960px 이상): 우주먼지 버튼을 가운데 아래 "기록 넣기"(높이 44) 바로 위로. 위 "hello" 말풍선(-32)까지 자리를 둔다 */
 .dust-dock { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + 44px + 16px + env(safe-area-inset-bottom, 0px)); z-index: 10; }
 @media (max-width: 1279px) { .dust-dock { bottom: calc(80px + 44px + 16px + env(safe-area-inset-bottom, 0px)); } } /* 기록 넣기가 한 줄 위로 */
+/* 사용자가 끌어 옮긴 우주먼지 (chat/dustPos.ts). 왼쪽 위 = 옮긴 자리. 다른 버튼보다 위 */
+.dust-free { position: fixed; z-index: 13; }
+.dust__btn:not(:disabled) { cursor: grab; touch-action: none; }
+.dust__btn:not(:disabled):active { cursor: grabbing; }
 
 /* 행성 간 거리 카드 (2.5D · 3D): 왼쪽 아래 묶음의 맨 아래 */
 .dist { width: 260px; max-width: calc(100vw - 48px); box-sizing: border-box; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; border-radius: var(--r-panel); border: 1px solid var(--color-line-card); background: var(--color-card-solid); }

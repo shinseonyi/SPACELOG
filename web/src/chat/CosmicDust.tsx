@@ -5,6 +5,7 @@ import { Button } from "../ui/Button.tsx";
 import { CHATBOT_OK, CHATBOT_URL } from "./chatApi.ts";
 import { useChat } from "./chatStore.ts";
 import { closeChat, installRelayout, runAction, sendChat, toggleChat } from "./controller.ts";
+import { consumeDragClick, startDustDrag } from "./dustPos.ts";
 import { ACTION_LABEL, BOT_NAME, FOLLOW_UP, suggestions, WAITING } from "./faq.ts";
 import "./chat.css";
 
@@ -28,19 +29,29 @@ export function Glow() {
  * 왼쪽 아래 묶음의 챗봇 버튼: 빛무리 + 이름표 "우주먼지" + "hello" 말풍선 (5-1, 문구는 팀 결정). 대화창이 열려 있으면 말풍선은 숨긴다.
  * 빛무리는 하나뿐이다: 길잡이로 날아가 있는 동안(GuideGlow)에는 버튼 자리(빛무리·이름표·말풍선)를 비워 두고, 돌아오면 다시 보인다.
  * 위치 편집(블랙홀이 켜진) 중에도 비워 둔다 — 그 자리는 블랙홀과 행성을 다루는 데 쓴다 (5-6).
+ * 끌어서 옮길 수 있다 (4px 넘게 움직이면 끌기, 놓은 뒤의 누름은 대화창을 열지 않는다). 옮긴 자리는 메모리에만 (dustPos.ts).
  */
 export function CosmicDustButton() {
   const open = useChat((s) => s.open);
   const edit = useStore((s) => s.editPos);
   const away = useChat((s) => s.guide !== null) || edit;
+  const root = useRef<HTMLSpanElement>(null);
+  const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.button === 0 && root.current) startDustDrag(e.nativeEvent, root.current.getBoundingClientRect());
+  };
+  const onClick = () => {
+    if (consumeDragClick()) return;
+    toggleChat();
+  };
+
   return (
-    <span className="dust">
+    <span className="dust" ref={root}>
       {!open && !away && (
         <span className="dust__bubble" aria-hidden>
           <span>hello</span>
         </span>
       )}
-      <button type="button" className="dust__btn" data-guide-source="dust" aria-label={`${BOT_NAME} 챗봇 ${open ? "닫기" : "열기"}`} aria-expanded={open} aria-haspopup="dialog" disabled={edit} onClick={toggleChat}>
+      <button type="button" className="dust__btn" data-guide-source="dust" aria-label={`${BOT_NAME} 챗봇 ${open ? "닫기" : "열기"}`} aria-expanded={open} aria-haspopup="dialog" title="눌러서 열기 · 끌어서 옮기기" disabled={edit} onClick={onClick} onPointerDown={onPointerDown}>
         {!away && <Glow />}
       </button>
       {!away && <span className="dust__name">{BOT_NAME}</span>}
