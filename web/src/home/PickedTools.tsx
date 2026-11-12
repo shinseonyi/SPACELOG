@@ -6,7 +6,7 @@ import { CreateLinkSheet } from "./LinkSheets.tsx";
 import { usePickedStars } from "./usePickedStars.ts";
 
 /**
- * 체크한 기록으로 할 일: 탐사선에 싣기 · 별자리 만들기 · 관측소에서 바로 보기. 셋은 같은 크기의 전체 폭 버튼이다.
+ * 체크한 기록으로 할 일: 탐사선에 싣기 · 별자리 만들기 · 관측소에서 바로 보기. 셋은 같은 크기·같은 스타일(강조색 없음)의 전체 폭 버튼이다.
  * 선택은 전역(store.picked)이라 오른쪽 창의 기록 목록과 행성 패널 어디서든 같은 선택을 이어서 쓴다.
  * 체크한 기록이 없으면 아무것도 그리지 않는다.
  */
@@ -42,7 +42,7 @@ export function PickedTools() {
       </div>
       <div className="pick__btns">
         <Button onClick={load}><Rocket size={16} aria-hidden /> 탐사선에 싣기</Button>
-        <Button variant="primary" onClick={() => setCreating(true)}><Waypoints size={16} aria-hidden /> 별자리 만들기</Button>
+        <Button onClick={() => setCreating(true)}><Waypoints size={16} aria-hidden /> 별자리 만들기</Button>
         <Button onClick={() => store.getState().openObservatory({ draftIds: stars.map((s) => s.id) })}><Orbit size={16} aria-hidden /> 관측소에서 바로 보기</Button>
       </div>
     </div>
