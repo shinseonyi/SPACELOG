@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/radii.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/base.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/styles.css">
+  <script src="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="spacelog-data.js"></script>
+  <style>:root{--font-display:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-text:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}button,input,textarea,select{font-family:inherit}button,kbd{white-space:nowrap;word-break:keep-all}body{word-break:keep-all}html,body{margin:0;height:100%;background:#000;color:#fff;font-family:var(--font-text);-webkit-font-smoothing:antialiased}a{color:var(--color-primary-on-dark);text-decoration:none}a:hover{text-decoration:underline}</style>
+</helmet>
+<section data-screen-label="W-03 기록 상세" aria-label="기록 상세" style="position:absolute;inset:0;display:flex;flex-direction:column;border-radius:18px;background:rgb(30,30,32);border:1px solid rgba(255,255,255,0.1);overflow:hidden;--color-primary:{{ accentBase }};--color-primary-focus:{{ accentBase }};--color-primary-on-dark:{{ accent }}">
+  <header style="display:flex;align-items:center;gap:8px;padding:16px 16px 12px">
+    <button onClick="{{ back }}" class="cc-type-caption" title="행성으로 돌아가기 (Esc)" style="height:36px;padding:0 14px 0 10px;border-radius:9999px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/arrow-left.svg" alt="" style="width:14px;height:14px;filter:invert(1)">{{ backText }}</button>
+    <span style="flex:1"></span>
+    <button onClick="{{ goPrev }}" disabled="{{ noPrev }}" aria-label="이전 기록 보기" title="이전 기록 보기" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.14);background:transparent;display:grid;place-items:center;cursor:pointer;opacity:{{ prevOpacity }};flex:none;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-left.svg" alt="" style="width:14px;height:14px;filter:invert(1)"></button>
+    <span class="cc-type-fine-print" style="color:var(--color-body-muted);min-width:44px;text-align:center;font-variant-numeric:tabular-nums">{{ position }}</span>
+    <button onClick="{{ goNext }}" disabled="{{ noNext }}" aria-label="다음 기록 보기" title="다음 기록 보기" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.14);background:transparent;display:grid;place-items:center;cursor:pointer;opacity:{{ nextOpacity }};flex:none;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg" alt="" style="width:14px;height:14px;filter:invert(1)"></button>
+  </header>
+
+  <div style="flex:1;min-height:0;overflow-y:auto;padding:0 16px 16px;display:flex;flex-direction:column;gap:16px">
+    <div style="position:relative;flex:none;border-radius:18px;overflow:hidden;background:{{ previewBg }};aspect-ratio:16/10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;box-sizing:border-box;text-align:center">
+      <img src="{{ icon }}" alt="" style="width:32px;height:32px;filter:invert(1);opacity:0.85">
+      <span class="cc-type-caption-strong" style="color:#fff">{{ previewTitle }}</span>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted);max-width:320px;line-height:1.5">{{ previewSub }}</span>
+      <sc-if value="{{ hasThumb }}"><img src="{{ thumb }}" alt="{{ title }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block"></sc-if>
+      <sc-if value="{{ hasBody }}"><div class="cc-type-body" style="position:absolute;inset:0;overflow-y:auto;box-sizing:border-box;padding:20px;background:rgb(38,38,40);color:#fff;text-align:left;white-space:pre-wrap;word-break:break-word;user-select:text">{{ body }}</div></sc-if>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h2 class="cc-type-tagline" style="margin:0;color:#fff;overflow-wrap:anywhere">{{ title }}</h2>
+      <span class="cc-type-caption" style="color:var(--color-body-muted)">{{ kindLabel }} · {{ meta }} · {{ added }} 넣음</span>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.Button" variant="secondary" on-dark="{{ true }}" on-click="{{ openOrig }}" hint-size="100px,40px">{{ openLabel }}</x-import>
+      <sc-if value="{{ hasFolder }}"><x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.Button" variant="secondary" on-dark="{{ true }}" on-click="{{ openFolder }}" hint-size="120px,40px">폴더에서 보기</x-import></sc-if>
+      <button onClick="{{ probe }}" class="cc-type-caption" style="height:40px;padding:0 16px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);background:transparent;color:#fff;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/rocket.svg" alt="" style="width:14px;height:14px;filter:invert(1)">탐사선에 싣기</button>
+    </div>
+
+    <label style="display:flex;flex-direction:column;gap:8px">
+      <span style="display:flex;justify-content:space-between"><span class="cc-type-caption-strong" style="color:#fff">메모</span><span class="cc-type-fine-print" style="color:{{ memoStatusColor }}">{{ memoStatus }}</span></span>
+      <textarea value="{{ memo }}" onChange="{{ onMemo }}" onKeyDown="{{ stopKeys }}" placeholder="이 기록에 대한 메모를 남겨 보세요" rows="3" class="cc-type-caption" style="resize:vertical;min-height:84px;padding:12px 14px;border-radius:11px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);color:#fff;outline:none;line-height:1.5"></textarea>
+    </label>
+
+    <div style="display:flex;flex-direction:column;gap:8px;position:relative">
+      <span class="cc-type-caption-strong" style="color:#fff">행성</span>
+      <button onClick="{{ toggleMove }}" aria-haspopup="listbox" aria-expanded="{{ moveOpen }}" style="height:44px;padding:0 14px 0 8px;border-radius:9999px;border:1px solid rgba(255,255,255,0.14);background:transparent;display:flex;align-items:center;gap:10px;cursor:pointer;align-self:flex-start;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">
+        <i style="width:28px;height:28px;border-radius:50%;background-color:#000;background-image:url('assets/planet-hero.png');background-size:230% auto;background-position:49% 62%;filter:{{ filter }};display:block"></i>
+        <span class="cc-type-caption" style="color:#fff">{{ planetName }}</span>
+        <span class="cc-type-fine-print" style="color:var(--color-body-muted)">옮기기</span>
+        <img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-down.svg" alt="" style="width:14px;height:14px;filter:invert(1);opacity:0.7">
+      </button>
+      <sc-if value="{{ moveOpen }}">
+        <div role="listbox" style="position:absolute;left:0;top:84px;z-index:4;width:240px;padding:6px;border-radius:18px;background:var(--surface-tile-1);border:1px solid rgba(255,255,255,0.1);box-shadow:var(--shadow-product);display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ moveTargets }}" as="mt">
+            <button role="option" aria-selected="{{ mt.selected }}" onClick="{{ mt.onClick }}" style="height:40px;padding:0 10px;border:0;border-radius:11px;display:flex;align-items:center;gap:10px;background:{{ mt.bg }};cursor:pointer">
+              <i style="width:20px;height:20px;border-radius:50%;background-color:#000;background-image:url('assets/planet-hero.png');background-size:230% auto;background-position:49% 62%;filter:{{ mt.filter }};display:block"></i>
+              <span class="cc-type-caption" style="color:#fff;flex:1;text-align:left">{{ mt.name }}</span>
+              <sc-if value="{{ mt.selected }}"><span class="cc-type-fine-print" style="color:var(--color-body-muted)">현재</span></sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <span class="cc-type-fine-print" style="color:var(--color-body-muted)">옮기면 우주에서도 기록이 그 행성으로 이동해요.</span>
+    </div>
+  </div>
+
+  <footer style="padding:14px 16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+    <sc-if value="{{ confirming }}">
+      <div style="display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:11px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+        <span class="cc-type-caption" style="color:#fff">이 기록과 보관함의 원본 복사본을 함께 지웁니다. 되돌릴 수 없어요.</span>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button onClick="{{ cancelDelete }}" class="cc-type-caption" style="height:36px;padding:0 18px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);background:transparent;color:#fff;cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">취소</button>
+          <button onClick="{{ doDelete }}" class="cc-type-caption" style="height:36px;padding:0 18px;border-radius:9999px;border:0;background:#fff;color:var(--color-ink);cursor:pointer;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">지우기</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ notConfirming }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;justify-content:flex-end">
+        <button onClick="{{ askDelete }}" class="cc-type-caption" style="height:36px;padding:0 14px;border-radius:9999px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--color-body-muted);cursor:pointer;display:flex;align-items:center;gap:6px"><img src="https://unpkg.com/lucide-static@0.469.0/icons/trash-2.svg" alt="" style="width:13px;height:13px;filter:invert(1);opacity:0.7">삭제</button>
+      </div>
+    </sc-if>
+  </footer>
+
+  <div aria-live="polite" style="position:absolute;left:50%;bottom:72px;transform:translateX(-50%);z-index:9;pointer-events:none;opacity:{{ toastOpacity }};transition:opacity 200ms var(--ease-standard)">
+    <div class="cc-type-caption" style="background:#fff;color:var(--color-ink);border-radius:9999px;padding:10px 16px;white-space:nowrap">{{ toast }}</div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:440,&quot;height&quot;:820},&quot;db&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;starId&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;s1&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;미리보기&quot;},&quot;onBack&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onAction&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;},&quot;onToast&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;function&quot;}}">
+class Component extends DCLogic {
+  state = { db: window.SPACELOG ? window.SPACELOG.initial() : null, starId: 's1', memoDraft: null, memoState: 'idle', move: false, confirm: false, toast: '', toastOn: false };
+
+  componentDidMount() {
+    const wait = () => window.SPACELOG ? this.setState({ db: this.state.db || window.SPACELOG.initial() }) : setTimeout(wait, 60);
+    wait();
+  }
+  componentWillUnmount() { clearTimeout(this._m); clearTimeout(this._t); }
+  componentDidUpdate(prev) { if (prev.starId !== this.props.starId) { this.flushMemo(); this.setState({ memoDraft: null, memoState: 'idle', move: false, confirm: false }); } }
+
+  db() { return this.props.db || this.state.db || { planets: [], stars: [] }; }
+  sid() { return this.props.starId ?? this.state.starId; }
+  act(a) { if (this.props.onAction) this.props.onAction(a); else this.setState({ db: window.SPACELOG.reduce(this.db(), a) }); }
+  flash(msg) {
+    if (this.props.onToast) return this.props.onToast(msg);
+    clearTimeout(this._t); this.setState({ toast: msg, toastOn: true }); this._t = setTimeout(() => this.setState({ toastOn: false }), 2200);
+  }
+  flushMemo() { if (this._pending) { clearTimeout(this._m); this.act(this._pending); this._pending = null; } }
+
+  renderVals() {
+    const S = window.SPACELOG, s = this.state, db = this.db();
+    const star = db.stars.find(x => x.id === this.sid());
+    if (!S || !star) return { title: '', planetName: '', back: () => this.props.onBack && this.props.onBack(), notConfirming: true, moveTargets: [] };
+    const p = db.planets.find(x => x.id === star.planet) || { name: '', accent: '#2997ff', base: '#0066cc', filter: 'none' };
+    const siblings = db.stars.filter(x => x.planet === star.planet).sort((a, b) => a.addedAt < b.addedAt ? 1 : -1);
+    const idx = siblings.findIndex(x => x.id === star.id);
+    const memo = s.memoDraft ?? star.memo ?? '';
+    const pv = {
+      image: { title: '이미지 미리보기', sub: star.title },
+      file: { title: star.title, sub: star.meta + ' · 원본은 내 PC 보관함에 있어요' },
+      link: { title: star.title, sub: 'https://' + star.meta + '/…' },
+      text: { title: '텍스트', sub: star.title }
+    }[star.kind];
+
+    return {
+      accent: p.accent, accentBase: p.base, filter: p.filter, planetName: p.name, backText: this.props.backText || p.name,
+      position: (idx + 1) + ' / ' + siblings.length,
+      ...(() => { const go = to => { const n = siblings[to]; if (!n) return; this.flushMemo(); this.setState({ memoDraft: null }); this.props.onNavigate ? this.props.onNavigate(n.id) : (window.location.href = 'SPACELOG_Prototype.dc.html#planet=' + star.planet + '&star=' + n.id); };
+        return { goPrev: () => go(idx - 1), goNext: () => go(idx + 1), noPrev: idx <= 0, noNext: idx >= siblings.length - 1, prevOpacity: idx <= 0 ? 0.3 : 1, nextOpacity: idx >= siblings.length - 1 ? 0.3 : 1 }; })(),
+      back: () => { this.flushMemo(); this.props.onBack ? this.props.onBack() : (window.location.href = 'SPACELOG_Prototype.dc.html#planet=' + star.planet); },
+      previewBg: star.kind === 'image' ? 'color-mix(in srgb, ' + p.accent + ' 22%, #161618)' : 'rgba(255,255,255,0.05)',
+      icon: S.iconUrl(S.ICON[star.kind]), previewTitle: pv.title, previewSub: pv.sub, hasBody: star.kind === 'text' && !!(star.body || star.memo), body: star.body || star.memo || '', hasThumb: !!star.thumb, thumb: star.thumb || '',
+      title: star.title, kindLabel: S.KIND[star.kind], meta: star.meta, added: S.fmtDate(star.addedAt),
+      openLabel: star.kind === 'link' ? '링크 열기' : '원본 열기', hasFolder: star.kind !== 'link' && star.kind !== 'text',
+      openOrig: () => this.flash(star.kind === 'link' ? '브라우저에서 링크를 열었어요' : '기본 앱으로 원본을 열었어요'),
+      openFolder: () => this.flash('보관함 폴더를 열었어요'),
+      probe: () => this.props.onProbe ? this.props.onProbe([star.id]) : this.flash('탐사선에 실었어요'),
+      memo, stopKeys: e => e.stopPropagation(),
+      onMemo: e => {
+        const v = e.target.value; this.setState({ memoDraft: v, memoState: 'saving' });
+        clearTimeout(this._m); this._pending = { type: 'memo', id: star.id, memo: v };
+        this._m = setTimeout(() => { this.act(this._pending); this._pending = null; this.setState({ memoState: 'saved' }); }, 600);
+      },
+      memoStatus: s.memoState === 'saving' ? '저장 중' : s.memoState === 'saved' ? '자동 저장됨' : '자동 저장',
+      memoStatusColor: s.memoState === 'saved' ? p.accent : 'var(--color-body-muted)',
+      moveOpen: s.move, toggleMove: () => this.setState({ move: !s.move }),
+      moveTargets: db.planets.map(o => ({ key: o.id, name: o.name, filter: o.filter, selected: o.id === star.planet, bg: o.id === star.planet ? 'rgba(255,255,255,0.08)' : 'transparent',
+        onClick: () => { this.setState({ move: false }); if (o.id !== star.planet) { this.act({ type: 'moveStar', id: star.id, planet: o.id }); this.flash('‘' + o.name + '’ 행성으로 옮겼어요'); } } })),
+      confirming: s.confirm, notConfirming: !s.confirm,
+      askDelete: () => this.setState({ confirm: true }), cancelDelete: () => this.setState({ confirm: false }),
+      doDelete: () => {
+        const next = siblings[idx + 1] || siblings[idx - 1];
+        this.act({ type: 'deleteStar', id: star.id }); this.flash('기록을 지웠어요');
+        if (this.props.onBack) this.props.onBack(); else this.setState({ starId: next ? next.id : null, confirm: false });
+      },
+      toast: s.toast, toastOpacity: s.toastOn ? 1 : 0
+    };
+  }
+}
+</script>
+</body>
+</html>

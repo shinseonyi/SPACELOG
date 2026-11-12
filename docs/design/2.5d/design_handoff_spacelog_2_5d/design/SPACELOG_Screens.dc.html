@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/radii.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/base.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/styles.css">
+  <script src="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="spacelog-data.js"></script>
+  <style>:root{--font-display:"Pretendard Variable",Pretendard,-apple-system,system-ui,sans-serif;--font-text:"Pretendard Variable",Pretendard,-apple-system,system-ui,sans-serif}body{margin:0;background:#111;color:#fff;font-family:var(--font-text);word-break:keep-all}a{color:#2997ff;text-decoration:none}a:hover{text-decoration:underline}</style>
+</helmet>
+<main style="display:flex;flex-direction:column;gap:40px;padding:40px;width:1280px">
+  <section style="display:flex;flex-direction:column;gap:12px">
+    <span class="cc-type-caption-strong" style="color:#fff">01 우주 홈 (2.5D)</span>
+    <div id="shot-01" data-screen-label="01 우주 홈" style="position:relative;width:1280px;height:800px;overflow:hidden;background:#000">
+      <dc-import name="W01_Home" no-3d="{{ true }}" period="week" paused="{{ true }}" style="position:absolute;inset:0" hint-size="100%,100%"></dc-import>
+    </div>
+  </section>
+  <section style="display:flex;flex-direction:column;gap:12px">
+    <span class="cc-type-caption-strong" style="color:#fff">02 행성 패널</span>
+    <div id="shot-02" data-screen-label="02 행성 패널" style="position:relative;width:1280px;height:800px;overflow:hidden;background:#000">
+      <dc-import name="W01_Home" no-3d="{{ true }}" period="week" focus="{{ focusP }}" panel-open="{{ true }}" paused="{{ true }}" style="position:absolute;inset:0" hint-size="100%,100%"></dc-import>
+      <dc-import name="W02_PlanetPanel" planet-id="p6" on-open-star="{{ noop }}" on-close="{{ noop }}" style="position:absolute;top:16px;right:16px;bottom:16px;width:440px;z-index:10" hint-size="440px,100%"></dc-import>
+    </div>
+  </section>
+  <section style="display:flex;flex-direction:column;gap:12px">
+    <span class="cc-type-caption-strong" style="color:#fff">03 기록 상세</span>
+    <div id="shot-03" data-screen-label="03 기록 상세" style="position:relative;width:1280px;height:800px;overflow:hidden;background:#000">
+      <dc-import name="W01_Home" no-3d="{{ true }}" period="week" focus="{{ focusP1 }}" panel-open="{{ true }}" paused="{{ true }}" style="position:absolute;inset:0" hint-size="100%,100%"></dc-import>
+      <dc-import name="W02_PlanetPanel" planet-id="p1" detail-id="{{ detailId }}" on-open-star="{{ noop }}" on-close="{{ noop }}" style="position:absolute;top:16px;right:16px;bottom:16px;width:440px;z-index:10" hint-size="440px,100%"></dc-import>
+    </div>
+  </section>
+  <section style="display:flex;flex-direction:column;gap:12px">
+    <span class="cc-type-caption-strong" style="color:#fff">04 탐사선</span>
+    <div id="shot-04" data-screen-label="04 탐사선" style="position:relative;width:1280px;height:800px;overflow:hidden;background:#000">
+      <dc-import name="W01_Home" no-3d="{{ true }}" period="week" panel-open="{{ true }}" paused="{{ true }}" style="position:absolute;inset:0" hint-size="100%,100%"></dc-import>
+      <dc-import name="W04_Ship" on-close="{{ noop }}" style="position:absolute;top:16px;right:16px;bottom:16px;width:480px;z-index:10" hint-size="480px,100%"></dc-import>
+    </div>
+  </section>
+  <section style="display:flex;flex-direction:column;gap:12px">
+    <span class="cc-type-caption-strong" style="color:#fff">05 관측소 · 별자리 관측</span>
+    <div id="shot-05" data-screen-label="05 관측소 별자리 관측" style="position:relative;width:1280px;height:800px;overflow:hidden;background:#000">
+      <dc-import name="W05_Observatory" on-close="{{ noop }}" style="position:absolute;inset:16px" hint-size="100%,100%"></dc-import>
+    </div>
+  </section>
+  <section style="display:flex;flex-direction:column;gap:12px">
+    <span class="cc-type-caption-strong" style="color:#fff">06 관측소 · 재발견 혜성 관측</span>
+    <div id="shot-06" data-screen-label="06 관측소 재발견 혜성 관측" style="position:relative;width:1280px;height:800px;overflow:hidden;background:#000">
+      <dc-import name="W05_Observatory" start-mode="comet" on-close="{{ noop }}" style="position:absolute;inset:16px" hint-size="100%,100%"></dc-import>
+    </div>
+  </section>
+  <section style="display:flex;flex-direction:column;gap:12px">
+    <span class="cc-type-caption-strong" style="color:#fff">07 수집 앱</span>
+    <div id="shot-07" data-screen-label="07 수집 앱" style="position:relative;width:1280px;height:800px;overflow:hidden;background:#000">
+      <dc-import name="SPACELOG_Collector" frozen="{{ true }}" style="position:absolute;inset:0" hint-size="100%,100%"></dc-import>
+    </div>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() { const w = () => window.SPACELOG ? this.forceUpdate() : (this._w = setTimeout(w, 60)); w(); }
+  componentWillUnmount() { clearTimeout(this._w); }
+  renderVals() {
+    this._noop = this._noop || (() => {});
+    this._f = this._f || { focusP: { planet: 'p6', nonce: 1 }, focusP1: { planet: 'p1', nonce: 2 } };
+    const S = window.SPACELOG;
+    if (S && !this._d) { const db = S.initial(), x = db.stars.find(s => s.planet === 'p1' && s.kind === 'text') || db.stars.find(s => s.planet === 'p1'); this._d = x ? x.id : null; }
+    return { noop: this._noop, ...this._f, detailId: this._d || null };
+  }
+}
+</script>
+</body>
+</html>
