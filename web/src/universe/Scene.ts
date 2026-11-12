@@ -1,6 +1,7 @@
 // 3D 우주 장면 (SPEC 3-5). React 바깥에서 돌고, 웹 스토어와는 계약 함수로만 주고받는다.
 // - 스토어 → 장면: planets·stars·selectedStarId·camera 를 구독해 다시 그린다
 // - 장면 → 스토어: openPanel · openStar · flyToPlanet · setCamera, 자동 비행은 registerFlyToPlanet 로 등록
+import { dimSide } from "../home/sideDim.ts";
 import * as THREE from "three";
 import { store, type Store } from "../state/store.ts";
 import { CameraController } from "./CameraController.ts";
@@ -183,6 +184,7 @@ export class UniverseScene {
     };
 
     on(window, "keydown", (e) => {
+      if (["w", "a", "s", "d", " ", "shift"].includes(e.key.toLowerCase())) dimSide();
       if (isTyping(e) || document.querySelector("dialog[open]")) return;
       // 버튼·링크에 포커스가 있으면 Space 는 그 버튼을 누르는 키다 (키보드 접근성)
       if (e.code === "Space" && e.target instanceof Element && e.target.closest("button, a[href], [role='button']")) return;
@@ -203,6 +205,7 @@ export class UniverseScene {
     on(window, "blur", () => this.keys.clear());
 
     on(cv, "pointerdown", (e) => {
+      dimSide(); // 우주를 다루기 시작 → 오른쪽 창 반투명
       this.drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY };
       cv.setPointerCapture(e.pointerId);
       cv.style.cursor = "grabbing";
@@ -222,6 +225,7 @@ export class UniverseScene {
       cv,
       "wheel",
       (e) => {
+        dimSide();
         e.preventDefault();
         this.cam.wheel(e.deltaY, store.getState().camera);
       },

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, ChevronDown, ChevronRight, Pencil, Waypoints, X } from "lucide-react";
 import type { Star } from "@spacelog/shared/types";
 import { demo, useDemo } from "../demo/demoStore.ts";
@@ -10,6 +10,7 @@ import { starTitle } from "../ui/starTitle.ts";
 import { useSceneState } from "../universe/sceneState.ts";
 import { FOLD_QUERY, useMedia } from "../ui/useMedia.ts";
 import { setBannerSlot } from "./bannerSlot.ts";
+import { undimSide, useSideDim } from "./sideDim.ts";
 
 const time = (iso: string) => new Date(iso).toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" });
 const accent = (token: string) => `var(--${planetColorToken(token)})`;
@@ -45,12 +46,15 @@ export function SideWindow() {
   const tab = useStore((s) => s.sideTab);
   const hidden = useStore((s) => s.selectedPlanetId !== null || s.selectedStarId !== null);
   const narrow = useMedia(FOLD_QUERY);
+  const dim = useSideDim();
+  useEffect(() => undimSide(), [tab]); // 위 칩으로 다른 목록을 열면 다시 또렷하게
   if (!tab || hidden) return null;
   return (
-    <aside className={`side${tab === "home" ? " side--home" : ""}`} aria-label={tab === "home" ? "행성 · 별자리 · 기록 목록" : tab === "planet" ? "행성 목록" : tab === "rec" ? "기록 목록" : "별자리 목록"}>
+    // 우주를 누르거나 움직이면 반투명(is-dim, home.css). 창에 올리거나 누르면 또렷하게
+    <aside className={`side${tab === "home" ? " side--home" : ""}${dim ? " is-dim" : ""}`} onPointerEnter={undimSide} onPointerDown={undimSide} onFocusCapture={undimSide} aria-label={tab === "home" ? "행성 · 별자리 · 기록 목록" : tab === "planet" ? "행성 목록" : tab === "rec" ? "기록 목록" : "별자리 목록"}>
       {tab === "home" && (
         <>
-          <PlanetCard closable />
+          <PlanetCard />
           <LinkQuickCard />
           <RecordCard />
         </>
@@ -65,7 +69,7 @@ export function SideWindow() {
   );
 }
 
-function PlanetCard({ closable = false }: { closable?: boolean }) {
+function PlanetCard() {
   const planets = useStore((s) => s.planets);
   const selected = useStore((s) => s.selectedPlanetId);
   const near = useSceneState((s) => s.nearPlanetId);
@@ -75,11 +79,6 @@ function PlanetCard({ closable = false }: { closable?: boolean }) {
     <section className={`card side__card side__card--planets${fold.open ? "" : " is-folded"}`}>
       <div className="side__head">
         <CardTitle title="행성으로 바로 날아가기" fold={fold} />
-        {closable && (
-          <button type="button" className="btn btn--icon side__close" aria-label="목록 닫기" title="목록 닫기 (위 태그로 다시 열기)" onClick={() => store.getState().closeSide()}>
-            <X size={14} aria-hidden />
-          </button>
-        )}
       </div>
       {fold.open && <ul className="rows rows--scroll">
         {sorted.map((p) => {

@@ -25,6 +25,10 @@ kbd { font: var(--type-fine-print); background: var(--color-chip); color: var(--
 
 /* 오른쪽 창: 폭 300px. 위 칩에서 고른 목록 하나 */
 .side { position: fixed; right: 24px; top: 88px; bottom: 84px; width: min(300px, calc(100vw - 48px)); z-index: 9; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
+/* 우주를 누르거나 움직이면 반투명 (home/sideDim.ts). 창에 올리면 또렷하게 */
+.side .side__card { transition: opacity 300ms ease; }
+.side.is-dim .side__card { opacity: 0.45; }
+.side.is-dim:hover .side__card { opacity: 1; }
 .side__card { pointer-events: auto; padding: 16px; display: flex; flex-direction: column; gap: 4px; min-height: 0; background: rgba(37, 37, 39, 0.78); border-color: var(--color-line-inset); }
 .side__card--list { flex: 0 1 auto; padding: 14px 8px 8px; gap: 8px; }
 /* 처음 화면: 행성 · 별자리 · 기록을 한 창에 쌓는다. 행성 목록은 높이를 나눠 쓰고 넘치면 스크롤 */
@@ -324,7 +328,6 @@ li.row--rec:active { transform: none; }
 @media (max-width: 959px) { .dist { display: none; } }
 /* 처음 화면 패널의 닫기 */
 .side--home .side__card--planets .side__head .side__title { padding-right: 0; }
-.side__close { width: 32px; height: 32px; }
 /* 휴대폰 폭: 왼쪽 아래 묶음(확대 조절 · 우주먼지 · 혜성 카드)을 오른쪽 세로 버튼 묶음보다 위로 올린다.
    "기록 넣기 · 행성 추가" 줄이 혜성 카드와 겹치지 않게. 오른쪽 창은 그 위에 덮는다 */
 @media (max-width: 480px) {

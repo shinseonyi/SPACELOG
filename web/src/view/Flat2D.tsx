@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { demo, useDemo } from "../demo/demoStore.ts";
 import { freeSpot } from "../demo/planets.ts";
+import { dimSide } from "../home/sideDim.ts";
 import { store, useStore } from "../state/store.ts";
 import heroUrl from "../assets/planet-hero.png";
 import nebulaUrl from "../assets/planet-nebula.png";
@@ -163,6 +164,7 @@ export function Flat2D() {
       );
     };
     const down = (e: KeyboardEvent) => {
+      dimSide();
       if (blocked(e)) return;
       const k = name(e);
       if (k === "e") {
@@ -202,6 +204,7 @@ export function Flat2D() {
   // 끌어서 옮기기. 4px 넘게 움직였으면 끌기, 아니면 클릭
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
+    dimSide(); // 우주를 다루기 시작 → 오른쪽 창 반투명
     drag.current = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false };
   };
   useEffect(() => {
@@ -276,6 +279,7 @@ export function Flat2D() {
 
   const onWheel = (e: React.WheelEvent) => {
     if ((e.target as Element).closest(".side, .side-panel")) return;
+    dimSide();
     cancelFlight();
     const c = live.current.cam;
     move({ ...c, z: clampZoom(c.z * Math.exp(-e.deltaY * 0.0012)) }, 0);

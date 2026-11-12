@@ -2,6 +2,7 @@
 // 행성은 사진 스프라이트, 시점은 자유 비행. 좌표: 행성 (x, y, z) → 3D (x, -y, -z), 1단위 = 1px.
 // 시안 대비 달라진 점: 별자리 선 · 거리 선은 별자리(5·6단계)·거리 카드와 함께 붙이고, 이름표는 행성 아래에만 놓는다(겹침 피하기 생략).
 import * as THREE from "three";
+import { dimSide } from "../home/sideDim.ts";
 import { store } from "../state/store.ts";
 import heroUrl from "../assets/planet-hero.png";
 import nebulaUrl from "../assets/planet-nebula.png";
@@ -155,6 +156,7 @@ export class DepthScene {
     };
     on(el, "pointerdown", (e) => {
       if (e.button !== 0) return;
+      dimSide(); // 우주를 다루기 시작 → 오른쪽 창 반투명
       this.drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false };
       try { el.setPointerCapture(e.pointerId); } catch { /* 캡처 못 해도 끌기는 동작 */ }
       el.style.cursor = "grabbing";
@@ -186,6 +188,7 @@ export class DepthScene {
     on(el, "pointercancel", () => { this.drag = null; });
     on(el, "wheel", (e) => {
       e.preventDefault();
+      dimSide();
       this.cancelFly();
       this.wheel += -e.deltaY * 6;
     }, { passive: false });
@@ -213,6 +216,7 @@ export class DepthScene {
         return;
       }
       if (["w", "a", "s", "d", " ", "shift"].includes(k)) {
+        dimSide();
         this.keys.add(k);
         this.cancelFly();
         if (k === " ") e.preventDefault();
