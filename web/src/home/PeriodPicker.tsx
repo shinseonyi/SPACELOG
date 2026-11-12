@@ -1,68 +1,102 @@
-import { useState } from "react";
-import { customPeriod, todayPeriod, weekPeriod } from "@spacelog/shared/period";
-import type { Period } from "@spacelog/shared/types";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { customPeriod } from "@spacelog/shared/period";
 import { store, useStore } from "../state/store.ts";
-import { Button } from "../ui/Button.tsx";
+import { PERIOD_LABEL, PERIOD_ORDER, periodFor, periodKey, type PeriodKey } from "./periodOptions.ts";
 
 const dot = (d: string) => d.replaceAll("-", ".");
 
-/** 오늘 / 이번 주 / 직접 지정(최대 1년) (POLICY 2-1, SPEC 1-4) */
+/** 기간 선택 버튼 + 메뉴: 오늘 · 이번 주 · 이번 달 · 전체 · 직접 지정 (README 6-1). 직접 지정은 최대 1년 */
 export function PeriodPicker() {
   const period = useStore((s) => s.period);
-  const [editing, setEditing] = useState(false);
+  const current = periodKey(period);
+  const [open, setOpen] = useState(false);
+  const [custom, setCustom] = useState(false);
   const [from, setFrom] = useState(period.from);
   const [to, setTo] = useState(period.to);
-  const set = (p: Period) => void store.getState().setPeriod(p);
+  const root = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open && !custom) return;
+    const close = (e: Event) => {
+      if (e instanceof KeyboardEvent ? e.key === "Escape" : !root.current?.contains(e.target as Node)) {
+        setOpen(false);
+        setCustom(false);
+        if (e instanceof KeyboardEvent) e.preventDefault(); // 메뉴만 닫고 한 단계 뒤로 가지는 않는다
+      }
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [open, custom]);
+
+  const choose = (key: PeriodKey) => {
+    if (key === "custom") {
+      setFrom(period.from);
+      setTo(period.to);
+      setCustom(true);
+      setOpen(false);
+      return;
+    }
+    setCustom(false);
+    setOpen(false);
+    void store.getState().setPeriod(periodFor(key));
+  };
 
   const apply = () => {
     if (!from || !to) return;
     const p = customPeriod(from, to);
-    const wantedTo = from > to ? from : to;
-    if (p.to !== wantedTo) store.getState().showToast(`최대 1년까지 볼 수 있어 ${dot(p.to)}까지로 맞췄어요`);
-    set(p);
-    setEditing(false);
+    if (p.to !== (from > to ? from : to)) store.getState().showToast(`최대 1년까지 볼 수 있어 ${dot(p.to)}까지로 맞췄어요`);
+    void store.getState().setPeriod(p);
+    setCustom(false);
   };
 
-  const preset = (key: Period["preset"], label: string, onClick: () => void) => (
-    <button type="button" className={`seg__item${period.preset === key ? " is-on" : ""}`} aria-pressed={period.preset === key} onClick={onClick}>
-      {label}
-    </button>
-  );
-
   return (
-    <div className="period">
-      <div className="seg" role="group" aria-label="기간">
-        {preset("today", "오늘", () => {
-          setEditing(false);
-          set(todayPeriod());
-        })}
-        {preset("week", "이번 주", () => {
-          setEditing(false);
-          set(weekPeriod());
-        })}
-        {preset("custom", "직접 지정", () => {
-          setFrom(period.from);
-          setTo(period.to);
-          setEditing((v) => !v);
-        })}
-      </div>
-      {period.preset === "custom" && !editing && (
-        <span className="period__range">
-          {dot(period.from)} ~ {dot(period.to)}
-        </span>
+    <div className="period" ref={root}>
+      <button
+        type="button"
+        className="pill-btn"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => {
+          setCustom(false);
+          setOpen((v) => !v);
+        }}
+      >
+        {current === "custom" ? `${dot(period.from)} ~ ${dot(period.to)}` : PERIOD_LABEL[current]}
+        <ChevronDown size={14} aria-hidden />
+      </button>
+      {open && (
+        <ul className="menu" role="listbox" aria-label="기간">
+          {PERIOD_ORDER.map((key) => (
+            <li key={key} role="presentation">
+              <button type="button" role="option" aria-selected={key === current} className={`menu__item${key === current ? " is-on" : ""}`} onClick={() => choose(key)}>
+                {PERIOD_LABEL[key]}
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
-      {editing && (
+      {custom && (
         <form
-          className="period__form"
+          className="menu period__form"
           onSubmit={(e) => {
             e.preventDefault();
             apply();
           }}
         >
-          <input type="date" aria-label="시작일" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} required />
-          <span aria-hidden="true">~</span>
-          <input type="date" aria-label="종료일" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} required />
-          <Button type="submit" variant="primary">보기</Button>
+          <label>
+            시작일
+            <input type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} required />
+          </label>
+          <label>
+            종료일
+            <input type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} required />
+          </label>
+          <button type="submit" className="btn btn--primary">보기</button>
         </form>
       )}
     </div>

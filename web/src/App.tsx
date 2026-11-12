@@ -5,8 +5,8 @@ import { ControlsHint } from "./home/ControlsHint.tsx";
 import { EmptyState } from "./home/EmptyState.tsx";
 import { HomeBanner } from "./home/HomeBanner.tsx";
 import { NearPrompt } from "./home/NearPrompt.tsx";
-import { PlanetList } from "./home/PlanetList.tsx";
-import { RediscoverySlot } from "./home/RediscoveryCard.tsx";
+import { LeftStack } from "./home/LeftStack.tsx";
+import { SideWindow } from "./home/SideWindow.tsx";
 import { TopBar } from "./home/TopBar.tsx";
 import "./home/home.css";
 import { store, useStore } from "./state/store.ts";
@@ -34,10 +34,10 @@ export function App() {
       <UniverseCanvas />
       <TopBar />
       <ControlsHint />
-      <PlanetList />
+      <SideWindow />
       <EmptyState />
       <NearPrompt />
-      <RediscoverySlot />
+      <LeftStack />
       <HomeBanner />
       <PerfMeter />
       <PanelPlaceholder />

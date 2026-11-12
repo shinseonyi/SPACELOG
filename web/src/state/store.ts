@@ -15,8 +15,13 @@ export interface ToastItem {
 /** 3D 쪽(이슈 #3)이 등록하는 자동 비행. 도착하면 true, 이동 키로 멈추면 false (DESIGN 9-4) */
 export type FlyHandler = (planetId: string) => Promise<boolean>;
 
+/** 우주 홈 오른쪽 창에 열린 목록. 한 번에 하나만 (README 6-1) */
+export type SideTab = "rec" | "planet" | "link";
+
 export interface Store extends WebState {
   auth: "checking" | "ok" | "required";
+  /** 오른쪽 창에 열린 목록. 같은 칩을 다시 누르면 닫힌다. 화면 설정이라 서버와 무관 */
+  sideTab: SideTab | null;
   route: Route;
   loading: boolean;
   toasts: ToastItem[];
@@ -50,6 +55,7 @@ export interface Store extends WebState {
   /** 현재 기간으로 다시 받기. 실패하면 마지막 데이터를 유지한다 (SPEC 3-4) */
   refresh(): Promise<void>;
   setExportFormat(format: WebState["exportFormat"]): void;
+  toggleSideTab(tab: SideTab): void;
   openProbe(): void;
 
   // ── 라우팅·알림 ──
@@ -96,6 +102,7 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
       cargo: [],
       exportFormat: "claude",
       auth: "checking",
+      sideTab: "planet",
       route: { name: "home" },
       loading: false,
       toasts: [],
@@ -249,6 +256,10 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
 
       setExportFormat(exportFormat) {
         set({ exportFormat });
+      },
+
+      toggleSideTab(tab) {
+        set({ sideTab: get().sideTab === tab ? null : tab });
       },
 
       openProbe() {
