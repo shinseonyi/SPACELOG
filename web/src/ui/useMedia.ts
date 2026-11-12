@@ -4,6 +4,8 @@ import { useSyncExternalStore } from "react";
 export const NARROW_QUERY = "(max-width: 480px)";
 /** 오른쪽 창이 아래 버튼 · 카드와 겹치기 시작하는 폭(측정). 오른쪽 창 카드를 접는다 (home.css 의 959px 규칙과 같은 값) */
 export const FOLD_QUERY = "(max-width: 959px)";
+/** "기록 넣기"가 가운데 아래에 있는 폭 (add.css 의 959px 규칙 반대). 우주먼지를 그 위로 옮긴다 */
+export const WIDE_QUERY = "(min-width: 960px)";
 
 const cache = new Map<string, MediaQueryList>();
 const mql = (q: string) => {

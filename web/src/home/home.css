@@ -106,6 +106,9 @@ li.row--rec:active { transform: none; }
 .stack { position: fixed; left: 24px; bottom: 88px; width: 260px; z-index: 10; display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 12px; }
 .stack__row { display: flex; align-items: center; gap: 14px; } /* 확대 조절 오른쪽에 우주먼지 (chat/chat.css) */
 .stack__row:empty { display: none; }
+/* 넓은 화면(960px 이상): 우주먼지 버튼을 가운데 아래 "기록 넣기"(높이 44) 바로 위로. 위 "hello" 말풍선(-32)까지 자리를 둔다 */
+.dust-dock { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + 44px + 16px + env(safe-area-inset-bottom, 0px)); z-index: 10; }
+@media (max-width: 1279px) { .dust-dock { bottom: calc(80px + 44px + 16px + env(safe-area-inset-bottom, 0px)); } } /* 기록 넣기가 한 줄 위로 */
 
 /* 행성 간 거리 카드 (2.5D · 3D): 왼쪽 아래 묶음의 맨 아래 */
 .dist { width: 260px; max-width: calc(100vw - 48px); box-sizing: border-box; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; border-radius: var(--r-panel); border: 1px solid var(--color-line-card); background: var(--color-card-solid); }
@@ -137,7 +140,7 @@ li.row--rec:active { transform: none; }
 .actionbar__n { min-width: 20px; padding: 0 6px; border-radius: var(--r-pill); background: rgba(255, 255, 255, 0.2); text-align: center; font: var(--type-fine-print); line-height: 20px; }
 @media (max-width: 760px) { .actionbar { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); } }
 
-.near { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); /* 가운데 아래 "기록 넣기" 위 */ z-index: 10; font-size: 16px; }
+.near { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(200px + env(safe-area-inset-bottom, 0px)); /* 가운데 아래 "기록 넣기"와 그 위 우주먼지(.dust-dock, 높이 약 107) 위 */ z-index: 10; font-size: 16px; }
 .near:active:not(:disabled) { transform: translateX(-50%) scale(var(--press-scale)); }
 
 /* 배너: 상단 바(위 20 · 높이 56) 바로 아래 가운데. 오른쪽 창보다 위에 덮는다 */
@@ -176,7 +179,7 @@ li.row--rec:active { transform: none; }
 .rediscovery__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption-strong); letter-spacing: var(--tracking-caption-strong); }
 .rediscovery__sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-fine-print); color: var(--color-body-muted); }
 
-@media (max-width: 1279px) { .near { bottom: calc(136px + env(safe-area-inset-bottom, 0px)); } } /* 기록 넣기가 한 줄 위로 올라가므로 그 위 */
+@media (max-width: 1279px) { .near { bottom: calc(256px + env(safe-area-inset-bottom, 0px)); } } /* 기록 넣기 · 우주먼지가 한 줄 위로 올라가므로 그 위 */
 @media (max-width: 760px) {
   .hint__keys { display: none; }
   .topbar { left: 16px; right: 16px; top: 12px; padding-left: 16px; }
