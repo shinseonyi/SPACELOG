@@ -56,7 +56,7 @@ export function CreateLinkSheet({ stars, onCancel, onDone }: { stars: Star[]; on
           </div>
         </div>
       )}
-      <div className="lsheet__actions">
+      <div className="lsheet__actions lsheet__actions--create">
         <Button onClick={onCancel}>취소</Button>
         <Button type="submit" variant="primary">저장하고 관측소에서 보기</Button>
       </div>
@@ -160,7 +160,7 @@ export function LinkView({ link, onBack }: { link: Link; onBack(): void }) {
         ) : (
           <>
             <Button onClick={start}><Pencil size={14} aria-hidden /> 별자리 수정하기</Button>
-            <Button variant="primary" onClick={() => store.getState().openObservatory({ linkId: link.id })}>관측소에서 보기</Button>
+            <Button onClick={() => store.getState().openObservatory({ linkId: link.id })}>관측소에서 보기</Button>
           </>
         )}
       </div>
