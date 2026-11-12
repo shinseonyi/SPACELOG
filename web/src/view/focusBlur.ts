@@ -7,8 +7,8 @@ export function focusBlur(gap: number, ref: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/** 2D: 화면에서 가장 흐린 정도의 흐림(화면 px)과 어둡기. 1 = 가장 흐림 */
+/** 2D: 화면에서 가장 흐린 정도의 흐림(px)과 어둡기. 1 = 가장 흐림 */
 export const FLAT_BLUR_PX = 7;
 export const FLAT_DIM = 0.4;
-/** 2D: 고른 행성에서 화면상 이 거리(px)만큼 떨어지면 가장 흐리다. 확대하면 같은 행성도 멀어져 더 흐리고, 축소하면 또렷해진다 */
-export const FLAT_BLUR_REF = 640;
+/** 2D: 이 거리(우주 px)만큼 떨어지면 가장 흐리다. 이웃 칸이 약 360 → 바로 옆 행성도 절반쯤 흐리다 */
+export const FLAT_BLUR_REF = 700;
