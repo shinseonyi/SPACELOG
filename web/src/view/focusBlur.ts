@@ -13,8 +13,8 @@ export function focusBlur(gap: number, ref: number, nearRatio = NEAR_RATIO): num
 }
 
 /** 2D: 화면에서 가장 흐린 정도의 흐림(px)과 어둡기. 1 = 가장 흐림 */
-export const FLAT_BLUR_PX = 6;
+export const FLAT_BLUR_PX = 9;
 export const FLAT_DIM = 0.3;
 /** 2D: 이 거리(우주 px)만큼 떨어지면 가장 흐리다. 흐림 없는 띠는 FLAT_NEAR_RATIO 만큼 → 바로 옆 행성(약 300 ~ 360)은 살짝만, 두 칸 너머부터 뚜렷이 */
-export const FLAT_BLUR_REF = 900;
-export const FLAT_NEAR_RATIO = 0.15;
+export const FLAT_BLUR_REF = 800;
+export const FLAT_NEAR_RATIO = 0.1;
