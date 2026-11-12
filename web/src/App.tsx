@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { AddRecord } from "./add/AddRecord.tsx";
 import { ERROR_MESSAGES } from "@spacelog/shared/errors";
 import { chat } from "./chat/chatStore.ts";
 import { closeChat } from "./chat/controller.ts";
@@ -47,6 +48,7 @@ export function App() {
       <PerfMeter />
       <PanelHost />
       <ActionBar />
+      <AddRecord />
       <Blackhole />
       <Observatory />
       <CosmicDust />

@@ -343,7 +343,7 @@ URL(해시 라우팅): `#/` 우주 홈 · `#/planet/:id` · `#/star/:id` · `#/p
 | `GET /api/health` | 수집 앱, 웹 | 서버 살아 있음 확인 (토큰 필요) |
 | `GET /api/universe?from=&to=` | 웹 | 기간 안의 별 + 모든 행성(기간 내·전체 별 개수 포함). 3D와 목록의 단일 소스 |
 | `GET /api/stars/:id` | 웹 | 별 1개 (텍스트 본문 포함) |
-| `POST /api/stars` | 수집 앱 | 기록 넣기. `multipart` 파일 여러 개(최대 20) 또는 `{kind:"text"\|"link", text\|url}`. 응답: 만든 별들, 중복·거부 목록 |
+| `POST /api/stars` | 수집 앱 · 웹(기록 넣기, 2026-11-12) | 기록 넣기. `multipart` 파일 여러 개(최대 20) 또는 `{kind:"text"\|"link", text\|url}`. 응답: 만든 별들, 중복·거부 목록 |
 | `PATCH /api/stars` | 수집 앱 | 넣은 직후 확인: `{ids[], planetId?, memo?}` 일괄 적용 |
 | `PATCH /api/stars/:id` | 웹 | `{memo?, planetId?}` |
 | `POST /api/stars/move` | 웹 | `{ids[], planetId}` 여러 별 옮기기 |

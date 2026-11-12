@@ -92,7 +92,7 @@ li.row--rec:active { transform: none; }
 .actionbar__n { min-width: 20px; padding: 0 6px; border-radius: var(--r-pill); background: rgba(255, 255, 255, 0.2); text-align: center; font: var(--type-fine-print); line-height: 20px; }
 @media (max-width: 760px) { .actionbar { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); } }
 
-.near { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 10; font-size: 16px; }
+.near { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); /* 가운데 아래 "기록 넣기" 위 */ z-index: 10; font-size: 16px; }
 .near:active:not(:disabled) { transform: translateX(-50%) scale(var(--press-scale)); }
 
 .home-banner { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); width: min(560px, calc(100vw - 2 * var(--gutter))); z-index: 15; overflow: hidden; padding: 0; }

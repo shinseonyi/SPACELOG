@@ -2,7 +2,7 @@
 // 목업의 가상 "오늘"은 2026-11-11 이라 기간과 상관없이 같은 우주를 돌려준다 (mocks/api/README.md).
 // `#/?token=dev&mock=empty` 로 열면 기록 0건 우주, `&stars=2000` 이면 별 2,000개 우주 (성능 측정).
 import { ERROR_MESSAGES } from "@spacelog/shared/errors";
-import type { ExportRequest, Planet, Star, UniverseResponse } from "@spacelog/shared/types";
+import type { CreateStarsResponse, ExportRequest, Planet, Star, UniverseResponse } from "@spacelog/shared/types";
 import { buildExport } from "../../../apps/server/export/buildExport.ts";
 import universe from "../../../mocks/api/universe.json";
 import universeEmpty from "../../../mocks/api/universe.empty.json";
@@ -62,7 +62,42 @@ function recount() {
   });
 }
 let planetSeq = 0;
+let starSeq = 0;
+
+/** 목업의 기록 넣기: 서버처럼 종류에 맞는 기본 행성에, 없으면 미분류(또는 첫 행성)에 넣는다 */
+function mockCreate(parts: Partial<Star>[]): CreateStarsResponse {
+  const now = new Date().toISOString();
+  const created = parts.map((part): Star => {
+    const kind = part.kind ?? "text";
+    const planet = data.planets.find((p) => p.defaultFor === kind) ?? data.planets.find((p) => p.system === "uncategorized") ?? data.planets[0];
+    return {
+      id: `mock-star-${Date.now()}-${++starSeq}`, kind, planetId: planet?.id ?? "", createdAtUtc: now, tzOffsetMin: -new Date().getTimezoneOffset(), updatedAtUtc: now,
+      storagePath: null, originalName: null, mimeType: null, sizeBytes: null, sha256: null, url: null, linkTitle: null, linkDomain: null, textBody: null,
+      thumbnailPath: null, thumbnailStatus: "fallback", linkFetchStatus: "none", memo: null, ...part,
+    };
+  });
+  data.stars = [...data.stars, ...created];
+  recount();
+  return { created, duplicates: [], rejected: [] };
+}
+
 function mockWrite(method: string, pathname: string, body: unknown): unknown | undefined {
+  if (method === "POST" && pathname === "/api/stars") {
+    if (typeof FormData !== "undefined" && body instanceof FormData) {
+      const files = body.getAll("files").filter((f): f is File => f instanceof File);
+      return mockCreate(files.map((f) => ({ kind: f.type.startsWith("image/") ? "image" : "file", originalName: f.name, mimeType: f.type || null, sizeBytes: f.size })));
+    }
+    const j = (body ?? {}) as { kind?: string; text?: string; url?: string };
+    if (j.kind === "link" && j.url) return mockCreate([{ kind: "link", url: j.url, linkDomain: new URL(j.url).hostname.replace(/^www\./, "") }]);
+    return mockCreate([{ kind: "text", textBody: j.text ?? "" }]);
+  }
+  if (method === "PATCH" && pathname === "/api/stars") {
+    const j = (body ?? {}) as { ids?: string[]; planetId?: string };
+    const ids = new Set(j.ids ?? []);
+    data.stars = data.stars.map((s) => (ids.has(s.id) && j.planetId ? { ...s, planetId: j.planetId, updatedAtUtc: new Date().toISOString() } : s));
+    recount();
+    return { stars: data.stars.filter((s) => ids.has(s.id)) };
+  }
   const b = (body ?? {}) as Record<string, string | null | undefined>;
   const star = pathname.match(/^\/api\/stars\/([^/]+)$/);
   if (star) {

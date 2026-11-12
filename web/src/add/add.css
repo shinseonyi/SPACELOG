@@ -1,0 +1,36 @@
+/* 웹에서 기록 넣기: 가운데 아래 버튼, 메모 창, 끌어다 놓기 덮개, 넣은 뒤 알림. 값은 시안 SPACELOG_Prototype */
+
+.addrec { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 12; height: 44px; padding: 0 18px; display: inline-flex; align-items: center; gap: 8px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: rgba(30, 30, 32, 0.88); -webkit-backdrop-filter: var(--blur-float); backdrop-filter: var(--blur-float); color: #fff; font: var(--type-caption); white-space: nowrap; cursor: pointer; transition: transform var(--press-time); }
+.addrec:active:not(:disabled) { transform: translateX(-50%) scale(var(--press-scale)); }
+.addrec:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.addrec:disabled { cursor: default; opacity: 0.7; }
+.addrec__sub { color: var(--color-body-muted); font: var(--type-fine-print); }
+@media (max-width: 1099px) { .addrec__sub { display: none; } }
+@media (max-width: 1023px) { .addrec { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } } /* 좁으면 아래 줄(조작 안내·버튼 묶음) 위로 */
+
+.addrec-wrap { position: fixed; left: 16px; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 26; display: flex; justify-content: center; pointer-events: none; }
+.addrec-sheet { pointer-events: auto; width: 420px; max-width: 100%; box-sizing: border-box; padding: 16px; display: flex; flex-direction: column; gap: 12px; border-radius: var(--r-panel); border: 1px solid var(--color-line-card); background: rgb(30, 30, 32); box-shadow: var(--shadow-float); animation: fade-in 0.2s ease-out; }
+.addrec-sheet__head { display: flex; align-items: center; gap: 8px; font: var(--type-caption-strong); color: #fff; }
+.addrec-sheet__head span { flex: 1; }
+.addrec-sheet__x { width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: var(--color-chip); color: #fff; display: grid; place-items: center; cursor: pointer; }
+.addrec-sheet__note { resize: none; min-height: 84px; padding: 12px 14px; box-sizing: border-box; border-radius: var(--r-field); border: 1.5px dashed rgba(255, 255, 255, 0.24); background: transparent; color: #fff; font: var(--type-caption); line-height: 1.5; font-family: inherit; outline: none; }
+.addrec-sheet__note:focus { border: 1.5px solid var(--color-primary-on-dark); }
+.addrec-sheet__note::placeholder { color: var(--color-body-muted); }
+.addrec-sheet__foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.addrec-sheet__pick { height: 40px; padding: 0 14px; display: inline-flex; align-items: center; gap: 8px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: transparent; color: #fff; font: var(--type-caption); cursor: pointer; transition: transform var(--press-time); }
+.addrec-sheet__hint { flex: 1; min-width: 0; font: var(--type-fine-print); color: var(--color-body-muted); }
+.addrec-sheet__go { height: 40px; padding: 0 18px; border: 0; border-radius: var(--r-pill); background: var(--color-primary); color: #fff; font: var(--type-caption); cursor: pointer; transition: transform var(--press-time); }
+.addrec-sheet__go:disabled { opacity: 0.4; cursor: default; }
+.addrec-sheet__pick:active, .addrec-sheet__go:active:not(:disabled) { transform: scale(var(--press-scale)); }
+.addrec-sheet__x:focus-visible, .addrec-sheet__pick:focus-visible, .addrec-sheet__go:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+.addrec-drop { position: fixed; inset: 16px; z-index: 40; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border-radius: var(--r-panel); border: 2px dashed var(--color-primary-on-dark); background: rgba(0, 0, 0, 0.72); color: #fff; pointer-events: none; }
+.addrec-drop strong { font: 600 28px/1.2 var(--f-body); }
+.addrec-drop span { font: var(--type-caption); color: var(--color-body-muted); }
+
+.addrec-done { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 31; max-width: calc(100vw - 32px); box-sizing: border-box; display: flex; align-items: center; gap: 14px; padding: 8px 8px 8px 20px; border-radius: var(--r-pill); background: #fff; color: var(--color-ink-on-light); box-shadow: var(--shadow-float); font: var(--type-caption); animation: fade-in 0.2s ease-out; }
+.addrec-done__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.addrec-done button { flex: none; height: 32px; padding: 0 14px; border: 0; border-radius: var(--r-pill); background: var(--color-primary); color: #fff; font: var(--type-caption); cursor: pointer; transition: transform var(--press-time); }
+.addrec-done button:active { transform: scale(var(--press-scale)); }
+@media (max-width: 1023px) { .addrec-done { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } }
+@media (prefers-reduced-motion: reduce) { .addrec-sheet, .addrec-done { animation: none; } }

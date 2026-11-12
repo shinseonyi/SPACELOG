@@ -4,6 +4,8 @@
 // - 서버에 닿지 못하면(네트워크 실패) connection = "lost", 응답을 받으면 "ok"
 import { ERROR_MESSAGES, isApiError, type ErrorCode } from "@spacelog/shared/errors";
 import type {
+  BulkUpdateStarsRequest,
+  CreateStarsResponse,
   ExportRequest,
   ExportResponse,
   OpenStarRequest,
@@ -11,6 +13,7 @@ import type {
   RediscoveryEventRequest,
   RediscoveryTodayResponse,
   StarResponse,
+  StarsResponse,
   UniverseResponse,
   UpdateStarRequest,
 } from "@spacelog/shared/types";
@@ -68,10 +71,12 @@ async function send(method: string, path: string, body?: unknown): Promise<Respo
   const headers: Record<string, string> = {};
   const token = currentToken();
   if (token) headers["X-Session-Token"] = token;
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+  // 파일은 multipart(FormData): 경계값이 든 Content-Type 은 브라우저가 붙인다
+  const form = typeof FormData !== "undefined" && body instanceof FormData;
+  if (body !== undefined && !form) headers["Content-Type"] = "application/json";
   let res: Response;
   try {
-    res = await fetch(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    res = await fetch(path, { method, headers, body: body === undefined ? undefined : form ? (body as FormData) : JSON.stringify(body) });
   } catch {
     listeners.onConnection("lost");
     throw new RequestError("NETWORK", NETWORK_MESSAGE, 0);
@@ -122,6 +127,18 @@ export const api = {
   rediscoveryToday: () => request<RediscoveryTodayResponse>("GET", "/api/rediscovery/today"),
   /** 재발견 이벤트 기록 (POST /api/rediscovery/events) */
   rediscoveryEvent: (body: RediscoveryEventRequest) => request<null>("POST", "/api/rediscovery/events", body),
+
+  // ── 웹에서 기록 넣기 (SPEC 2-6 POST /api/stars). 수집 앱과 같은 API 다 ──
+  /** 파일 여러 개(최대 20): multipart 필드 "files" */
+  createFiles: (files: File[]) => {
+    const form = new FormData();
+    for (const f of files) form.append("files", f, f.name);
+    return request<CreateStarsResponse>("POST", "/api/stars", form);
+  },
+  /** 메모 한 덩어리 또는 링크 하나 */
+  createTextOrLink: (body: { kind: "text"; text: string } | { kind: "link"; url: string }) => request<CreateStarsResponse>("POST", "/api/stars", body),
+  /** 넣은 기록 여럿을 한 번에 옮기기 (PATCH /api/stars). 행성 패널을 연 채 넣으면 그 행성으로 */
+  updateStars: (body: BulkUpdateStarsRequest) => request<StarsResponse>("PATCH", "/api/stars", body),
 
   // ── 기록·행성 수정 (SPEC 2-6). 서버 담당(#5)이 만들면 바로 동작한다 ──
   updateStar: (id: string, body: UpdateStarRequest) => request<StarResponse>("PATCH", `/api/stars/${encodeURIComponent(id)}`, body),
