@@ -169,7 +169,7 @@ function RecordCard() {
 const QUICK_MAX = 5;
 
 /**
- * 행성 목록 아래 "별자리 바로 보기" (시안 W01 별자리 카드). 별자리가 있을 때만.
+ * 행성 목록 아래 "별자리 태그 보기" (시안 W01 별자리 카드). 별자리가 있을 때만. 체크만 누를 수 있다 (이름은 보기만) — 기록은 위 별자리 태그에서.
  * 체크 = 그 별자리를 우주에 선으로 잇기(행성끼리). 이름을 누르면 그 별자리의 기록 창. 5개까지, 나머지는 위의 별자리 태그에서
  */
 function LinkQuickCard() {
@@ -178,8 +178,8 @@ function LinkQuickCard() {
   const fold = useFold();
   if (links.length === 0) return null;
   return (
-    <section className={`card side__card lquick${fold.open ? "" : " is-folded"}`} aria-label="별자리 바로 보기">
-      <CardTitle title="별자리 바로 보기" fold={fold} className="lquick__title" />
+    <section className={`card side__card lquick${fold.open ? "" : " is-folded"}`} aria-label="별자리 태그 보기">
+      <CardTitle title="별자리 태그 보기" fold={fold} className="lquick__title" />
       {fold.open && (<>
       <p className="side__note">체크한 별자리만 우주에 선으로 보여요</p>
       <ul className="rows lquick__rows">
@@ -188,10 +188,10 @@ function LinkQuickCard() {
           return (
             <li key={l.id} className="lquick__row">
               <button type="button" role="checkbox" aria-checked={shown} aria-label={`${l.name} 우주에 선으로 ${shown ? "숨기기" : "보이기"}`} title="우주에 선으로 보이기 · 숨기기" className={`check${shown ? " is-on" : ""}`} onClick={() => demo.getState().toggleLinkShown(l.id)} />
-              <button type="button" className="lquick__open" title="별자리의 기록 보기" onClick={() => store.getState().openLinkView(l.id)}>
+              <span className="lquick__label">
                 <span className="lquick__name">{l.name}</span>
                 <span className="lquick__n">기록 {l.starIds.length}</span>
-              </button>
+              </span>
             </li>
           );
         })}
