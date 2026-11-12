@@ -129,7 +129,8 @@ function createDropzone(): void {
     alwaysOnTop: true,
     skipTaskbar: true, // 작업 표시줄 아이콘 없음 (맥은 app.dock.hide)
     show: false,
-    backgroundColor: "#1e1e20",
+    transparent: true, // 바깥 귀퉁이를 비워 안쪽 18px 둥근 모서리만 보이게 한다 (불투명이면 운영체제 모서리와 겹쳐 두 겹으로 보인다)
+    backgroundColor: "#00000000",
     title: "SpaceLog 드롭존",
     webPreferences: { preload: path.join(DIST, "preload.cjs"), contextIsolation: true, nodeIntegration: false, sandbox: true },
   });

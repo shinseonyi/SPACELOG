@@ -25,17 +25,18 @@
   word-break: keep-all;
 }
 * { box-sizing: border-box; }
-html, body, #root { margin: 0; height: 100%; overflow: hidden; background: var(--panel); color: var(--body); user-select: none; }
+html, body, #root { margin: 0; height: 100%; overflow: hidden; background: transparent; color: var(--body); user-select: none; }
 button, select, input, textarea { font: inherit; letter-spacing: inherit; }
 button { transition: transform var(--press); }
 button:active:not(:disabled) { transform: scale(0.95); }
 :focus-visible { outline: 2px solid var(--primary-on-dark); outline-offset: 2px; }
 kbd { font: 400 12px/1 inherit; padding: 3px 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.1); color: #fff; white-space: nowrap; }
 
-/* 창 모서리는 운영체제(Windows 11 · macOS)가 이미 둥글게 깎는다. 안쪽 최상위 요소(.handle · .panel · .card)에 둥근 모서리나 테두리를 또 그리면 두 겹으로 보인다 */
+/* 드롭존 창은 투명하다(main/app.ts transparent). 바깥 네 귀퉁이는 비워 두고 안쪽 최상위 요소(.handle · .panel · .card)의 18px 둥근 모서리만 보이게 한다.
+   불투명 창이면 귀퉁이에 배경색이 남아 운영체제의 모서리와 겹쳐 두 겹으로 보인다 */
 /* collapsed: 가장자리 손잡이 */
 .handle { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  background: var(--panel); cursor: pointer; -webkit-app-region: no-drag; }
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); cursor: pointer; -webkit-app-region: no-drag; }
 .planet-dot { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #8fb4ff, #2f6fe0); position: relative; }
 .planet-dot.is-error::after, .planet-dot.is-warn::after { content: ""; position: absolute; right: -3px; bottom: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); border: 1px solid var(--panel); }
 .planet-dot.is-warn::after { background: var(--warn); }
@@ -43,7 +44,7 @@ kbd { font: 400 12px/1 inherit; padding: 3px 8px; border-radius: 6px; background
 .handle-label { font-size: 10px; color: var(--muted); }
 
 /* expanded / dragOver / saving / error */
-.panel { height: 100%; display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--panel); }
+.panel { height: 100%; display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); }
 .p-head { display: flex; align-items: center; gap: 8px; }
 .p-logo { width: 28px; height: 28px; border-radius: 50%; background: var(--chip); display: grid; place-items: center; flex: none; }
 .p-logo i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #fff; border-right-color: transparent; transform: rotate(-30deg); display: block; }
@@ -91,7 +92,7 @@ kbd { font: 400 12px/1 inherit; padding: 3px 8px; border-radius: 6px; background
 .link-btn:disabled { opacity: 0.5; cursor: default; }
 
 /* confirm: 넣은 직후 확인 카드 */
-.card { height: 100%; display: flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--panel); }
+.card { height: 100%; display: flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); }
 .card-item { display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: var(--r-field); background: var(--inset); }
 .card-thumb { position: relative; overflow: hidden; width: 44px; height: 44px; border-radius: 10px; background: var(--chip); display: grid; place-items: center; flex: none; font-size: 18px; }
 .card-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
