@@ -40,8 +40,8 @@ interface Imgs {
 let imgs: Promise<Imgs> | null = null;
 const loadImgs = () => (imgs ??= Promise.all([loadImage(heroUrl), loadImage(ringUrl), loadImage(nebulaUrl)]).then(([hero, ring, nebula]) => ({ hero, ring, nebula })));
 
-/** 심도 효과의 흐림 단계 (256px 사진 기준 흐림 px). 0 = 원본 */
-const BLUR_STEPS = [0, 2, 4, 7, 10, 14];
+/** 심도 효과의 흐림 단계 (256px 사진 기준 흐림 px). 0 = 원본. 촘촘해야 스크롤할 때 튀지 않는다 */
+const BLUR_STEPS = [0, 1.5, 3, 4.5, 6, 8, 10, 12, 14];
 
 interface Node3 {
   p: DepthPlanet;
@@ -265,16 +265,18 @@ export class DepthScene {
   }
 
   /**
-   * 심도 효과: 행성을 고르면(패널 열림) 그 행성에 초점을 맞추고, 다른 행성은 카메라에서의 거리가 초점과 다를수록 흐리고 어둡게.
+   * 심도 효과: 행성을 고르면(패널 열림) 그 행성은 늘 또렷하고, 다른 행성은 카메라에서의 거리가 고른 행성과 다를수록 흐리고 어둡게.
+   * 심도 폭은 고른 행성까지의 거리에 비례한다 — 휠로 가까이 갈수록 얕아져 다른 행성이 더 흐려지고, 멀어질수록 다시 또렷해진다.
    * 흐림 정도는 천천히 따라가고, 사진은 흐림 단계 그림으로 바꿔 끼운다. 공전 점 · 이름표도 같이 흐려진다
    */
   private applyFocus(dt: number, camPos: THREE.Vector3) {
     const focusId = store.getState().selectedPlanetId;
     const f = focusId ? this.nodes.get(focusId) : undefined;
     const fd = f ? camPos.distanceTo(f.at) : 0;
+    const ref = Math.max(300, fd * 0.8);
     const k = 1 - Math.exp(-dt * 4);
     this.nodes.forEach((n) => {
-      const want = f && n !== f ? focusBlur(camPos.distanceTo(n.at) - fd, Math.max(400, fd * 1.2)) : 0;
+      const want = f && n !== f ? focusBlur(camPos.distanceTo(n.at) - fd, ref) : 0;
       n.blur += (want - n.blur) * k;
       if (Math.abs(want - n.blur) < 0.002) n.blur = want;
       const level = Math.round(n.blur * (BLUR_STEPS.length - 1));

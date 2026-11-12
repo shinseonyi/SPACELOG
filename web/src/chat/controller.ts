@@ -240,7 +240,8 @@ export function sendChat(raw: string) {
       thinkTimer = null;
       // 재발견 혜성인데 아직 볼 혜성이 없으면(7일 지난 기록 없음) 날아가지 않고 안내만. 위치는 [네]를 누르면 알려 준다
       if (a.then === "comet" && !cometAvailable()) {
-        chat.getState().push({ who: "bot", text: `${a.text}\n${NO_COMET_YET}`, action: "guideComet" });
+        // 답의 첫 줄(무엇인지)만 쓰고 "어디서 볼 수 있어요" 줄은 뺀다 — 지금은 볼 수 없으니
+        chat.getState().push({ who: "bot", text: `${a.text.split("\n")[0]}\n${NO_COMET_YET}`, action: "guideComet" });
         chat.getState().setTyping(false);
         currentTarget = null;
         chat.getState().setGuide(null);
