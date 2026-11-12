@@ -6,6 +6,10 @@ kbd { font: var(--type-fine-print); background: var(--color-chip); color: var(--
 /* 좁아지면 두 줄이 되지 않게 목록 칩(기록 · 행성 · 별자리 · 선택)을 뺀다. 목록은 오른쪽 창 · 행성 패널로 */
 @media (max-width: 879px) { .topbar .chip { display: none; } }
 .topbar__brand { margin: 0; font: var(--type-tagline); letter-spacing: 0.18em; }
+/* 로고 = 사용 방법(How to use) 페이지 링크. 새 탭 */
+.topbar__logo { color: inherit; text-decoration: none; border-radius: var(--r-item); transition: opacity 120ms ease; }
+.topbar__logo:hover { opacity: 0.75; }
+.topbar__logo:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
 .topbar__spacer { flex: 1; }
 .chip { height: 28px; padding: 0 12px; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--color-body-sub); font: var(--type-caption); letter-spacing: var(--tracking-caption); white-space: nowrap; cursor: pointer; transition: transform var(--press-time); }
 .chip:active { transform: scale(var(--press-scale)); }

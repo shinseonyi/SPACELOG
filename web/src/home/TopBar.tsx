@@ -1,3 +1,4 @@
+import { HOW_TO_USE_URL } from "../ui/links.ts";
 import { X } from "lucide-react";
 import { store, useStore, type SideTab, type ViewMode } from "../state/store.ts";
 import { useDemo } from "../demo/demoStore.ts";
@@ -32,7 +33,9 @@ export function TopBar() {
   );
   return (
     <header className="topbar card">
-      <h1 className="topbar__brand">SPACELOG</h1>
+      <h1 className="topbar__brand">
+        <a className="topbar__logo" href={HOW_TO_USE_URL} target="_blank" rel="noreferrer" title="사용 방법 보기 (How to use)">SPACELOG</a>
+      </h1>
       {chip("rec", "기록", stars)}
       {chip("planet", "행성", planets)}
       {chip("link", "별자리", links)}
