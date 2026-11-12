@@ -20,7 +20,7 @@ const TYPES: Record<string, string> = {
   ".map": "application/json; charset=utf-8",
 };
 
-/** URL 경로 → webDir 안의 파일 경로. 밖으로 나가거나 이상한 경로면 null */
+/** URL 경로 → webDir 안의 파일 경로. 폴더(끝이 /)면 그 안의 index.html. 밖으로 나가거나 이상한 경로면 null */
 export function resolveStaticPath(webDir: string, urlPath: string): string | null {
   let decoded: string;
   try {
@@ -30,7 +30,7 @@ export function resolveStaticPath(webDir: string, urlPath: string): string | nul
   }
   if (decoded.includes("\0")) return null;
   const root = resolve(webDir);
-  const file = resolve(root, "." + (decoded === "/" ? "/index.html" : decoded));
+  const file = resolve(root, "." + (decoded.endsWith("/") ? decoded + "index.html" : decoded));
   return file.startsWith(root + sep) ? file : null;
 }
 

@@ -6,6 +6,8 @@ export interface ServerConfig {
   basePort: number;
   /** 웹 빌드 결과(web/dist). 없으면 정적 파일을 내려주지 않는다 */
   webDir: string | null;
+  /** 소개 사이트(site/). 있으면 /how-to-use/ 아래를 내려준다 — 상단 바 로고가 여는 사용 방법 페이지 (Render 에 올리기 전에도 보이게) */
+  siteDir: string | null;
   /** 개발 중 Vite 개발 서버 Origin. 있을 때만 허용한다 */
   devOrigin: string | null;
   /** 보관함 폴더 (SPEC 2-7). 없으면 DB를 쓰는 API를 붙이지 않는다 */
@@ -26,6 +28,7 @@ export function configFromEnv(env: NodeJS.ProcessEnv = process.env): ServerConfi
     token,
     basePort,
     webDir: env.SPACELOG_WEB_DIR || null,
+    siteDir: env.SPACELOG_SITE_DIR || null,
     devOrigin: env.SPACELOG_DEV_ORIGIN || null,
     vaultDir: env.SPACELOG_VAULT || null,
   };

@@ -57,7 +57,7 @@ describe("GET /api/universe", () => {
   it("HTTP로 조회된다", async () => {
     const v = seeded();
     const unmount = mountRoutes(routes, universeRoutes(v, { now: () => NOW }));
-    const { server, port } = await startServer({ token: "t", basePort: 0, webDir: null, devOrigin: null, vaultDir: null });
+    const { server, port } = await startServer({ token: "t", basePort: 0, webDir: null, siteDir: null, devOrigin: null, vaultDir: null });
     try {
       const body = await new Promise<{ status: number; json: UniverseResponse }>((ok, fail) => {
         request({ host: "127.0.0.1", port, path: "/api/universe?from=2026-11-11&to=2026-11-11", headers: { "x-session-token": "t" } }, (res) => {

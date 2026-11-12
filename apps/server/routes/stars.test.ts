@@ -24,7 +24,7 @@ describe("POST /api/stars", () => {
   before(async () => {
     vault = openVault(mkdtempSync(join(tmpdir(), "spacelog-stars-")), () => NOW);
     unmount = mountRoutes(routes, starRoutes(vault, { now: () => NOW }));
-    ({ server, port } = await startServer({ token: TOKEN, basePort: 0, webDir: null, devOrigin: null, vaultDir: null }));
+    ({ server, port } = await startServer({ token: TOKEN, basePort: 0, webDir: null, siteDir: null, devOrigin: null, vaultDir: null }));
   });
   after(() => {
     unmount();

@@ -32,9 +32,14 @@ describe("서버 보안·정적 파일", () => {
   mkdirSync(join(webDir, "assets"));
   writeFileSync(join(webDir, "index.html"), "<!doctype html><title>SpaceLog</title>");
   writeFileSync(join(webDir, "assets", "app-abc123.js"), "console.log(1)");
+  // 소개 사이트 사본: /how-to-use/ 아래만 내려준다
+  const siteDir = mkdtempSync(join(tmpdir(), "spacelog-site-"));
+  mkdirSync(join(siteDir, "how-to-use"));
+  writeFileSync(join(siteDir, "index.html"), "<!doctype html><title>download</title>");
+  writeFileSync(join(siteDir, "how-to-use", "index.html"), "<!doctype html><title>How to use</title>");
 
   before(async () => {
-    const config: ServerConfig = { token: TOKEN, basePort: 0, webDir, devOrigin: "http://localhost:5173", vaultDir: null };
+    const config: ServerConfig = { token: TOKEN, basePort: 0, webDir, siteDir, devOrigin: "http://localhost:5173", vaultDir: null };
     ({ server, port } = await startServer(config));
   });
   after(() => server.close());
@@ -69,6 +74,18 @@ describe("서버 보안·정적 파일", () => {
     assert.equal((await call(port, "/api/health", { ...auth, origin: `http://127.0.0.1:${port}` })).status, 200);
     assert.equal((await call(port, "/api/health", { ...auth, host: `localhost:${port}`, origin: `http://localhost:${port}` })).status, 200);
     assert.equal((await call(port, "/api/health", { ...auth, origin: "http://localhost:5173" })).status, 200);
+  });
+
+  it("사용 방법(How to use) 페이지: /how-to-use/ 아래만 소개 사이트에서, 그 밖은 아니다", async () => {
+    const page = await call(port, "/how-to-use/", {});
+    assert.equal(page.status, 200);
+    assert.match(page.body, /How to use/);
+    assert.equal((await call(port, "/how-to-use", {})).status, 200, "끝 / 없이도");
+    assert.equal((await call(port, "/how-to-use/missing.html", {})).status, 404);
+    const up = await call(port, "/how-to-use/../index.html", {});
+    assert.doesNotMatch(up.body, /download/, "../ 로 올라가도 소개 사이트의 다른 페이지(받는 곳)는 내려주지 않는다"); // 경로가 정리되어 웹의 index.html 이 나온다
+    const home = await call(port, "/", {});
+    assert.match(home.body, /SpaceLog/, "/ 는 그대로 웹");
   });
 
   it("다른 Origin은 토큰이 맞아도, 정적 파일이어도 막는다", async () => {
@@ -110,11 +127,11 @@ describe("설정·포트", () => {
   it("토큰이 없으면 시작을 거부한다", () => {
     assert.throws(() => configFromEnv({}), /SPACELOG_TOKEN/);
     assert.throws(() => configFromEnv({ SPACELOG_TOKEN: "t", SPACELOG_PORT: "abc" }), /SPACELOG_PORT/);
-    assert.deepEqual(configFromEnv({ SPACELOG_TOKEN: "t" }), { token: "t", basePort: 47800, webDir: null, devOrigin: null, vaultDir: null });
+    assert.deepEqual(configFromEnv({ SPACELOG_TOKEN: "t" }), { token: "t", basePort: 47800, webDir: null, siteDir: null, devOrigin: null, vaultDir: null });
   });
 
   it("개발 Origin이 없으면 Vite 주소도 막는다", async () => {
-    const { server, port } = await startServer({ token: TOKEN, basePort: 0, webDir: null, devOrigin: null, vaultDir: null });
+    const { server, port } = await startServer({ token: TOKEN, basePort: 0, webDir: null, siteDir: null, devOrigin: null, vaultDir: null });
     try {
       assert.equal((await call(port, "/api/health", { "x-session-token": TOKEN, origin: "http://localhost:5173" })).status, 403);
     } finally {
@@ -127,7 +144,7 @@ describe("설정·포트", () => {
     await new Promise<void>((ok) => blocker.listen(0, "127.0.0.1", ok));
     const taken = (blocker.address() as { port: number }).port;
     try {
-      const { server, port } = await startServer({ token: TOKEN, basePort: taken, webDir: null, devOrigin: null, vaultDir: null });
+      const { server, port } = await startServer({ token: TOKEN, basePort: taken, webDir: null, siteDir: null, devOrigin: null, vaultDir: null });
       try {
         assert.ok(port > taken && port < taken + 10, `${port}`);
         assert.equal((await call(port, "/api/health", { "x-session-token": TOKEN })).status, 200);
@@ -153,7 +170,7 @@ describe("라우트·본문", () => {
     routes.set(added[3], () => {
       throw RouteError.of("PLANET_SYSTEM");
     });
-    ({ server, port } = await startServer({ token: TOKEN, basePort: 0, webDir: null, devOrigin: null, vaultDir: null }));
+    ({ server, port } = await startServer({ token: TOKEN, basePort: 0, webDir: null, siteDir: null, devOrigin: null, vaultDir: null }));
   });
   after(() => {
     for (const k of added) routes.delete(k);

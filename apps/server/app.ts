@@ -1,4 +1,5 @@
 // 로컬 서버: 요청 처리와 포트 열기. 실행 진입점은 index.ts.
+import { join } from "node:path";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { apiError, ERROR_STATUS, type ErrorCode } from "@spacelog/shared/errors";
 import type { ServerConfig } from "./config.ts";
@@ -75,7 +76,12 @@ export function createHandler(config: ServerConfig, getPort: () => number) {
         if (!route) return sendError(res, "NOT_FOUND");
         return sendJson(res, 200, await route.handler(req, route.params));
       }
-      if ((method === "GET" || method === "HEAD") && config.webDir && (await serveStatic(config.webDir, path, method, res))) return;
+      if (method === "GET" || method === "HEAD") {
+        // 사용 방법(How to use) 체험 페이지: 소개 사이트(site/)의 how-to-use/ 를 그대로
+        // how-to-use/ 폴더만 뿌리로 삼아, ../ 로 소개 사이트의 다른 페이지로 올라가지 못한다
+        if (config.siteDir && (path === "/how-to-use" || path.startsWith("/how-to-use/")) && (await serveStatic(join(config.siteDir, "how-to-use"), path.slice("/how-to-use".length) || "/", method, res))) return;
+        if (config.webDir && (await serveStatic(config.webDir, path, method, res))) return;
+      }
       sendError(res, "NOT_FOUND");
     } catch (err) {
       if (err instanceof RouteError && !res.headersSent) {

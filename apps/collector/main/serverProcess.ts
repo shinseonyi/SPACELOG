@@ -12,6 +12,8 @@ export interface ServerOptions {
   entry: string; // dist/server.mjs
   vaultPath: string;
   webDir: string | null;
+  /** 소개 사이트(site/). /how-to-use/ 체험 페이지를 로컬 서버가 내려준다 */
+  siteDir: string | null;
   basePort?: number;
 }
 
@@ -54,6 +56,8 @@ export class ServerProcess extends EventEmitter<{ state: [ServerState, string | 
     // 사용자 PC에 남은 SPACELOG_WEB_DIR이 새지 않게, 웹 위치는 수집 앱이 정한 값만 넘긴다
     delete env.SPACELOG_WEB_DIR;
     if (this.opts.webDir && existsSync(this.opts.webDir)) env.SPACELOG_WEB_DIR = this.opts.webDir;
+    delete env.SPACELOG_SITE_DIR;
+    if (this.opts.siteDir && existsSync(this.opts.siteDir)) env.SPACELOG_SITE_DIR = this.opts.siteDir;
     const child = utilityProcess.fork(this.opts.entry, [], { serviceName: "SpaceLog 로컬 서버", env, stdio: "inherit" });
     this.child = child;
 
@@ -132,6 +136,12 @@ export class ServerProcess extends EventEmitter<{ state: [ServerState, string | 
  * - 배포 빌드: 설치 폴더의 resources/web (package.mjs가 web/dist를 extraResource로 싣는다). 환경 변수는 읽지 않는다
  * - 개발: 환경 변수 → 저장소의 web/dist
  */
+/** 소개 사이트 위치 (how-to-use/ 가 그 안에). 배포 빌드: resources/site, 개발: 저장소의 site/ */
+export function resolveSiteDir(appRoot: string, packaged?: { resourcesPath: string }): string | null {
+  const dir = packaged ? path.join(packaged.resourcesPath, "site") : path.resolve(appRoot, "../../site");
+  return existsSync(path.join(dir, "how-to-use", "index.html")) ? dir : null;
+}
+
 export function resolveWebDir(appRoot: string, packaged?: { resourcesPath: string }): string | null {
   if (packaged) {
     const dir = path.join(packaged.resourcesPath, "web");

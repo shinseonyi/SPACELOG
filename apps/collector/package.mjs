@@ -32,6 +32,7 @@ run(process.execPath, ["build.mjs"], here);
 
 rmSync(out, { recursive: true, force: true });
 cpSync(webDist, path.join(stage, "web"), { recursive: true }); // extraResource는 폴더 이름 그대로 싣는다
+cpSync(path.join(repo, "site"), path.join(stage, "site"), { recursive: true }); // 사용 방법(How to use) 체험 페이지 — 로컬 서버가 /how-to-use/ 로 내려준다
 
 // 3) 묶기. 렌더러·서버 의존성은 esbuild가 dist/에 다 넣었으므로 node_modules는 싣지 않는다
 const keep = (p) => p === "" || p === "/package.json" || p === "/dist" || p.startsWith("/dist/");
@@ -47,7 +48,7 @@ const [appDir] = await packager({
   arch,
   asar: true,
   ignore: (p) => !keep(p.replace(/\\/g, "/")),
-  extraResource: [path.join(stage, "web")],
+  extraResource: [path.join(stage, "web"), path.join(stage, "site")],
   overwrite: true,
   // 맥: 트레이 앱이라 Dock·앱 전환기에 안 뜨게 (app.ts의 app.dock.hide()보다 먼저 적용돼 깜빡임이 없다)
   extendInfo: { LSUIElement: true },
