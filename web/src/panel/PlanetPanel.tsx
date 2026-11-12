@@ -3,8 +3,10 @@ import { MoreHorizontal, Rocket } from "lucide-react";
 import { PLANET_NAME_MAX, type Planet, type Star } from "@spacelog/shared/types";
 import { api } from "../api/client.ts";
 import { demo, useDemo } from "../demo/demoStore.ts";
-import { PLANET_COLORS, type PlanetShapeChoice } from "../demo/types.ts";
+import type { PlanetShapeChoice } from "../demo/types.ts";
 import { planetColorToken } from "../ui/planetColor.ts";
+import { suggestColor } from "../ui/planetLookChoice.ts";
+import { PlanetLookPicker } from "../ui/PlanetLookPicker.tsx";
 import { PickedTools } from "../home/PickedTools.tsx";
 import { PERIOD_LABEL, periodFor, periodKey } from "../home/periodOptions.ts";
 import { store, useStore } from "../state/store.ts";
@@ -123,9 +125,12 @@ export function PlanetPanel({ planetId }: { planetId: string }) {
           submitLabel="만들기"
           planets={planets}
           busy={busy}
+          withLook
           onCancel={() => setSheet(null)}
-          onSubmit={async (name) => {
-            if (await run(() => api.createPlanet(name), `‘${name}’ 행성을 만들었어요`)) {
+          onSubmit={async (name, chosen) => {
+            let made: Planet | null = null;
+            if (await run(async () => { made = await api.createPlanet(name); }, `‘${name}’ 행성을 만들었어요`)) {
+              if (made && chosen) demo.getState().setPlanet((made as Planet).id, chosen); // 색·모양은 시연용 덧씌우기 (행성 수정과 같음)
               setSheet(null);
               await store.getState().refresh();
             }
@@ -248,17 +253,24 @@ function StarRow({ star, planet, checked, onToggle }: { star: Star; planet: Plan
   );
 }
 
-/** 이름 입력 시트 (새 행성 · 이름 바꾸기). 이름은 1~20자, 대소문자 무시로 같은 이름이 없어야 한다 (POLICY 2-4) */
-function NameSheet({ title, submitLabel, initial = "", self, planets, busy, onCancel, onSubmit }: {
+/**
+ * 이름 입력 시트 (새 행성 · 이름 바꾸기). 이름은 1~20자, 대소문자 무시로 같은 이름이 없어야 한다 (POLICY 2-4).
+ * `withLook`(새 행성): 색 7가지 · 모양도 고른다. 처음 색은 아직 아무 행성도 안 쓴 색
+ */
+function NameSheet({ title, submitLabel, initial = "", self, planets, busy, withLook, onCancel, onSubmit }: {
   title: string;
   submitLabel: string;
   initial?: string;
   self?: string;
   planets: Planet[];
   busy: boolean;
+  withLook?: boolean;
   onCancel(): void;
-  onSubmit(name: string): void;
+  onSubmit(name: string, look?: { colorToken: string; shape: PlanetShapeChoice }): void;
 }) {
+  const overrides = useDemo((st) => st.planets);
+  const [colorToken, setColorToken] = useState(() => suggestColor(planets.map((p) => overrides[p.id]?.colorToken ?? p.colorToken)));
+  const [shape, setShape] = useState<PlanetShapeChoice>("");
   const [name, setName] = useState(initial);
   const [touched, setTouched] = useState(false);
   const trimmed = name.trim();
@@ -266,13 +278,14 @@ function NameSheet({ title, submitLabel, initial = "", self, planets, busy, onCa
   const error = !trimmed ? "이름을 입력해 주세요" : dup ? "같은 이름의 행성이 있어요" : "";
   const ok = !error && trimmed !== initial;
   return (
-    <form className="sheet" aria-label={title} onSubmit={(e) => { e.preventDefault(); if (ok) onSubmit(trimmed); }}>
+    <form className="sheet" aria-label={title} onSubmit={(e) => { e.preventDefault(); if (ok) onSubmit(trimmed, withLook ? { colorToken, shape } : undefined); }}>
       <h3 className="sheet__title">{title}</h3>
       <label className="field">
         행성 이름
         <input value={name} maxLength={PLANET_NAME_MAX} autoFocus onChange={(e) => setName(e.target.value)} onBlur={() => setTouched(true)} aria-invalid={touched && !!error} />
       </label>
       {touched && error && <p className="field__error" role="alert">{error}</p>}
+      {withLook && <PlanetLookPicker colorToken={colorToken} shape={shape} onColor={setColorToken} onShape={setShape} />}
       <div className="sheet__actions">
         <Button onClick={onCancel}>취소</Button>
         <Button type="submit" variant="primary" disabled={!ok || busy}>{submitLabel}</Button>
@@ -281,11 +294,6 @@ function NameSheet({ title, submitLabel, initial = "", self, planets, busy, onCa
   );
 }
 
-const SHAPES: { key: PlanetShapeChoice; label: string }[] = [
-  { key: "", label: "기본" },
-  { key: "ring", label: "고리" },
-  { key: "nebula", label: "성운" },
-];
 const NAME_MAX = 16; // 시안(README 6-2)은 16자
 
 /** 행성 수정 시트 (README 6-2): 이름 · 색 7가지 · 모양(기본 / 고리 / 성운). 색·모양은 시연용으로 이 브라우저에 저장된다 */
@@ -312,22 +320,7 @@ function EditSheet({ planet, shape: current, planets, busy, onCancel, onSave }: 
         <input value={name} maxLength={NAME_MAX} disabled={system} title={system ? "미분류는 이름을 바꿀 수 없어요" : undefined} onChange={(e) => setName(e.target.value)} aria-invalid={!!error} />
       </label>
       {error && !system && <p className="field__error" role="alert">{error}</p>}
-      <div className="field">
-        색상
-        <div className="swatches" role="radiogroup" aria-label="색상">
-          {PLANET_COLORS.map((c) => (
-            <button key={c.token} type="button" role="radio" aria-checked={colorToken === c.token} aria-label={c.label} title={c.label} className={`swatch${colorToken === c.token ? " is-on" : ""}`} style={{ background: `var(--${c.token})` }} onClick={() => setColorToken(c.token)} />
-          ))}
-        </div>
-      </div>
-      <div className="field">
-        모양
-        <div className="shapes" role="radiogroup" aria-label="모양">
-          {SHAPES.map((s) => (
-            <button key={s.key || "default"} type="button" role="radio" aria-checked={shape === s.key} className={`shape${shape === s.key ? " is-on" : ""}`} onClick={() => setShape(s.key)}>{s.label}</button>
-          ))}
-        </div>
-      </div>
+      <PlanetLookPicker colorToken={colorToken} shape={shape} onColor={setColorToken} onShape={setShape} />
       <div className="sheet__actions">
         <Button onClick={onCancel}>취소</Button>
         <Button type="submit" variant="primary" disabled={busy || (!system && !!error)}>저장</Button>

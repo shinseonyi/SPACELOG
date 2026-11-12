@@ -198,12 +198,14 @@ li.row--rec:active { transform: none; }
 /* 오른쪽 아래: 행성 추가 카드 · 위치 편집 켜짐 */
 .actionbar { flex-wrap: wrap; justify-content: flex-end; max-width: calc(100vw - 48px); }
 .actionbar__btn.is-on { background: #fff; color: var(--color-ink-on-light); border-color: #fff; }
-.newplanet { position: absolute; right: 0; bottom: 56px; width: 280px; max-width: calc(100vw - 48px); box-sizing: border-box; padding: 16px; border-radius: var(--r-panel); background: var(--color-card-solid); border: 1px solid var(--color-line-card); box-shadow: var(--shadow-float); display: flex; flex-direction: column; gap: 10px; }
+.newplanet { position: absolute; right: 0; bottom: 56px; width: 300px; max-width: calc(100vw - 48px); box-sizing: border-box; padding: 16px; border-radius: var(--r-panel); background: var(--color-card-solid); border: 1px solid var(--color-line-card); box-shadow: var(--shadow-float); display: flex; flex-direction: column; gap: 10px; }
 .newplanet strong { font: var(--type-caption-strong); }
 .newplanet input { box-sizing: border-box; height: 40px; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--color-line-btn); background: var(--color-chip); color: var(--color-body); font: var(--type-caption); }
 .newplanet input[aria-invalid="true"] { border-color: #ff8a80; }
 .newplanet input:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
 .newplanet__error { margin: -4px 0 0; font: var(--type-fine-print); color: #ff8a80; }
+.newplanet .field { display: flex; flex-direction: column; gap: 8px; font: var(--type-fine-print); color: var(--color-body-muted); }
+.newplanet .swatches { gap: 8px; }
 .newplanet__actions { display: flex; gap: 8px; justify-content: flex-end; }
 .newplanet__actions .btn { height: 36px; padding: 0 14px; }
 .actionbar { position: fixed; }
