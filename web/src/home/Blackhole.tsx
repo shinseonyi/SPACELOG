@@ -20,15 +20,19 @@ const when = (iso: string) => {
  * 블랙홀 (README 6-1): 위치 편집 중 왼쪽 아래에 나타난다. 행성을 끌어다 놓으면 확인 뒤 보관함으로 보내고,
  * 블랙홀을 누르면 보관한 행성 목록(꺼내기 · 완전히 삭제)이 열린다. 서버에서 지우는 게 아니라 웹이 숨겼다가 되돌린다.
  */
+/** 행성이 블랙홀로 빨려 들어가는 시간 (view.css · Depth25 와 같은 값) */
+export const VANISH_MS = 750;
+
 export function Blackhole() {
   const edit = useStore((s) => s.editPos);
   const ask = useStore((s) => s.askTrash);
+  const eating = useStore((s) => s.vanishing !== null);
   const trash = useDemo((s) => s.trash);
   const [open, setOpen] = useState(false);
   if (!edit) return null;
   return (
     <>
-      <button type="button" className="bh" data-blackhole aria-expanded={open} title="블랙홀 열기" onClick={() => setOpen((v) => !v)}>
+      <button type="button" className={`bh${eating ? " is-eating" : ""}`} data-blackhole aria-expanded={open} title="블랙홀 열기" onClick={() => setOpen((v) => !v)}>
         <span className="bh__img" aria-hidden style={{ backgroundImage: `url(${blackholeUrl})` }} />
         <span className="bh__text">
           <span className="bh__name">블랙홀</span>
@@ -47,10 +51,15 @@ function AskCard({ planetId }: { planetId: string }) {
   const n = planet.starCountTotal ?? 0;
   const send = () => {
     const s = store.getState();
-    demo.getState().sendToBlackHole({ planetId, name: planet.name, colorToken: planet.colorToken, starIds: [], starCount: n });
-    s.planetDeleted(planetId); // 탐사선에 실은 것 · 열려 있던 패널 정리
+    // 먼저 빨려 들어가는 연출(보기가 그린다), 끝나면 보관함으로
     s.setAskTrash(null);
-    s.showToast(`‘${planet.name}’ 행성을 블랙홀에 넣었어요`);
+    s.setVanishing(planetId);
+    setTimeout(() => {
+      demo.getState().sendToBlackHole({ planetId, name: planet.name, colorToken: planet.colorToken, starIds: [], starCount: n });
+      store.getState().planetDeleted(planetId); // 탐사선에 실은 것 · 열려 있던 패널 정리
+      store.getState().setVanishing(null);
+      store.getState().showToast(`‘${planet.name}’ 행성을 블랙홀에 넣었어요`);
+    }, VANISH_MS);
   };
   return (
     <div className="bh-card" role="alertdialog" aria-label="행성을 블랙홀에 넣기">

@@ -47,6 +47,9 @@ export interface Store extends WebState {
   /** 블랙홀에 넣을지 묻는 중인 행성 id */
   askTrash: string | null;
   setAskTrash(planetId: string | null): void;
+  /** 블랙홀에 넣기로 해 빨려 들어가는 중인 행성 (VANISH_MS 뒤 보관함으로). 보기가 연출을 그린다 */
+  vanishing: string | null;
+  setVanishing(planetId: string | null): void;
   /** 오른쪽 창에서 기록 창이 열린 별자리 */
   linkViewId: string | null;
   togglePicked(id: string): void;
@@ -154,6 +157,7 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
       linkViewId: null,
       editPos: false,
       askTrash: null,
+      vanishing: null,
       route: { name: "home" },
       loading: false,
       toasts: [],
@@ -335,6 +339,9 @@ export function createWebStore(navigate: (hash: string) => void = defaultNavigat
 
       setAskTrash(planetId) {
         set({ askTrash: planetId });
+      },
+      setVanishing(planetId) {
+        set({ vanishing: planetId });
       },
 
       openLinkView(linkId) {

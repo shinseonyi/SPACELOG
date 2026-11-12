@@ -9,6 +9,11 @@
 .flat__planet.is-edit { cursor: grab; touch-action: none; }
 .flat__planet.is-edit .flat__body { outline: 1px dashed rgba(255, 255, 255, 0.35); outline-offset: 10px; border-radius: 50%; }
 .flat__planet.is-dragging { cursor: grabbing; z-index: 50; }
+/* 블랙홀: 넣으면 가운데로 끌려가며 작아지고 돌며 옅어진다(750ms, Blackhole.tsx VANISH_MS). 취소하면 제자리로 미끄러진다 */
+.flat__planet.is-vanishing { z-index: 50; transition: left 750ms cubic-bezier(0.4, 0, 1, 1), top 750ms cubic-bezier(0.4, 0, 1, 1), opacity 750ms ease-in, filter 600ms ease; animation: flat-vanish 750ms cubic-bezier(0.4, 0, 1, 1) forwards; }
+@keyframes flat-vanish { to { transform: translate(-50%, -50%) scale(0.08) rotate(240deg); opacity: 0; } }
+.flat__planet.is-returning { transition: left 500ms cubic-bezier(0.2, 0.7, 0.2, 1), top 500ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 200ms, filter 600ms ease; }
+@media (prefers-reduced-motion: reduce) { .flat__planet.is-vanishing { animation: none; opacity: 0; } .flat__planet.is-returning { transition: none; } }
 .flat__planet:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 12px; border-radius: 50%; }
 .flat__body { position: relative; display: block; }
 .flat__disc { position: absolute; inset: 0; border-radius: 50%; background-color: #000; background-size: 230% auto; background-position: 49% 62%; display: block; }

@@ -4,6 +4,7 @@
 import * as THREE from "three";
 import { demo } from "../demo/demoStore.ts";
 import { freeSpot } from "../demo/planets.ts";
+import { VANISH_MS } from "../home/Blackhole.tsx";
 import { dimSide } from "../home/sideDim.ts";
 import { store } from "../state/store.ts";
 import heroUrl from "../assets/planet-hero.png";
@@ -260,6 +261,7 @@ export class DepthScene {
     this.labels.style.pointerEvents = store.getState().editPos ? "none" : "";
     this.cleanups.push(store.subscribe((s, prev) => {
       if (s.editPos !== prev.editPos) this.labels.style.pointerEvents = s.editPos ? "none" : ""; // 위치 편집 중엔 이름표 대신 행성을 잡는다
+      if (s.askTrash === null && prev.askTrash !== null) this.onAskAnswered(s.vanishing);
       if (s.camera === "overview" && prev.camera !== "overview") this.overview(1100);
       if (s.selectedPlanetId && s.selectedPlanetId !== prev.selectedPlanetId) this.followMoved(); // 방금 자리가 바뀐 행성을 열었으면 따라간다
     }));
@@ -550,9 +552,19 @@ export class DepthScene {
     const hole = document.querySelector("[data-blackhole]")?.getBoundingClientRect();
     if (hole && e.clientX >= hole.left && e.clientX <= hole.right && e.clientY >= hole.top && e.clientY <= hole.bottom) {
       const s = store.getState();
-      if (s.planets.length <= 1) s.showToast("마지막 행성은 블랙홀에 넣을 수 없어요");
-      else s.setAskTrash(d.n.p.id);
-      return back();
+      if (s.planets.length <= 1) {
+        s.showToast("마지막 행성은 블랙홀에 넣을 수 없어요");
+        return back();
+      }
+      // 묻는 동안 블랙홀 안에 머문다. 넣으면 블랙홀 가운데(같은 깊이 평면 위의 점)로 빨려 들어간다
+      const r = this.renderer.domElement.getBoundingClientRect();
+      const cx = hole.left + hole.width / 2, cy = hole.top + hole.height * 0.52;
+      this.ray.setFromCamera(new THREE.Vector2(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1), this.camera);
+      const center = new THREE.Vector3();
+      if (!this.ray.ray.intersectPlane(d.plane, center)) center.copy(d.n.at);
+      this.held = { n: d.n, origin: d.origin, center };
+      s.setAskTrash(d.n.p.id);
+      return;
     }
     // 우주 좌표: x 는 그대로, y 는 화면 아래가 + (pos() 의 반대)
     const others = [...this.nodes.values()].filter((n) => n !== d.n).map((n) => ({ id: n.p.id, x: n.at.x, y: -n.at.y }));
@@ -560,6 +572,34 @@ export class DepthScene {
     d.n.at.set(spot.x, -spot.y, d.origin.z);
     this.rebuildLinks();
     demo.getState().setPlanet(d.n.p.id, { x: spot.x, y: spot.y });
+  }
+
+  /** 블랙홀에 놓인 행성 (묻는 중) */
+  private held: { n: Node3; origin: THREE.Vector3; center: THREE.Vector3 } | null = null;
+  /** 빨려 들어가는 중 */
+  private vanish: { n: Node3; t: number; from: THREE.Vector3; to: THREE.Vector3 } | null = null;
+
+  /** 블랙홀 확인 창의 답: 넣으면 빨려 들어가고(작아지며 돌며 옅어진다), 취소하면 제자리로 미끄러진다 */
+  private onAskAnswered(vanishing: string | null) {
+    const h = this.held;
+    if (!h) return;
+    this.held = null;
+    if (vanishing === h.n.p.id) this.vanish = { n: h.n, t: 0, from: h.n.at.clone(), to: h.center };
+    else this.glide = { t: 0, ms: 500, moves: [{ n: h.n, from: h.n.at.clone(), to: h.origin }] };
+  }
+
+  private stepVanish(dt: number) {
+    const v = this.vanish;
+    if (!v) return;
+    v.t = Math.min(1, v.t + (dt * 1000) / VANISH_MS);
+    const e = v.t * v.t; // 점점 빨라지며
+    v.n.at.lerpVectors(v.from, v.to, e);
+    v.n.g.scale.setScalar(1 - e * 0.92);
+    v.n.g.rotation.z = e * 4.2; // 빨려 들며 돈다
+    v.n.sprite.material.opacity = (v.n.p.count ? 1 : 0.7) * (1 - e);
+    v.n.dotMat.opacity = 1 - e;
+    v.n.label.style.opacity = String(1 - e);
+    if (v.t >= 1) this.vanish = null; // 곧 스토어에서 행성이 빠진다
   }
 
   private openPlanet(id: string) {
@@ -723,6 +763,7 @@ export class DepthScene {
     this.reportPercent(now);
 
     this.stepGlide(dt);
+    this.stepVanish(dt);
     let dmin = Infinity, dmax = 0;
     this.nodes.forEach((n) => {
       n.orbit.rotation.z += dt * 0.22;
