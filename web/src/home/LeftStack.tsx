@@ -1,10 +1,14 @@
 import { Minus, MessageCircle, Plus } from "lucide-react";
-import { useStore } from "../state/store.ts";
+import { store, useStore } from "../state/store.ts";
 import { useViewApi } from "../view/viewApi.ts";
 import { RediscoverySlot } from "./RediscoveryCard.tsx";
 
-/** 배포한 챗봇 주소. 설정값이 없으면 버튼을 그리지 않는다 (README 6-1, 9단계에서 주소 확정) */
-const CHATBOT_URL = (import.meta.env.VITE_CHATBOT_URL as string | undefined) || "";
+/**
+ * 배포한 챗봇 주소 (빌드할 때 VITE_CHATBOT_URL 로 넣는다). 챗봇 버튼은 제품에 항상 있다 (README 6-1).
+ * 주소가 아직 없으면 누를 때 "준비 중"이라고 알리고, 있으면 새 탭으로 연다. http(s) 주소만 받는다.
+ */
+const CHATBOT_URL = ((import.meta.env.VITE_CHATBOT_URL as string | undefined) ?? "").trim();
+const CHATBOT_OK = /^https?:\/\//i.test(CHATBOT_URL);
 
 /**
  * 왼쪽 아래 묶음. 아래에서 위로 쌓인다 (left 24 · bottom 72 · gap 12 · 폭 260).
@@ -23,10 +27,14 @@ export function LeftStack() {
             <button type="button" className="zoom__step" aria-label="축소" title="축소 (Space)" onClick={zoom.zoomOut}><Minus size={18} aria-hidden /></button>
           </div>
         )}
-        {CHATBOT_URL && (
+        {CHATBOT_OK ? (
           <a className="chatbot" href={CHATBOT_URL} target="_blank" rel="noreferrer" aria-label="챗봇 열기" title="챗봇 열기">
             <MessageCircle size={22} aria-hidden />
           </a>
+        ) : (
+          <button type="button" className="chatbot" aria-label="챗봇 (준비 중)" title="챗봇 · 준비 중" onClick={() => store.getState().showToast("챗봇을 준비하고 있어요. 곧 연결돼요")}>
+            <MessageCircle size={22} aria-hidden />
+          </button>
         )}
       </div>
       <RediscoverySlot />
