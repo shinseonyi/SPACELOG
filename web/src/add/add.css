@@ -36,3 +36,10 @@
 @media (max-width: 1279px) { .addrec-done { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } }
 @media (max-width: 479px) { .addrec-done { bottom: calc(136px + env(safe-area-inset-bottom, 0px)); } }
 @media (prefers-reduced-motion: reduce) { .addrec-sheet, .addrec-done { animation: none; } }
+
+/* 960px 미만: 오른쪽 버튼이 세로로 쌓여 가운데가 좁다. 조작 안내가 빠진 왼쪽 아래로 (home.css 와 같은 폭) */
+@media (max-width: 959px) {
+  .addrec, .addrec-done { left: 16px; right: auto; transform: none; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  .addrec:active:not(:disabled) { transform: scale(var(--press-scale)); }
+  .addrec-done { max-width: calc(100vw - 32px - 140px); }
+}

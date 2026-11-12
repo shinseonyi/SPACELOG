@@ -271,3 +271,15 @@ li.row--rec:active { transform: none; }
   .topbar .viewseg button { padding: 0 6px; }
   .topbar .period .pill-btn { padding-left: 10px; padding-right: 8px; }
 }
+
+/* 좁은 화면(960px 미만 — 버튼 한 줄이 조작 안내와 부딪히는 폭부터, 측정): 조작 안내(WASD…)는 숨기고,
+   오른쪽 아래 버튼은 관측소 위로 세로로 쌓는다 (위에서 아래로 위치 편집 · 행성 추가 · 탐사선 · 관측소). "기록 넣기"는 비워진 왼쪽 아래 (add/add.css) */
+@media (max-width: 959px) {
+  .hint { display: none; }
+  .actionbar { flex-direction: column; flex-wrap: nowrap; align-items: flex-end; max-width: none; }
+  .newplanet { bottom: calc(100% + 8px); } /* 세로 묶음 위로 */
+  .near { bottom: calc(240px + env(safe-area-inset-bottom, 0px)); }
+  .home-banner { bottom: calc(240px + env(safe-area-inset-bottom, 0px)); }
+}
+/* 휴대폰 폭: 왼쪽 아래 카드(혜성 · 거리)가 오른쪽 세로 버튼과 겹치지 않게 그 앞에서 멈춘다 */
+@media (max-width: 480px) { .rediscovery, .dist { max-width: calc(100vw - 172px); } }
