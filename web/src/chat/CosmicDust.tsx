@@ -91,6 +91,7 @@ function ChatPanel() {
   const setInput = useChat((s) => s.setInput);
   const edit = useStore((s) => s.editPos);
   const obsOpen = useStore((s) => s.route.name === "observatory");
+  const guiding = useChat((s) => s.guide !== null);
   const log = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLInputElement>(null);
 
@@ -109,86 +110,90 @@ function ChatPanel() {
   const dim = obsOpen ? "obs" : edit ? "edit" : undefined; // 관측소가 열리면 0%, 위치 편집 중엔 16% (5-6)
 
   return (
-    <section
-      className="chat"
-      role="dialog"
-      aria-label={`${BOT_NAME} 챗봇`}
-      data-dim={dim}
-      style={{ height }}
-      onKeyDown={(e) => {
-        e.stopPropagation(); // 대화창 안의 키는 우주 비행 키(WASD 등)로 가지 않는다 (5-7)
-        if (e.key === "Escape") closeChat();
-      }}
-    >
-      <header className="chat__head">
-        <i className="chat__dot" aria-hidden />
-        <div className="chat__titles">
-          <span className="chat__title">{BOT_NAME}</span>
-          <span className="chat__sub">이 우주를 떠다니는 길잡이</span>
-        </div>
-        {CHATBOT_OK && (
-          <a className="chat__newtab" href={CHATBOT_URL} target="_blank" rel="noreferrer">
-            새 탭에서 열기
-          </a>
-        )}
-        <Button className="btn--icon" aria-label="챗봇 닫기" onClick={closeChat}>
-          <X size={14} aria-hidden />
-        </Button>
-      </header>
-
-      <div className="chat__log" ref={log} aria-live="polite">
-        {messages.map((m) =>
-          m.who === "user" ? (
-            <span key={m.id} className="chat__msg chat__msg--user">{m.text}</span>
-          ) : (
-            <div key={m.id} className="chat__group">
-              <span className="chat__msg chat__msg--bot">{m.text || "…"}</span>
-              {m.action && (
-                <button type="button" className="chat__chip" onClick={() => runAction(m.action!)}>
-                  {ACTION_LABEL[m.action]}
-                  <ArrowRight size={12} aria-hidden />
-                </button>
-              )}
-            </div>
-          ),
-        )}
-        {typing && <span className="chat__msg chat__msg--bot chat__msg--wait">{WAITING}</span>}
-        {chips.length > 0 && (
-          <div className="chat__group chat__group--wide">
-            {messages.length > 1 && <span className="chat__msg chat__msg--bot">{FOLLOW_UP}</span>}
-            <div className="chat__chips">
-              {chips.map((q) => (
-                <button key={q} type="button" className="chat__chip" onClick={() => sendChat(q)}>{q}</button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <form
-        className="chat__form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          sendChat(input);
+    <>
+      {/* 뒤 화면을 어둡고 흐리게. 길잡이 빛무리가 가리키는 버튼은 또렷해야 하므로 그동안은 뺀다 */}
+      {!dim && !guiding && <div className="chat-dim" aria-hidden onClick={closeChat} />}
+      <section
+        className="chat"
+        role="dialog"
+        aria-label={`${BOT_NAME} 챗봇`}
+        data-dim={dim}
+        style={{ height }}
+        onKeyDown={(e) => {
+          e.stopPropagation(); // 대화창 안의 키는 우주 비행 키(WASD 등)로 가지 않는다 (5-7)
+          if (e.key === "Escape") closeChat();
         }}
       >
-        <input
-          ref={field}
-          className="chat__input"
-          value={input}
-          maxLength={200}
-          autoComplete="off"
-          placeholder="어디서 무엇을 하는지 물어보세요"
-          aria-label="질문"
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && e.nativeEvent.isComposing) e.preventDefault(); // 한글 조합 중 Enter 는 보내지 않는다
+        <header className="chat__head">
+          <i className="chat__dot" aria-hidden />
+          <div className="chat__titles">
+            <span className="chat__title">{BOT_NAME}</span>
+            <span className="chat__sub">이 우주를 떠다니는 길잡이</span>
+          </div>
+          {CHATBOT_OK && (
+            <a className="chat__newtab" href={CHATBOT_URL} target="_blank" rel="noreferrer">
+              새 탭에서 열기
+            </a>
+          )}
+          <Button className="btn--icon" aria-label="챗봇 닫기" onClick={closeChat}>
+            <X size={14} aria-hidden />
+          </Button>
+        </header>
+
+        <div className="chat__log" ref={log} aria-live="polite">
+          {messages.map((m) =>
+            m.who === "user" ? (
+              <span key={m.id} className="chat__msg chat__msg--user">{m.text}</span>
+            ) : (
+              <div key={m.id} className="chat__group">
+                <span className="chat__msg chat__msg--bot">{m.text || "…"}</span>
+                {m.action && (
+                  <button type="button" className="chat__chip" onClick={() => runAction(m.action!)}>
+                    {ACTION_LABEL[m.action]}
+                    <ArrowRight size={12} aria-hidden />
+                  </button>
+                )}
+              </div>
+            ),
+          )}
+          {typing && <span className="chat__msg chat__msg--bot chat__msg--wait">{WAITING}</span>}
+          {chips.length > 0 && (
+            <div className="chat__group chat__group--wide">
+              {messages.length > 1 && <span className="chat__msg chat__msg--bot">{FOLLOW_UP}</span>}
+              <div className="chat__chips">
+                {chips.map((q) => (
+                  <button key={q} type="button" className="chat__chip" onClick={() => sendChat(q)}>{q}</button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <form
+          className="chat__form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendChat(input);
           }}
-        />
-        <button type="submit" className="chat__send" aria-label="보내기" disabled={typing || !input.trim()}>
-          <ArrowUp size={18} aria-hidden />
-        </button>
-      </form>
-    </section>
+        >
+          <input
+            ref={field}
+            className="chat__input"
+            value={input}
+            maxLength={200}
+            autoComplete="off"
+            placeholder="어디서 무엇을 하는지 물어보세요"
+            aria-label="질문"
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && e.nativeEvent.isComposing) e.preventDefault(); // 한글 조합 중 Enter 는 보내지 않는다
+            }}
+          />
+          <button type="submit" className="chat__send" aria-label="보내기" disabled={typing || !input.trim()}>
+            <ArrowUp size={18} aria-hidden />
+          </button>
+        </form>
+      </section>
+    </>
   );
 }

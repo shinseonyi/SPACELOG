@@ -94,13 +94,16 @@ function watchTarget(target: GuideTarget) {
   el.addEventListener("click", settleGuide, { once: true, signal: settleCtrl.signal });
 }
 
-/** 대화창 높이를 다시 잰다: 확대 조절·우주먼지 줄을 덮도록 (5-2). 보기 방식이 바뀌면 그 줄의 높이가 달라진다 */
+/** 대화창 높이: 화면 가운데에 뜨므로 위아래 88px(상단 바)을 뺀 높이, 420 ~ 680 */
+export function panelHeight(vh: number): number {
+  return Math.round(Math.min(680, Math.max(420, vh - 176)));
+}
+
+/** 대화창 높이를 다시 잰다 (창 크기가 바뀌면) */
 function measurePanel() {
   const s = chat.getState();
   if (!s.open) return;
-  const row = rectOf(".stack__row");
-  if (!row) return;
-  const h = Math.max(520, Math.round(window.innerHeight - 24 - (row.top - 20)));
+  const h = panelHeight(window.innerHeight);
   if (h !== s.height) s.setOpen(true, h);
 }
 
@@ -149,12 +152,10 @@ export function installRelayout(): () => void {
 
 /** 대화창을 연다. 높이는 확대 조절·챗봇 버튼 줄을 완전히 덮도록 열 때 잰다 (5-2) */
 export function openChat() {
-  const row = rectOf(".stack__row");
-  const h = row ? Math.round(window.innerHeight - 24 - (row.top - 20)) : 0;
   cancelComet();
   cancelSettle();
   chat.getState().setGuide(null);
-  chat.getState().setOpen(true, Math.max(520, h));
+  chat.getState().setOpen(true, panelHeight(window.innerHeight));
 }
 
 /** 닫는다. 날아가 있던 빛무리는 버튼 자리로 돌아온 뒤 사라진다 (5-5) */
