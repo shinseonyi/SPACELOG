@@ -22,3 +22,17 @@ export function formatStamp(iso: string): string {
   const p = (n: number) => String(n).padStart(2, "0");
   return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
+
+export type Point3 = readonly [number, number, number];
+
+/** 기준 행성에서 각 행성까지의 거리(반올림). 기준 행성은 0. 좌표는 각 보기가 행성을 놓는 자리 그대로 */
+export function distancesFrom(refId: string, points: Map<string, Point3>): Map<string, number> {
+  const out = new Map<string, number>();
+  const ref = points.get(refId);
+  if (!ref) return out;
+  for (const [id, p] of points) out.set(id, Math.round(Math.hypot(p[0] - ref[0], p[1] - ref[1], p[2] - ref[2])));
+  return out;
+}
+
+/** "1,234m" */
+export const formatDistance = (d: number) => `${d.toLocaleString("ko-KR")}m`;

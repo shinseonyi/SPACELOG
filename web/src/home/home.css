@@ -73,8 +73,9 @@ li.row--rec:active { transform: none; }
 .dist__row:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
 .dist__dot { width: 8px; height: 8px; flex: none; border-radius: 50%; display: block; }
 .dist__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--type-caption); }
-.dist__d { flex: none; font: var(--type-caption-strong); font-variant-numeric: tabular-nums; }
+.dist__d { flex: none; font: 400 13px/1.3 var(--f-body); font-variant-numeric: tabular-nums; white-space: nowrap; } /* 굵기 없이 본문보다 살짝 작게 */
 .dist__d.is-empty { font: var(--type-fine-print); color: var(--color-body-muted); }
+.dist__m { font: 400 12px/1 var(--f-body); color: var(--color-body-sub); } /* 괄호 거리: 굵기 없이 한 단계 작게 */
 .dist__row.is-on .dist__name { font-weight: 600; }
 @media (max-width: 760px) { .dist { display: none; } } /* 좁은 화면에서는 행성 목록(위쪽 칩)으로 */
 
