@@ -102,12 +102,17 @@ export function planetNodes(planets: Planet[], overrides: Record<string, PlanetO
 /** 2.5D 앞뒤 간격: 최근에 기록을 넣은 행성이 앞, 한 단계마다 260 뒤로 (README 6-1). 거리 카드도 같은 값으로 잰다 */
 export const DEPTH_STEP = 260;
 
-/** 가장 최근에 기록을 넣은 행성부터 0,1,2… 순위. 2.5D에서 앞쪽에 놓는 기준 (README 6-1). 기록이 없는 행성은 맨 뒤 */
+/**
+ * 가장 최근에 기록을 넣은 행성부터 0,1,2… 순위. 2.5D에서 앞쪽에 놓는 기준 (README 6-1).
+ * 기록이 없는 행성은 모두 같은 순위(기록 있는 행성 수)로 맨 뒤 한 줄에 둔다 — 서로 앞뒤를 나눌 근거가 없어서다.
+ */
 export function recencyRank(planets: Pick<Planet, "id">[], stars: { planetId: string; createdAtUtc: string }[]): Map<string, number> {
   const last = new Map<string, string>();
   for (const s of stars) if ((last.get(s.planetId) ?? "") < s.createdAtUtc) last.set(s.planetId, s.createdAtUtc);
-  const order = [...planets].sort((a, b) => (last.get(b.id) ?? "").localeCompare(last.get(a.id) ?? "") || a.id.localeCompare(b.id));
-  return new Map(order.map((p, i) => [p.id, i]));
+  const withRecords = planets.filter((p) => last.has(p.id)).sort((a, b) => (last.get(b.id) as string).localeCompare(last.get(a.id) as string) || a.id.localeCompare(b.id));
+  const rank = new Map(withRecords.map((p, i) => [p.id, i]));
+  for (const p of planets) if (!rank.has(p.id)) rank.set(p.id, withRecords.length);
+  return rank;
 }
 
 export interface Box {

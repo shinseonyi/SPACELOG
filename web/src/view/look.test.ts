@@ -44,6 +44,13 @@ test("최근에 기록을 넣은 행성이 앞, 기록 없는 행성은 맨 뒤"
   assert.deepEqual([rank.get("b"), rank.get("a"), rank.get("c")], [0, 1, 2]);
 });
 
+test("기록이 없는 행성은 모두 같은 순위로 맨 뒤 (2.5D 같은 깊이)", () => {
+  const rank = recencyRank([{ id: "z" }, { id: "a" }, { id: "b" }, { id: "y" }], [{ planetId: "b", createdAtUtc: "2026-11-05T00:00:00Z" }]);
+  assert.deepEqual([rank.get("b"), rank.get("a"), rank.get("y"), rank.get("z")], [0, 1, 1, 1]);
+  const none = recencyRank([{ id: "a" }, { id: "b" }], []);
+  assert.deepEqual([none.get("a"), none.get("b")], [0, 0]);
+});
+
 test("조망은 모든 행성이 들어오고, 오른쪽 창만큼 왼쪽으로 치운다", () => {
   const nodes = planetNodes([planet("a"), planet("b", { createdAtUtc: "2026-11-02T00:00:00Z" })]);
   const box = boundsOf(nodes)!;
