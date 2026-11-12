@@ -35,7 +35,7 @@ export function Glow() {
 export function CosmicDustButton() {
   const open = useChat((s) => s.open);
   const edit = useStore((s) => s.editPos);
-  const away = useChat((s) => s.guide !== null) || edit;
+  const away = useChat((s) => s.guide !== null && !s.guide.home) || edit; // 돌아와 옅어지는 동안은 버튼의 빛무리를 켠다
   const here = useChat((s) => s.here);
   const hereSeq = useChat((s) => s.hereSeq);
   const root = useRef<HTMLSpanElement>(null);

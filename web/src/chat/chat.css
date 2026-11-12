@@ -35,7 +35,7 @@
 
 /* 길잡이 빛무리: 답이 가리키는 버튼 옆으로 날아가 머문다. 덮개(z 19)보다 위 · 대화창(z 20, DOM 에서 뒤)보다 아래, 2단계는 관측소(z 25)보다 위 */
 .guide { position: fixed; width: 48px; height: 48px; margin: -24px 0 0 -24px; z-index: 20; pointer-events: none; transition: opacity 700ms ease; }
-.guide--move { transition: left 900ms cubic-bezier(0.25, 0.1, 0.25, 1), top 900ms cubic-bezier(0.25, 0.1, 0.25, 1), opacity 700ms ease; }
+.guide--move { transition: left 900ms cubic-bezier(0.2, 0.7, 0.15, 1), top 900ms cubic-bezier(0.2, 0.7, 0.15, 1), opacity 700ms ease; } /* 빠르게 떠나 천천히 다가가 멈춘다 */
 .guide--over { z-index: 30; }
 .guide--fade { opacity: 0; }
 

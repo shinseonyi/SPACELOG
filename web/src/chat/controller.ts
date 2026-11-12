@@ -223,10 +223,14 @@ export function closeChat() {
   if (guide && home) {
     chat.getState().setGuide({ x: guide.x, y: guide.y, move: false });
     setTimeout(() => chat.getState().setGuide({ x: home.x, y: home.y, move: true }), 20);
+    // 도착하면 바로 지우지 않고 옅어지며, 그동안 버튼의 빛무리가 켜져 겹치며 바뀐다 (뚝 끊기지 않게)
     setTimeout(() => {
       const g = chat.getState().guide;
-      if (g && g.x === home.x && g.y === home.y) chat.getState().setGuide(null);
-    }, FLY_MS + 40);
+      if (g && g.x === home.x && g.y === home.y) chat.getState().setGuide({ ...g, move: false, fade: true, home: true });
+    }, FLY_MS + 20);
+    setTimeout(() => {
+      if (chat.getState().guide?.home) chat.getState().setGuide(null);
+    }, FLY_MS + 20 + COMET_FADE_MS);
   } else chat.getState().setGuide(null);
 }
 
