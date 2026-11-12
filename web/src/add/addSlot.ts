@@ -8,5 +8,3 @@ export const setAddSlot = (el: HTMLElement | null) => {
 };
 export const useAddSlot = () => useStore(addSlot, (s) => s.el);
 
-/** 버튼을 "행성 추가" 옆으로 옮기는 폭 (add.css · home.css 와 같은 값) */
-export const INLINE_QUERY = "(max-width: 480px)";

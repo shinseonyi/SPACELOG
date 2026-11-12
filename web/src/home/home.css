@@ -303,3 +303,20 @@ li.row--rec:active { transform: none; }
   .stack { bottom: calc(232px + env(safe-area-inset-bottom, 0px)); }
   .side { z-index: 11; }
 }
+/* 가장 좁은 화면: 오른쪽 창 카드는 모두 접힌 채로, 제목(▾)을 눌러 펼친다 */
+.side__title--fold { padding: 0; }
+.side__fold { width: 100%; min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 8px; border: 0; border-radius: var(--r-item); background: transparent; color: var(--color-body); font: inherit; letter-spacing: inherit; text-align: left; cursor: pointer; }
+.side__fold span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side__fold svg { flex: none; opacity: 0.7; transition: transform var(--press-time); }
+.side__fold svg.is-open { transform: rotate(180deg); }
+.side__fold:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.side__card.is-folded { flex: none; padding-top: 6px; padding-bottom: 6px; min-height: 0; }
+.side--home .side__card.is-folded { flex: none; max-height: none; }
+@media (prefers-reduced-motion: reduce) { .side__fold svg { transition: none; } }
+/* 접는 제목은 카드마다 들여쓰기가 달랐다. 가장 좁은 화면에서는 같은 여백으로 */
+.side .side__title--fold { padding: 0; }
+@media (max-width: 480px) {
+  .side .side__card { padding: 6px 8px; }
+  .side .side__card:not(.is-folded) { padding-bottom: 10px; }
+  .side__fold { padding: 0 10px; }
+}

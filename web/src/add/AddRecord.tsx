@@ -2,23 +2,18 @@
 // - 우주 홈 가운데 아래 [＋ 기록 넣기 · 끌어다 놓기 · 붙여넣기] → 메모 창(메모·링크 한 줄, 파일 고르기)
 // - 화면 어디에 파일·글자를 끌어다 놓거나, 입력 칸 밖에서 붙여넣어도 넣는다
 // - 넣은 뒤 흰 알림 "넣었어요 · 제목 · 행성" + [넣기 취소] 7초. 행성 패널을 연 채 넣으면 그 행성으로 옮긴다
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Paperclip, Plus, Sparkle, X } from "lucide-react";
 import type { CreateStarsResponse } from "@spacelog/shared/types";
 import { api, RequestError } from "../api/client.ts";
 import { store, useStore } from "../state/store.ts";
 import { addedMessage, classifyText, mergeResults, rejectionLines, splitFiles, textBody } from "./addInput.ts";
-import { INLINE_QUERY, useAddSlot } from "./addSlot.ts";
+import { useAddSlot } from "./addSlot.ts";
+import { NARROW_QUERY, useMedia } from "../ui/useMedia.ts";
 import "./add.css";
 
-const inlineMq = typeof window !== "undefined" ? window.matchMedia(INLINE_QUERY) : null;
-const subscribeMq = (cb: () => void) => {
-  inlineMq?.addEventListener("change", cb);
-  return () => inlineMq?.removeEventListener("change", cb);
-};
-/** 가장 좁은 화면인가 (버튼을 "행성 추가" 옆으로) */
-const useInline = () => useSyncExternalStore(subscribeMq, () => !!inlineMq?.matches, () => false);
+const useInline = () => useMedia(NARROW_QUERY);
 
 const UNDO_MS = 7000;
 
