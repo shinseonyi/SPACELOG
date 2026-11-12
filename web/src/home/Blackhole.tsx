@@ -27,12 +27,13 @@ export function Blackhole() {
   const edit = useStore((s) => s.editPos);
   const ask = useStore((s) => s.askTrash);
   const eating = useStore((s) => s.vanishing !== null);
+  const holding = useStore((s) => s.askTrash !== null); // 행성이 블랙홀에 놓인 채 묻는 중
   const trash = useDemo((s) => s.trash);
   const [open, setOpen] = useState(false);
   if (!edit) return null;
   return (
     <>
-      <button type="button" className={`bh${eating ? " is-eating" : ""}`} data-blackhole aria-expanded={open} title="블랙홀 열기" onClick={() => setOpen((v) => !v)}>
+      <button type="button" className={`bh${eating ? " is-eating" : ""}${holding ? " is-holding" : ""}`} data-blackhole aria-expanded={open} title="블랙홀 열기" onClick={() => setOpen((v) => !v)}>
         <span className="bh__img" aria-hidden style={{ backgroundImage: `url(${blackholeUrl})` }} />
         <span className="bh__text">
           <span className="bh__name">블랙홀</span>

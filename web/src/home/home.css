@@ -257,7 +257,10 @@ li.row--rec:active { transform: none; }
 
 /* 블랙홀 (위치 편집 중 왼쪽 아래) */
 .bh { position: fixed; left: 8px; bottom: 8px; z-index: 12; width: 300px; height: 169px; padding: 0; border: 0; background: none; cursor: pointer; color: inherit; }
-/* 행성이 빨려 들어가는 동안 블랙홀이 한 번 일렁인다 (Blackhole.tsx VANISH_MS) */
+/* 행성이 블랙홀에 놓여 묻는 동안(is-holding) · 빨려 들어가는 동안(is-eating): 그림을 반투명하게 해 그 뒤(우주 층)의 행성이 안에 있는 것처럼 비친다.
+   빨려 들어가는 동안엔 블랙홀이 한 번 일렁인다 (Blackhole.tsx VANISH_MS) */
+.bh__img { transition: opacity 300ms ease; }
+.bh.is-holding .bh__img, .bh.is-eating .bh__img { opacity: 0.55; }
 .bh.is-eating .bh__img { animation: bh-eat 750ms ease-in-out; }
 @keyframes bh-eat { 0% { transform: scale(1); filter: brightness(1); } 55% { transform: scale(1.07); filter: brightness(1.7); } 100% { transform: scale(1); filter: brightness(1); } }
 @media (prefers-reduced-motion: reduce) { .bh.is-eating .bh__img { animation: none; } }
