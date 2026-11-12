@@ -8,7 +8,7 @@ import { store, useStore } from "../state/store.ts";
 import { planetColorToken } from "../ui/planetColor.ts";
 import { starTitle } from "../ui/starTitle.ts";
 import { useSceneState } from "../universe/sceneState.ts";
-import { NARROW_QUERY, useMedia } from "../ui/useMedia.ts";
+import { FOLD_QUERY, useMedia } from "../ui/useMedia.ts";
 
 const time = (iso: string) => new Date(iso).toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" });
 const accent = (token: string) => `var(--${planetColorToken(token)})`;
@@ -18,11 +18,11 @@ const accent = (token: string) => `var(--${planetColorToken(token)})`;
  * 행성 줄을 누르면 날아가 패널을 연다 (SPEC 1-4, POLICY 2-5): 0개 행성은 흐리게, 날아가지 않고 패널만.
  */
 /**
- * 가장 좁은 화면(480px 이하)에서는 오른쪽 창의 카드를 모두 접어 두고, 제목을 눌러 펼친다. 넓은 화면에서는 늘 펼침.
+ * 좁은 화면(959px 이하 — 오른쪽 창이 아래 버튼 · 카드와 겹치는 폭)에서는 오른쪽 창의 카드를 모두 접어 두고, 제목을 눌러 펼친다. 넓은 화면에서는 늘 펼침.
  * open = 지금 내용을 보일지
  */
 function useFold(): { narrow: boolean; open: boolean; toggle(): void } {
-  const narrow = useMedia(NARROW_QUERY);
+  const narrow = useMedia(FOLD_QUERY);
   const [unfolded, setUnfolded] = useState(false);
   return { narrow, open: !narrow || unfolded, toggle: () => setUnfolded((v) => !v) };
 }

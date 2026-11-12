@@ -142,9 +142,15 @@ li.row--rec:active { transform: none; }
 
 .home-banner { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); width: min(560px, calc(100vw - 2 * var(--gutter))); z-index: 15; overflow: hidden; padding: 0; }
 
-.empty { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 5; padding: 20px 24px; text-align: center; max-width: min(420px, calc(100vw - 2 * var(--gutter))); }
+/* 빈 우주 안내: 흰 카드 (넣기 알림 .addrec-done 과 같은 흰 면) + [확인]으로 닫기 */
+.empty { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 12; box-sizing: border-box; width: max-content; max-width: min(420px, calc(100vw - 32px)); padding: 24px 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; border-radius: var(--r-panel); background: #fff; color: var(--color-ink-on-light); box-shadow: var(--shadow-float); animation: fade-in 0.2s ease-out; }
 .empty h2 { margin: 0 0 6px; font: var(--type-tagline); }
-.empty p { margin: 4px 0 0; color: var(--color-body-sub); line-height: 1.5; }
+.empty p { margin: 4px 0 0; color: rgba(29, 29, 31, 0.68); font: var(--type-caption); line-height: 1.5; }
+.empty kbd { background: rgba(29, 29, 31, 0.08); color: var(--color-ink-on-light); }
+.empty__ok { margin-top: 16px; height: 36px; padding: 0 22px; border: 0; border-radius: var(--r-pill); background: var(--color-primary); color: #fff; font: var(--type-caption); cursor: pointer; transition: transform var(--press-time); }
+.empty__ok:active { transform: scale(var(--press-scale)); }
+.empty__ok:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .empty { animation: none; } }
 
 /* 재발견 혜성 카드: 왼쪽 아래 묶음 안. 카드 전체가 버튼 (design handoff 7-3) */
 .rediscovery { display: flex; align-items: center; gap: 12px; width: 260px; max-width: calc(100vw - 48px); box-sizing: border-box; padding: 12px 14px 12px 10px; border-radius: var(--r-panel); border: 1px solid var(--color-line-card); background: var(--color-card-solid); color: var(--color-body); text-align: left; overflow: hidden; cursor: pointer; transition: transform var(--press-time); }
@@ -303,7 +309,7 @@ li.row--rec:active { transform: none; }
   .stack { bottom: calc(232px + env(safe-area-inset-bottom, 0px)); }
   .side { z-index: 11; }
 }
-/* 가장 좁은 화면: 오른쪽 창 카드는 모두 접힌 채로, 제목(▾)을 눌러 펼친다 */
+/* 좁은 화면(959px 이하): 오른쪽 창 카드는 모두 접힌 채로, 제목(▾)을 눌러 펼친다 (ui/useMedia.ts FOLD_QUERY) */
 .side__title--fold { padding: 0; }
 .side__fold { width: 100%; min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 8px; border: 0; border-radius: var(--r-item); background: transparent; color: var(--color-body); font: inherit; letter-spacing: inherit; text-align: left; cursor: pointer; }
 .side__fold span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -313,10 +319,18 @@ li.row--rec:active { transform: none; }
 .side__card.is-folded { flex: none; padding-top: 6px; padding-bottom: 6px; min-height: 0; }
 .side--home .side__card.is-folded { flex: none; max-height: none; }
 @media (prefers-reduced-motion: reduce) { .side__fold svg { transition: none; } }
-/* 접는 제목은 카드마다 들여쓰기가 달랐다. 가장 좁은 화면에서는 같은 여백으로 */
+/* 접는 제목은 카드마다 들여쓰기가 달랐다. 접는 폭에서는 같은 여백으로 */
 .side .side__title--fold { padding: 0; }
-@media (max-width: 480px) {
+@media (max-width: 959px) {
   .side .side__card { padding: 6px 8px; }
   .side .side__card:not(.is-folded) { padding-bottom: 10px; }
   .side__fold { padding: 0 10px; }
+  /* 펼친 카드가 남은 높이를 쓴다 (처음 화면의 행성 34% · 별자리 26% 나눔은 넓은 화면용) */
+  .side--home .side__card:not(.is-folded) { flex: 0 1 auto; max-height: none; min-height: 0; }
+  /* 펼쳐도 오른쪽 아래 세로 버튼(관측소 묶음, 높이 200 + 아래 24) 위에서 멈춘다 */
+  .side { bottom: calc(232px + env(safe-area-inset-bottom, 0px)); }
 }
+/* 760px 이하: 오른쪽 창이 가로를 꽉 채우므로 왼쪽 아래 묶음(확대 조절 · 혜성, 위 끝 = 아래에서 304) 위에서 멈춘다 */
+@media (max-width: 760px) { .side { bottom: calc(312px + env(safe-area-inset-bottom, 0px)); } }
+/* 가장 좁은 화면은 왼쪽 아래 묶음을 위로 올리고 오른쪽 창이 그 위를 덮는다 (위 480px 규칙) */
+@media (max-width: 480px) { .side { bottom: 84px; } }

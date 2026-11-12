@@ -1,7 +1,9 @@
 import { useSyncExternalStore } from "react";
 
-/** 가장 좁은 화면(휴대폰). 오른쪽 창 카드 접기 · "기록 넣기"를 "행성 추가" 옆으로 (CSS 의 480px 규칙과 같은 값) */
+/** 가장 좁은 화면(휴대폰). "기록 넣기"를 "행성 추가" 옆으로 (CSS 의 480px 규칙과 같은 값) */
 export const NARROW_QUERY = "(max-width: 480px)";
+/** 오른쪽 창이 아래 버튼 · 카드와 겹치기 시작하는 폭(측정). 오른쪽 창 카드를 접는다 (home.css 의 959px 규칙과 같은 값) */
+export const FOLD_QUERY = "(max-width: 959px)";
 
 const cache = new Map<string, MediaQueryList>();
 const mql = (q: string) => {
