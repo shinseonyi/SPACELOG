@@ -27,9 +27,9 @@
     <span class="cc-type-fine-print" style="color:var(--color-body-muted);margin-right:4px">How to Use</span>
     <a onClick="{{ navGuard }}" href="SPACELOG_Collector.dc.html" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:rgba(255,255,255,0.16);color:#fff;font-weight:600">1 수집 앱</a>
     <img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg" alt="" style="width:12px;height:12px;filter:invert(1);opacity:0.5">
-    <a onClick="{{ navGuard }}" href="SPACELOG_Prototype.dc.html" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:transparent;color:var(--color-body-muted);font-weight:400">2 웹 우주</a>
+    <a onClick="{{ navGuard }}" href="web/#/?token=dev&mock=seed" target="_blank" rel="noreferrer" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:transparent;color:var(--color-body-muted);font-weight:400">2 웹 우주</a>
     <img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg" alt="" style="width:12px;height:12px;filter:invert(1);opacity:0.5;flex:none">
-    <a onClick="{{ navGuard }}" href="SPACELOG_Prototype.dc.html#ship" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:transparent;color:var(--color-body-muted);font-weight:400">3 관측소</a>
+    <a onClick="{{ navGuard }}" href="web/#/observatory?token=dev&mock=seed" target="_blank" rel="noreferrer" class="cc-type-fine-print" style="height:24px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;background:transparent;color:var(--color-body-muted);font-weight:400">3 관측소</a>
     <span style="flex:1"></span>
     <button role="switch" aria-checked="{{ tourIsOn }}" onClick="{{ tourToggle }}" title="체험 가이드 켜기 · 끄기" class="cc-type-fine-print" style="height:24px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap">체험 가이드<span aria-hidden="true" style="position:relative;width:36px;height:20px;border-radius:9999px;background:{{ tourSwBg }};display:block;flex:none;transition:background 200ms var(--ease-standard)"><i style="position:absolute;top:2px;left:{{ tourSwLeft }};width:16px;height:16px;border-radius:50%;background:#fff;display:block;transition:left 200ms var(--ease-standard)"></i></span><span style="min-width:22px;text-align:left;color:{{ tourSwColor }}">{{ tourSwText }}</span></button>
     <button onClick="{{ toggleTray }}" title="SPACELOG 수집 앱 열기·접기" aria-label="SPACELOG 수집 앱 열기·접기" style="width:28px;height:28px;border-radius:6px;border:0;background:{{ trayBg }};display:grid;place-items:center;cursor:pointer"><img src="https://unpkg.com/lucide-static@0.469.0/icons/orbit.svg" alt="" style="width:15px;height:15px;filter:invert(1)"></button>
@@ -41,7 +41,7 @@
     <p class="cc-type-body" style="margin:0;color:var(--color-body-muted);text-wrap:pretty">아래 예시를 오른쪽 수집 앱으로 끌어 보세요. 내 PC의 파일이나 브라우저의 링크를 끌어와도 됩니다.</p>
     <div style="display:flex;flex-wrap:wrap;gap:10px">
       <button onClick="{{ dlApp }}" class="cc-type-caption" style="height:44px;padding:0 20px 0 16px;box-sizing:border-box;border-radius:9999px;border:0;background:var(--color-primary);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/download.svg" alt="" style="width:16px;height:16px;filter:invert(1)">PC앱 다운로드 받기</button>
-      <a onClick="{{ navGuard }}" href="SPACELOG_Prototype.dc.html" class="cc-type-caption" style="height:44px;padding:0 16px 0 20px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);color:#fff;text-decoration:none;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">웹 바로가기<img src="https://unpkg.com/lucide-static@0.469.0/icons/arrow-right.svg" alt="" style="width:16px;height:16px;filter:invert(1)"></a>
+      <a onClick="{{ navGuard }}" href="web/#/?token=dev&mock=seed" target="_blank" rel="noreferrer" class="cc-type-caption" style="height:44px;padding:0 16px 0 20px;box-sizing:border-box;border-radius:9999px;border:1px solid rgba(255,255,255,0.24);color:#fff;text-decoration:none;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:transform 200ms var(--ease-standard)" style-active="transform:scale(0.95)">웹 바로가기<img src="https://unpkg.com/lucide-static@0.469.0/icons/arrow-right.svg" alt="" style="width:16px;height:16px;filter:invert(1)"></a>
     </div>
     <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
       <button draggable="{{ true }}" onDragStart="{{ s0.onDragStart }}" onClick="{{ s0.onClick }}" title="끌어서 수집 앱에 놓기" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;cursor:grab;text-align:left">
@@ -154,8 +154,13 @@ const SAMPLES = [
   { kind: 'link', title: '로컬 퍼스트 소프트웨어 글', meta: 'inkandswitch.com' },
   { kind: 'text', title: '탐사선 이름 아이디어', meta: '텍스트 · 64자' }
 ];
+// 웹 우주는 실제 제품 웹을 예시 데이터(mock)로 빌드한 것(web/). 새 탭 하나를 계속 다시 씁니다.
+const WEB = 'web/#/?token=dev&mock=seed';
+// 재발견 알림이 여는 주소는 실제 수집 앱과 같은 형식(#/star/:id?from=rediscovery). 예시 데이터에서 7일 전 기록은 s2
+const REDISC = { id: 's2', title: '온보딩 리서치 메모', planet: '제품 기획', url: 'web/#/star/s2?from=rediscovery&token=dev&mock=seed' };
 class Component extends DCLogic {
   state = { ...this.sceneState(this.props.scene || 'open'), tour: 0 };
+  openUniverse(url) { const w = window.open(url, 'spacelog-web'); if (w) w.focus(); else window.location.href = url; }
   setTour(n) { if (window.SPACELOG_TOUR) window.SPACELOG_TOUR.set(n); if (!n && window.SPACELOG) window.SPACELOG.clearTourLink(); this.setState({ tour: n }); }
   go(n, url) { const T = window.SPACELOG_TOUR; if (T) { T.set(n); url = T.url(url); } window.location.href = url; }
   ok(...steps) { const t = this.state.tour; if (!t || steps.includes(t)) return true; this.flash('체험 중에는 안내된 단계만 할 수 있어요'); return false; }
@@ -205,7 +210,7 @@ class Component extends DCLogic {
   renderVals() {
     const S = window.SPACELOG, s = this.state;
     const db = S ? S.initial() : null;
-    const re = db ? S.rediscovery(db) : null, rp = re ? db.planets.find(p => p.id === re.planet) : null;
+    const re = REDISC, rp = { name: REDISC.planet };
     return {
       expanded: !s.collapsed, collapsed: s.collapsed,
       isDrop: s.view === 'drop', isConfirm: s.view === 'confirm', isSettings: s.view === 'settings',
@@ -217,7 +222,7 @@ class Component extends DCLogic {
       onRootDragEnter: () => { if (s.collapsed || (s.view === 'confirm' && s.seen)) this.setState({ collapsed: false, view: 'drop', status: 'idle' }); },
       onItems: items => this.ok(1) && this.save(items),
       onStatus: st => this.setState({ status: st }),
-      openWeb: () => this.ok(2) && (s.tour === 2 ? this.go(3, 'SPACELOG_Prototype.dc.html') : (window.location.href = 'SPACELOG_Prototype.dc.html')),
+      openWeb: () => { if (!this.ok(2, 3)) return; this.openUniverse(WEB); if (s.tour === 2) this.setTour(3); },
       openSettings: () => this.ok() && this.setState({ view: 'settings' }),
       backFromSettings: () => this.setState({ view: 'drop' }),
       settings: s.settings, changeSettings: patch => this.setState(st => ({ settings: { ...st.settings, ...patch }, notice: patch.redisc === false ? false : st.notice })),
@@ -231,26 +236,26 @@ class Component extends DCLogic {
       ...Object.fromEntries(SAMPLES.map((it, n) => ['s' + n, {
         onDragStart: e => { if (!this.ok(1)) { e.preventDefault(); return; } e.dataTransfer.setData('application/x-spacelog', JSON.stringify(it)); e.dataTransfer.effectAllowed = 'copy'; },
         onClick: () => this.flash('끌어서 오른쪽 수집 앱에 놓아 보세요') }])),
-      previewNotice: () => !this.ok(10) ? null : s.settings.redisc ? (re ? this.setState({ notice: true }) : this.flash('7일 전에 넣은 기록이 없어요')) : this.flash('설정에서 재발견 알림이 꺼져 있어요'),
+      previewNotice: () => !this.ok(4) ? null : s.settings.redisc ? (re ? this.setState({ notice: true }) : this.flash('7일 전에 넣은 기록이 없어요')) : this.flash('설정에서 재발견 알림이 꺼져 있어요'),
       showNotice: s.notice && !!re && !!rp, noticeTitle: re ? re.title : '', noticePlanet: rp ? rp.name : '',
-      openNotice: () => !this.ok(10) ? null : s.tour === 10 ? this.go(11, 'SPACELOG_Prototype.dc.html#redisc') : (window.location.href = 'SPACELOG_Prototype.dc.html#redisc'),
+      openNotice: () => { if (!this.ok(4)) return; this.setState({ notice: false }); this.openUniverse(REDISC.url); if (s.tour === 4) this.setTour(5); },
       ...(() => { const T = window.SPACELOG_TOUR, v = T ? T.view(s.tour, 'c') : { on: false, h: 0 }; return { tourOn: v.on, tourH: v.h, tourNo: v.no, tourPct: v.pct, tourTitle: v.title, tourDesc: v.desc, tourCta: v.cta, tourSkipLabel: v.skip, tourHere: v.here }; })(),
       navGuard: e => { if (s.tour) { e.preventDefault(); this.flash('체험 중에는 안내된 단계만 할 수 있어요'); } },
       dlApp: () => { location.href = '../download/'; }, // 받는 곳(설치 파일)
       tourSkip: () => this.setTour(0),
       ...(() => { const on = !!s.tour; return { tourIsOn: on, tourSwBg: on ? 'var(--color-primary)' : 'rgba(255,255,255,0.24)', tourSwLeft: on ? '18px' : '2px', tourSwText: on ? 'On' : 'Off', tourSwColor: on ? '#fff' : 'var(--color-body-muted)' }; })(),
       tourCanBack: s.tour > 1,
-      tourBack: () => { const T = window.SPACELOG_TOUR, n = s.tour - 1; if (!T || n < 1) return; const pg = T.steps[n - 1].page; T.set(n);
-        if (pg === 'c') { if (location.hash === '#tour') location.reload(); else { location.hash = 'tour'; location.reload(); } }
-        else window.location.href = T.url(pg === 'w' ? 'SPACELOG_Prototype.dc.html' : 'SPACELOG_Collector.dc.html'); },
+      tourBack: () => { const T = window.SPACELOG_TOUR, n = s.tour - 1; if (!T || n < 1) return; T.set(n);
+        if (location.hash === '#tour') location.reload(); else { location.hash = 'tour'; location.reload(); } },
       tourToggle: () => { if (s.tour) this.setTour(0); else this._tourStart && this._tourStart(); },
       tourStart: this._tourStart = () => { clearTimeout(this._a); clearTimeout(this._b); this.setState(this.sceneState('open')); this.setTour(1); },
       tourNext: () => {
         const t = s.tour;
         if (t === 1) this.save([SAMPLES[2]]);
-        else if (t === 2) this.go(3, 'SPACELOG_Prototype.dc.html');
-        else if (t === 10) this.go(11, 'SPACELOG_Prototype.dc.html#redisc');
-        else this.go(t, t === 11 ? 'SPACELOG_Prototype.dc.html#redisc' : 'SPACELOG_Prototype.dc.html');
+        else if (t === 2) { this.openUniverse(WEB); this.setTour(3); }
+        else if (t === 3) { this.setState({ view: 'drop', status: 'idle', items: [], ids: [], seen: false }); this.setTour(4); } // 알림 보기 버튼은 넣기 화면에 있다
+        else if (t === 4) { this.setState({ notice: false }); this.openUniverse(REDISC.url); this.setTour(5); }
+        else this._tourStart();
       },
       ...Object.fromEntries([['toolDrive', 'Google Drive'], ['toolNotion', 'Notion'], ['toolSlack', 'Slack'], ['toolGmail', 'Gmail'], ['toolFigma', 'Figma']].map(([k, name]) => [k, () => this.ok() && this.flash(name + ' 연결은 준비 중이에요')])),
       addTool: () => this.ok() && this.flash('연결할 수 있는 도구를 더 준비하고 있어요'),
